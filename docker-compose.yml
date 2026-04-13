@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # Banco de dados PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: elefantinho_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: elefantinho
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/api/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./src/api/db/schema_create.sql:/docker-entrypoint-initdb.d/02-schema_create.sql
+    networks:
+      - app-network
+
+  # API Backend Node.js
+  api:
+    image: node:18-alpine
+    container_name: elefantinho_api
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=elefantinho
+      - DB_USER=elefantinho
+      - DB_PASSWORD=elefantinho
+      - JWT_SECRET=K7gNU3sdo+OL0wNhqoVWhr3g6s1xYv72ol/pe/Unols=
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src/api:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+    command: sh -c "apk add --no-cache netcat-openbsd && npm install && while ! nc -z postgres 5432; do sleep 1; done && npm run dev"
+
+  # Frontend SvelteKit
+  frontend:
+    image: node:18-alpine
+    container_name: elefantinho_frontend
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./src/frontend-app:/app
+      - /app/node_modules
+    depends_on:
+      - api
+    networks:
+      - app-network
+    command: sh -c "npm install && npm run dev -- --host --port 5173"
+
+  # Nginx Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: elefantinho_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+      - frontend
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,31 @@
+# Dependências Node.js
+**/node_modules
+**/npm-debug.log
+**/package-lock.json
+
+# Arquivos de ambiente e configuração
+**/.env
+**/.env.*
+!**/.env.example
+
+# Git e controle de versão
+.git
+.gitignore
+
+# Arquivos Docker (não precisamos mais)
+**/Dockerfile
+**/.dockerignore
+
+# Build e cache do frontend
+src/frontend-app/.svelte-kit
+src/frontend-app/build
+src/frontend-app/dist
+
+# Logs e temporários
+**/*.log
+**/tmp
+**/temp
+
+# Documentação
+README.md
+**/README.md
