@@ -14,7 +14,7 @@
   
   // Opções de roles
   const roleOptions = [
-    { value: 'user', name: 'Usuário' },
+    { value: 'jogador', name: 'Jogador' },
     { value: 'admin', name: 'Administrador' }
   ];
   let loading = false;
