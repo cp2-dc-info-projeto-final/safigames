@@ -7,10 +7,11 @@
   import { goto } from '$app/navigation'; // navegação
   import { ArrowLeftOutline, FloppyDiskAltOutline } from 'flowbite-svelte-icons'; // ícones
   import type { User, UserFormData } from '$lib/models/User';
+  import { getToken } from "$lib/auth";
 
   export let id: number | null = null; // id do usuário
 
-  let user: UserFormData = { id: 0, login: '', email: '', senha: '', role: 'user' }; // dados do form
+  let user: UserFormData = { id: 0, login: '', email: '', senha: '', role: 'jogador' }; // dados do form
   
   // Opções de roles
   const roleOptions = [
@@ -20,6 +21,10 @@
   let loading = false;
   let error = '';
   let fieldErrors: ApiFieldError[] = [];
+  let hasToken = false;
+  let confirmarSenha = '';
+  let senhaVisivel = false;
+  let confirmarSenhaVisivel = false;
 
   function errorOf(field: string): string | null {
     return fieldErrors.find((item) => item.field === field)?.message ?? null;
@@ -57,9 +62,9 @@
       return;
     }
     
-    if (id !== null && user.senha && user.senha.length < 6) {
-      fieldErrors = [{ field: 'senha', message: 'Senha deve ter pelo menos 6 caracteres.' }];
-      error = 'Senha deve ter pelo menos 6 caracteres.';
+    if (user.senha !== confirmarSenha) {
+      fieldErrors = [{ field: 'senha', message: 'Senhas precisam ser iguais!' }];
+      error = 'Senhas precisam ser iguais!';
       return;
     }
 
@@ -101,6 +106,11 @@
 
   function handleCancel() {
     goto('/users');
+  }
+  void verificaUser();
+  async function verificaUser() {
+    hasToken = getToken() !== null;
+    console.log('SIIIIIIIIIIXSEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEVEN')
   }
 </script>
 
@@ -144,19 +154,43 @@
         minlength={6}
         class="mt-1" 
       />
+    
       {#if errorOf('senha')}
         <div class="mt-1 text-sm text-red-500">{errorOf('senha')}</div>
       {/if}
     </div>
+
+    <div>
+      <Label for="confirmarSenha">Confirme a Senha</Label>
+      <Input 
+        id ="confirmarSenha"
+        type="password"
+        bind:value={confirmarSenha} 
+        placeholder={id === null ? 'Confirme sua senha' : 'Confirme sua senha (opcional)'}
+        required={id === null}
+        minlength={6}
+        class="mt-1" 
+      />
+    </div>
+
     <!-- Campo role -->
     <div>
-      <Label for="role">Perfil</Label>
-      <Select id="role" bind:value={user.role} items={roleOptions} class="mt-1" />
+        {#if hasToken}
+          <Label for="role">Perfil</Label>
+          <Select id="role" bind:value={user.role} items={roleOptions} class="mt-1" />
+
+        {:else}
+          
+          <Select id="role" bind:value={user.role} items={roleOptions} class="mt-1" hidden />
+        {/if}
+        
+
       {#if errorOf('role')}
         <div class="mt-1 text-sm text-red-500">{errorOf('role')}</div>
       {/if}
     </div>
     <!-- Botões de ação -->
+    
     <div class="flex gap-4 justify-end mt-4">
       <!-- Botão cancelar/voltar -->
       <Button color="light" type="button" onclick={handleCancel} disabled={loading}>
@@ -167,7 +201,7 @@
       <Button type="submit" color="primary" disabled={loading}>
         <FloppyDiskAltOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
         {id === null ? 'Cadastrar' : 'Salvar'}
-      </Button>
+      </Button> 
     </div>
   </form>
 </Card>
