@@ -83,6 +83,9 @@
           >
             {loading ? 'Entrando...' : 'Entrar'}
           </Button>
+            
+          <a href="/public_user" style="color: var(--color-primary-700); text-decoration: underline;">Cadastre-se</a>
+
       </form>
     </Card>
   </div>
