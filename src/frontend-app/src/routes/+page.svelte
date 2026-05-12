@@ -7,7 +7,7 @@
 <Menu />
 
 <div class="text-center p-8 pt-32">
-	<Heading tag="h2" class="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-6">Esgotamento: Um projeto Safigames</Heading>
+	<Heading tag="h2" class="text-4xl font-extrabold tracking-tight text-primary-500 dark:text-white mb-6">Esgotamento: Um projeto Safigames</Heading>
 	<P class="text-lg leading-relaxed text-gray-700 dark:text-gray-300 mb-4 text-justify">
 		Somos do Colégio Pedro II - Campus Duque de Caxias do terceiro ano do curso desenvolvimento de sistemas. 
 		Como projeto final, estamos desenvolvendo um jogo estilo RPG de texto. O jogo será baseado em botões para interagir com o mundo.
