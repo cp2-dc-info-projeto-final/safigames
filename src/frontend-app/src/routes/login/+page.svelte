@@ -37,12 +37,12 @@
 </script>
 
 <svelte:head>
-  <title>Login - Projeto Modelo 2025</title>
+  <title>Login - Projeto Safigames</title>
 </svelte:head>
 
-<div class="h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
+<div class="h-screen flex flex-col items-center justify-center bg-primary-900 p-4">
   <div class="w-full max-w-sm">
-    <h2 class="text-center text-3xl font-extrabold text-gray-900 mb-6">
+    <h2 class="text-center text-3xl font-extrabold text-primary-100 mb-6">
       Login
     </h2>
     
