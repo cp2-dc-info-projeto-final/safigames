@@ -40,16 +40,16 @@
   <title>Login - Projeto Safigames</title>
 </svelte:head>
 
-<div class="h-screen flex flex-col items-center justify-center bg-primary-900 p-4">
+<div class="h-screen flex flex-col items-center justify-center bg-primary-800 p-4">
   <div class="w-full max-w-sm">
     <h2 class="text-center text-3xl font-extrabold text-primary-100 mb-6">
       Login
     </h2>
     
-    <Card class="p-6 w-full">
+    <Card class="p-6 w-full bg-primary-900 border-primary-500 text-primary-500">
       <form on:submit|preventDefault={handleLogin} class="space-y-6">
           <div>
-            <Label for="login" class="mb-2">Login</Label>
+            <Label for="login" class="mb-2 text-primary-500">Login</Label>
             <Input
               id="login"
               type="text"
@@ -60,8 +60,8 @@
           </div>
 
           <div>
-            <Label for="password" class="mb-2">Senha</Label>
-            <Input
+            <Label for="password" class="mb-2 text-primary-500">Senha</Label>
+            <Input 
               id="password"
               type="password"
               bind:value={password}
