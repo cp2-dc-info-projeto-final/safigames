@@ -3,7 +3,6 @@
 Projeto Final 2025 do Curso Técnico Integrado de Desenvolvimento de Sistemas - Colégio Pedro II - Campus Duque de Caxias
 
 **Integrantes:**
- - João Miguel Judce Fragoso Senra
  - João Vitor Nascimento da Silva
  - Daniel do Nascimento Folly
  - Vitoria Ferreira de Almeida
