@@ -65,6 +65,23 @@ router.get('/pesquisa/:login', verifyToken, isAdmin, async function(req, res) {
   }
 });
 
+/* GET parametrizado - Buscar usuário por ID */
+router.get('/:id', verifyToken, isAdmin, async function(req, res) {
+  try {
+    const { id } = req.params;
+    const result = await pool.query('SELECT id, login, email, role FROM usuario WHERE id = $1', [id]);
+
+    if (result.rows.length === 0) {
+      return sendError(res, 404, 'Usuário não encontrado');
+    }
+
+    return sendSuccess(res, 200, null, result.rows[0]);
+  } catch (error) {
+    console.error('Erro ao buscar usuário:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
 /* POST - Criar novo usuário */
 router.post('/',  async function(req, res) {
   try {
