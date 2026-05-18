@@ -78,13 +78,13 @@
 
           <Button 
             type="submit"
-            class="w-full" 
+            class="w-full bg-primary-700 hover:bg-primary-200" 
             disabled={loading}
           >
             {loading ? 'Entrando...' : 'Entrar'}
           </Button>
             
-          <a href="/public_user" style="color: var(--color-primary-700); text-decoration: underline;">Cadastre-se</a>
+          <a href="/public_user" style="color: var(--color-primary-500); text-decoration: underline;">Cadastre-se</a>
 
       </form>
     </Card>

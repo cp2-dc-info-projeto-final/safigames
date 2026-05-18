@@ -119,25 +119,25 @@ $:if (filtro) {
 {:else}
   <!-- Tabela para telas médias/grandes -->
   <div class="hidden xl:block">
-    <Pesquisa
+    <Pesquisa 
      bind:filtro={filtro} />
     <!-- Tabela de usuários -->
-    <Table class="w-full max-w-5xl mx-auto my-8 shadow-lg border border-gray-200 rounded-lg">
-      <TableHead>
+    <Table class="w-full max-w-5xl mx-auto my-8 shadow-lg border border-primary-500 rounded-lg ">
+      <TableHead class="bg-primary-900 text-primary-500">
         <TableHeadCell class="w-16">ID</TableHeadCell>
         <TableHeadCell class="w-32">Login</TableHeadCell>
         <TableHeadCell class="min-w-0">Email</TableHeadCell>
         <TableHeadCell class="w-20">Role</TableHeadCell>
         <TableHeadCell class="w-24"></TableHeadCell> <!-- coluna para editar/remover -->
       </TableHead>
-      <TableBody>
+      <TableBody >
         {#each users as user}
-          <TableBodyRow>
+          <TableBodyRow class="bg-primary-900 text-primary-500" >
             <TableBodyCell>{user.id}</TableBodyCell>
             <TableBodyCell>{user.login}</TableBodyCell>
             <TableBodyCell class="truncate max-w-0">{user.email}</TableBodyCell>
             <TableBodyCell>
-              <Badge color={user.role === 'admin' ? 'red' : 'blue'} class="text-xs">
+              <Badge class={user.role === 'admin' ? 'bg-primary-600 text-xs mt-1' : 'text-xs mt-1 bg-primary-200 text-primary-900'}>
                 {user.role}
               </Badge>
             </TableBodyCell>
@@ -163,7 +163,7 @@ $:if (filtro) {
           </TableBodyRow>
         {/each}
         {#if users.length === 0}
-            <TableBodyCell>Nenhum usuário encontrado!</TableBodyCell>
+            <TableBodyCell class="text-primary-500">Nenhum usuário encontrado!</TableBodyCell>
         {/if}
       </TableBody>
     </Table>
@@ -178,7 +178,7 @@ $:if (filtro) {
             <div>
               <div class="text-lg font-semibold text-gray-800 text-left">{user.login}</div>
               <div class="text-xs text-gray-400 text-left">ID: {user.id}</div>
-              <Badge color={user.role === 'admin' ? 'red' : 'blue'} class="text-xs mt-1">
+              <Badge class="{user.role === 'admin' ? 'bg-primary-500 text-xs mt-1' : 'text-xs mt-1 bg-primary-900 text-primary-500'}">
                 {user.role}
               </Badge>
             </div>

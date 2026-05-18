@@ -8,5 +8,5 @@ export let filtro = ''
     id="filtro" 
     bind:value={filtro} 
     placeholder="Pesquise por login"
-    class="mt-1"
+    class="mt-1 bg-primary-100 border-primary-900"
 />

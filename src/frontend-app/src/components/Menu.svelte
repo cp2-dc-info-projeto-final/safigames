@@ -92,7 +92,7 @@
             <div class="flex items-center">
               <span class="text-primary-500 dark:text-primary-400 px-4 py-2">Olá, {user.login}</span>
               <button 
-                class="ml-2 px-3 py-1 bg-primary-600 hover:bg-primary-700 text-white rounded text-sm flex items-center gap-1"
+                class="ml-2 px-3 py-1 bg-primary-600 hover:bg-primary-200 text-white rounded text-sm flex items-center gap-1"
                 on:click={handleLogout}
               >
                 <ArrowRightToBracketOutline class="w-4 h-4" />
