@@ -59,10 +59,10 @@ CREATE TABLE cena (
     npc TEXT,
     dialogo TEXT NOT NULL,
     tipo TEXT NOT NULL,
-    id_inimigo INTEGER NOT NULL,
+    id_inimigo INTEGER,
     FOREIGN KEY (id_inimigo)
         REFERENCES inimigo (id),
-    id_comerciante INTEGER NOT NULL,
+    id_comerciante INTEGER,
     FOREIGN KEY (id_comerciante)
         REFERENCES comerciante (id),
     id_episodio INTEGER NOT NULL,
@@ -99,7 +99,7 @@ DROP TABLE IF EXISTS item CASCADE;
 
 CREATE TABLE item(
     id bigint GENERATED ALWAYS AS IDENTITY,
-    desricao TEXT NOT NULL,
+    descricao TEXT NOT NULL,
     tipo TEXT NOT NULL,
     fator_vida INTEGER,
     fator_dano INTEGER,
@@ -136,3 +136,32 @@ CREATE TABLE catalogo(
 
     CONSTRAINT pk_catalogo PRIMARY KEY (id)
 );
+
+INSERT INTO usuario (login, email, senha, role) VALUES
+-- senha efelantinho
+('vit_dev', 'vit@gmail.com', '$2a$12$f2c.uHGHS4drfaz6HR870OLamkarD57kI.gkr4//Vbbp0vN9IrFfG', 'admin');
+
+INSERT INTO inimigo(nome, vida, dano, descricao, fator_xp, fator_dinheiro)
+VALUES('Carlinhos de LP', 670, 180, 'Gordinho bem pedofilo bem bizarro bem nooooojento', 200, 12);
+
+INSERT INTO comerciante(nome, descricao)
+VALUES('Stefany da empadinha bem safadinha', 'Ela vende empadas que regeneram sua vida (e é bem safadinha)');
+
+INSERT INTO episodio(titulo)
+VALUES('Episódio 1: A RATIFICAÇÃO');
+
+INSERT INTO cena(npc, dialogo, tipo, id_episodio)
+VALUES('Vini do soep', 'Vini: OI! Você: Oi! Como vai? Vini: Vou bem.', 'Diálogo', 1);
+
+INSERT INTO personagem(nome, vida, stamina, classe, arma, id_usuario, id_cena)
+VALUES('Jâo, o garoto de programa', 90, 3, 'Mago', 'Cajado', 1, 1);
+
+INSERT INTO item(descricao, tipo, fator_vida, preco)
+VALUES('Deliciosa empadinha de queijo que te dá mais vontade de viver', 'Cura', 50, 5);
+
+INSERT INTO inventario(id_item, id_personagem)
+VALUES(1, 1);
+
+INSERT INTO catalogo(id_item, id_comerciante)
+VALUES(1, 1);
+
