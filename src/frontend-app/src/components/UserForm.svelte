@@ -114,11 +114,11 @@
 </script>
 
 <!-- Card do formulário -->
-<Card class="max-w-md mx-auto mt-10 p-0 overflow-hidden shadow-lg border border-gray-200 rounded-lg">
+<Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
   <!-- Formulário principal -->
   <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={handleSubmit}>
     <!-- Título -->
-    <Heading tag="h3" class="mb-2 text-center">
+    <Heading tag="h3" class="mb-2 text-center text-primary-100">
       {id === null ? 'Cadastrar Usuário' : 'Editar Usuário'}
     </Heading>
     <!-- Mensagem de erro -->
@@ -127,7 +127,7 @@
     {/if}
     <!-- Campo login -->
     <div>
-      <Label for="login">Login</Label>
+      <Label for="login" class="text-primary-500">Login</Label>
       <Input id="login" bind:value={user.login} placeholder="Digite o login" required class="mt-1" />
       {#if errorOf('login')}
         <div class="mt-1 text-sm text-red-500">{errorOf('login')}</div>
@@ -135,7 +135,7 @@
     </div>
     <!-- Campo email -->
     <div>
-      <Label for="email">Email</Label>
+      <Label for="email" class="text-primary-500">Email</Label>
       <Input id="email" type="email" bind:value={user.email} placeholder="Digite o e-mail" required class="mt-1" />
       {#if errorOf('email')}
         <div class="mt-1 text-sm text-red-500">{errorOf('email')}</div>
@@ -143,7 +143,7 @@
     </div>
     <!-- Campo senha -->
     <div>
-      <Label for="senha">Senha {id !== null ? '(deixe vazio para manter atual)' : ''}</Label>
+      <Label for="senha" class="text-primary-500">Senha {id !== null ? '(deixe vazio para manter atual)' : ''}</Label>
       <Input 
         id="senha" 
         type="password" 
@@ -160,7 +160,7 @@
     </div>
 
     <div>
-      <Label for="confirmarSenha">Confirme a Senha</Label>
+      <Label for="confirmarSenha" class="text-primary-500">Confirme a Senha</Label>
       <Input 
         id ="confirmarSenha"
         type="password"
@@ -175,7 +175,7 @@
     <!-- Campo role -->
     <div>
         {#if hasToken}
-          <Label for="role">Perfil</Label>
+          <Label for="role" class="text-primary-500">Perfil</Label>
           <Select id="role" bind:value={user.role} items={roleOptions} class="mt-1" />
 
         {:else}
