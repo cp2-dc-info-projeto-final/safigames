@@ -2,6 +2,7 @@
   // Tabela de usuários
   import { Table, TableHead, TableHeadCell, TableBody, TableBodyRow, TableBodyCell, Card, Badge } from 'flowbite-svelte'; // UI
   import ConfirmModal from './ConfirmModal.svelte'; // modal de confirmação
+  import Pesquisa from './Pesquisa.svelte'; // pesquisa de usuário
   import { UserEditOutline, TrashBinOutline } from 'flowbite-svelte-icons'; // ícones
   import { goto } from '$app/navigation'; // navegação
   import api from '$lib/api'; // API backend
@@ -15,6 +16,7 @@
   let deletingId: number | null = null; // id em deleção
   let confirmOpen = false; // modal aberto?
   let confirmTargetId: number | null = null; // id alvo do modal
+  export let filtro: string;
 
   // Abre modal de confirmação
   function openConfirm(id: number) {
@@ -61,8 +63,12 @@
   }
 
   onMount(async () => {
+   buscarTodosUsuarios()
+  })
+  
+  async function buscarTodosUsuarios(){
     try {
-      const res = await api.get('/users');
+      const res = await api.get('/users/');
       const body = res.data as ApiResponse<User[]>;
       if (body.success) {
         users = body.data ?? [];
@@ -76,7 +82,34 @@
     } finally {
       loading = false;
     }
-  });
+  };
+  
+
+  async function pesquisaLogin(){
+    try {
+      const res = await api.get(`/users/pesquisa/${filtro}`);
+      const body = res.data as ApiResponse<User[]>;
+      if (body.success) {
+        users = body.data ?? [];
+      } else {
+        error = body.message;
+      }
+    } catch (e: any) {
+      console.error('Erro ao carregar usuários:', e);
+      const body = e.response?.data as ApiResponse<User[]> | undefined;
+      error = body?.message || 'Erro ao carregar usuários';
+    } finally {
+      loading = false;
+    }
+  }
+
+$:if (filtro) {
+  pesquisaLogin();
+}
+  else{
+    buscarTodosUsuarios();
+  }
+
 </script>
 
 {#if loading}
@@ -86,23 +119,25 @@
 {:else}
   <!-- Tabela para telas médias/grandes -->
   <div class="hidden xl:block">
+    <Pesquisa 
+     bind:filtro={filtro} />
     <!-- Tabela de usuários -->
-    <Table class="w-full max-w-5xl mx-auto my-8 shadow-lg border border-gray-200 rounded-lg">
-      <TableHead>
+    <Table class="w-full max-w-5xl mx-auto my-8 shadow-lg border border-primary-500 rounded-lg ">
+      <TableHead class="bg-primary-900 text-primary-500">
         <TableHeadCell class="w-16">ID</TableHeadCell>
         <TableHeadCell class="w-32">Login</TableHeadCell>
         <TableHeadCell class="min-w-0">Email</TableHeadCell>
         <TableHeadCell class="w-20">Role</TableHeadCell>
         <TableHeadCell class="w-24"></TableHeadCell> <!-- coluna para editar/remover -->
       </TableHead>
-      <TableBody>
+      <TableBody >
         {#each users as user}
-          <TableBodyRow>
+          <TableBodyRow class="bg-primary-900 text-primary-500" >
             <TableBodyCell>{user.id}</TableBodyCell>
             <TableBodyCell>{user.login}</TableBodyCell>
             <TableBodyCell class="truncate max-w-0">{user.email}</TableBodyCell>
             <TableBodyCell>
-              <Badge color={user.role === 'admin' ? 'red' : 'blue'} class="text-xs">
+              <Badge class={user.role === 'admin' ? 'bg-primary-600 text-xs mt-1' : 'text-xs mt-1 bg-primary-200 text-primary-900'}>
                 {user.role}
               </Badge>
             </TableBodyCell>
@@ -127,6 +162,9 @@
             </TableBodyCell>
           </TableBodyRow>
         {/each}
+        {#if users.length === 0}
+            <TableBodyCell class="text-primary-500">Nenhum usuário encontrado!</TableBodyCell>
+        {/if}
       </TableBody>
     </Table>
   </div>
@@ -140,7 +178,7 @@
             <div>
               <div class="text-lg font-semibold text-gray-800 text-left">{user.login}</div>
               <div class="text-xs text-gray-400 text-left">ID: {user.id}</div>
-              <Badge color={user.role === 'admin' ? 'red' : 'blue'} class="text-xs mt-1">
+              <Badge class="{user.role === 'admin' ? 'bg-primary-500 text-xs mt-1' : 'text-xs mt-1 bg-primary-900 text-primary-500'}">
                 {user.role}
               </Badge>
             </div>

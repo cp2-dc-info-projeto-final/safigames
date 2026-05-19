@@ -50,6 +50,21 @@ router.get('/me', verifyToken, async function(req, res) {
   }
 });
 
+/* GET parametrizado - Buscar usuário por login */
+router.get('/pesquisa/:login', verifyToken, isAdmin, async function(req, res) {
+  try {
+    const { login } = req.params;
+    const result = await pool.query('SELECT id, login, email, role FROM usuario WHERE login like $1', [`%${login}%`]);
+
+
+
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar usuário:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
 /* GET parametrizado - Buscar usuário por ID */
 router.get('/:id', verifyToken, isAdmin, async function(req, res) {
   try {

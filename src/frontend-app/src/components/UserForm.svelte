@@ -110,7 +110,6 @@
   void verificaUser();
   async function verificaUser() {
     hasToken = getToken() !== null;
-    console.log('SIIIIIIIIIIXSEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEVEN')
   }
 </script>
 
