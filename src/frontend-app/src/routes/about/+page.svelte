@@ -5,35 +5,44 @@
 
 <Menu />
 
+
+<style>
+  img{
+    width: 150px;
+    height: 150px;
+  }
+</style>
 <div class="text-center p-8 pt-32">
   <Heading tag="h1" class="text-4xl font-extrabold tracking-tight text-primary-100 dark:text-white mb-6">Sobre</Heading>
   <P class="text-lg leading-relaxed text-primary-50 mb-4 text-justify">
     Somos estudantes do 3º ano do Ensino Médio Integrado: Técnico em desenvolvimento de sistemas no Colégio Pedro II - Campus Duque de Caxias
-    
+
   </P>
-  <P class="text-base leading-relaxed text-gray-600 dark:text-gray-400 text-justify">
-    Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem.
-  </P>
-  <ImagePlaceholder class="my-8 mx-auto" />
-  <P class="text-base leading-relaxed text-gray-700 dark:text-gray-300 mb-4 text-justify">
-    Curabitur blandit tempus porttitor. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Nullam quis risus eget urna mollis ornare vel eu leo. Vestibulum id ligula porta felis euismod semper. Etiam porta sem malesuada magna mollis euismod.
-  </P>
-  <P class="text-base leading-relaxed text-gray-700 dark:text-gray-300 mb-4 text-justify">
-    Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Aenean lacinia bibendum nulla sed consectetur. Cras justo odio, dapibus ac facilisis in, egestas eget quam.
-  </P>
-  <P class="text-base leading-relaxed text-gray-700 dark:text-gray-300 mb-4 text-justify">
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.
-  </P>
-  <P class="text-base leading-relaxed text-gray-700 dark:text-gray-300 mb-4 text-justify">
-    Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta.
-  </P>
-  <P class="text-base leading-relaxed text-gray-700 dark:text-gray-300 mb-4 text-justify">
-    Morbi in sem quis dui placerat ornare. Pellentesque odio nisi, euismod in, pharetra a, ultricies in, diam. Sed arcu. Cras consequat.
-  </P>
-  <P class="text-base leading-relaxed text-gray-700 dark:text-gray-300 mb-4 text-justify">
-    Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem. In porttitor. Donec laoreet nonummy augue.
-  </P>
-  <P class="text-base leading-relaxed text-gray-700 dark:text-gray-300 mb-4 text-justify">
-    Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui.
-  </P>
+  <Heading tag="h3" class="text-base leading-relaxed text-primary-50 dark:text-gray-400 text-justify">
+    Abaixo, segue algumas fotos e informações sobre nossa equipe:
+  </Heading>
+  <div class="text-center pt-10" style="display:flex">
+    <img src="/images/vit.jpg" alt="" class="rounded-lg border-primary-50 border shadow-lg shadow-primary-500">
+    <P class=" leading-relaxed text-primary-50 mb-4 text-justify pl-5">
+       Vitória Ferreira de Almeida, moradora de Vila São João - São João de Meriti, entrou no Colégio Pedro II para ter uma formação técnica e melhores oportunidades no mercado.
+    </P>
+  </div>
+  <div class="text-center pt-10" style="display:flex">
+    <P class=" leading-relaxed text-primary-50 mb-4 text-justify pr-5">
+       Isaac de Magalhães Rocha da Silva, morador de Nova Campinas - Duque de Caxias, entrou no Colégio Pedro II para ter um melhor ensino e porque sempre teve interesse em ingressar na escola.
+    </P>
+    <img src="/images/isaac.jpg" alt="" class="rounded-lg border-primary-50 border shadow-lg shadow-primary-500">
+  </div>
+  <div class="text-center pt-10" style="display:flex">
+    <img src="/images/jao.jpg" alt="" class="rounded-lg border-primary-50 border shadow-lg shadow-primary-500">
+    <P class=" leading-relaxed text-primary-50 mb-4 text-justify pl-5">
+      João Vitor Nascimento da Silva, morador de Olavo Bilac - Duque de Caxias, entrou no Colégio Pedro II para fazer Desenvolvimento de Sistemas, pois sempre gostou dessa área e queria uma formação técnica.
+    </P>
+  </div>
+  <div class="text-center pt-10" style="display:flex">
+    <P class="leading-relaxed text-primary-50 mb-4 text-justify pr-5">
+       Daniel do Nascimento Folly, morador da Vila Rosali - São João de Meriti, entrou no Colégio Pedro II para ter uma formação acadêmica melhor e numa área que tem interesse.
+    </P>
+    <img src="/images/dan.jpg" alt="" class="rounded-lg border-primary-50 border shadow-lg shadow-primary-500">
+  </div>
 </div>
