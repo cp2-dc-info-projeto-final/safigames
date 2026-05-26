@@ -11,6 +11,8 @@
     width: 150px;
     height: 150px;
   }
+
+
 </style>
 <div class="text-center p-8 pt-32">
   <Heading tag="h1" class="text-4xl font-extrabold tracking-tight text-primary-100 dark:text-white mb-6">Sobre</Heading>
@@ -24,7 +26,7 @@
   <div class="text-center pt-10" style="display:flex">
     <img src="/images/vit.jpg" alt="" class="rounded-lg border-primary-50 border shadow-lg shadow-primary-500">
     <P class=" leading-relaxed text-primary-50 mb-4 text-justify pl-5">
-       Vitória Ferreira de Almeida, moradora de Vila São João - São João de Meriti, entrou no Colégio Pedro II para ter uma formação técnica e melhores oportunidades no mercado.
+       Vitória Ferreira de Almeida, moradora da Vila São João - São João de Meriti, entrou no Colégio Pedro II para ter uma formação técnica e melhores oportunidades no mercado.
     </P>
   </div>
   <div class="text-center pt-10" style="display:flex">
