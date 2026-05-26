@@ -3,7 +3,7 @@
   import { onMount } from "svelte";
   import { logout, getCurrentUser, getToken, type User } from "$lib/auth";
   import { goto } from "$app/navigation";
-  import { ArrowRightToBracketOutline } from "flowbite-svelte-icons";
+  import { ArrowRightToBracketOutline, PlaySolid } from "flowbite-svelte-icons";
   import { page } from "$app/stores";
   
   let user: User | null = null;
@@ -70,6 +70,11 @@
       console.error('Erro no logout:', error);
     }
   }
+
+	function irParaJogo() {
+		goto('/game'); // Caminho do jogo
+	}
+
 </script>
 
 <div class="relative px-8">
@@ -83,20 +88,31 @@
       <NavLi href="/" nonActiveClass="text-lg font-bold px-4 py-2 text-primary-500 dark:text-primary-400 hover:text-primary-200 hover:bg-primary-900 focus:text-primary-400 focus:bg-primary-300 transition-colors rounded-lg">Início</NavLi>
       <NavLi href="/about" nonActiveClass="text-lg font-bold px-4 py-2 text-primary-500 dark:text-primary-400 hover:text-primary-200 hover:bg-primary-900 focus:text-primary-400 focus:bg-primary-300 transition-colors rounded-lg">Sobre</NavLi>
       
+      
       {#if hasToken}
         {#if user} <!-- se existir usuário é porque conseguiu logar-->
           {#if user.role === 'admin'} <!-- só exibe menu usuários para admin-->
             <NavLi href="/users" nonActiveClass="text-lg font-bold px-4 py-2 text-primary-500 dark:text-primary-400 hover:text-primary-200 hover:bg-primary-900 focus:text-primary-400 focus:bg-primary-300 transition-colors rounded-lg">Usuários</NavLi>
           {/if}
           <NavLi>
+          
             <div class="flex items-center">
               <span class="text-primary-500 dark:text-primary-400 px-4 py-2">Olá, {user.login}</span>
+                {#if user}
+                  {#if user.role === 'jogador'}
+                <button 
+                  class="ml-2 px-3 py-1 bg-secondary-50 hover:bg-primary-200 text-white rounded text-lg flex items-center gap-1"
+                  on:click={irParaJogo}>
+                  <PlaySolid class="shrink-0 h-6 w-6" />
+                  Jogar
+                </button>
+                  {/if}
+                {/if}
+
               <button 
-                class="ml-2 px-3 py-1 bg-primary-600 hover:bg-primary-200 text-white rounded text-sm flex items-center gap-1"
-                on:click={handleLogout}
-              >
-                <ArrowRightToBracketOutline class="w-4 h-4" />
-                Sair
+                class="ml-2 px-3 py-1 bg-primary-900 hover:bg-primary-200 text-white rounded text-sm flex items-center gap-1"
+                on:click={handleLogout}>
+                <ArrowRightToBracketOutline class="w-6 h-6" /> Sair
               </button>
             </div>
           </NavLi>

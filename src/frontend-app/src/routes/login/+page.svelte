@@ -2,6 +2,7 @@
   import { Card, Button, Input, Label, Alert } from "flowbite-svelte";
   import { goto } from "$app/navigation";
   import { login as authLogin } from "$lib/auth";
+  import Menu from "../../components/Menu.svelte";
   
   let login = '';
   let password = '';
@@ -36,6 +37,7 @@
 
 </script>
 
+<Menu />
 <svelte:head>
   <title>Login - Projeto Safigames</title>
 </svelte:head>
