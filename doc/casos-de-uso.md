@@ -22,6 +22,8 @@
   
 - O sistema encaminha o user para o menu principal do jogo.
 
+  ![Cadastro de usuário](diagramas/Cadastro_de_usuario.drawio.png)
+
 #### Fluxo Alternativo A: O email já está cadastrado
 
 - O sistema apresenta formulário de cadastro.
@@ -108,6 +110,8 @@
 
 - O sistema encaminha o user para o menu principal do jogo.
 
+  ![Fazer login](diagramas/Fazer_login.drawio.png)
+
 #### Fluxo Alternativo A: Email inválido
 
 - O sistema apresenta a página de formulário de Login.
@@ -158,6 +162,8 @@
 
 - O jogador pode interagir dentro do jogo com comandos
 
+  ![Jogar](diagramas/Jogar.drawio.png)
+
 #### Fluxo alternativo A: Carregar save
 
 - O jogador acessa o menu principal do jogo
@@ -188,6 +194,8 @@
 
 - O banco de dados exclui os dados do save e retorna uma mensagem de sucesso
 
+  ![Excluir save](diagramas/Excluir_save.drawio.png)
+
 #### Fluxo alternativo: Não há saves
 
 - O jogador acessa o menu principal do jogo 
@@ -215,8 +223,10 @@
 - A página exibe uma lista com todos os inimigos
 
 - O adm pode criar, editar, e excluir inimigos
+
+  ![Cadastro de inimigo](diagramas/cadastro_de_inimigo.drawio.png)
  
-### Caso de Uso 6: Gerenciar NPCs
+### Caso de Uso 6: Gerenciar Cena
 
 #### Atores: 
 
@@ -226,13 +236,87 @@
 
 - O adm acessa o menu principal do jogo
 
-- O adm acessa a página "NPCs"
+- O adm acessa a página "Cenas"
 
-- A página exibe uma lista com todos os NPCs
+- A página exibe uma lista com todas as cenas
 
-- O adm pode criar, editar, e excluir NPCs
+- O adm pode criar, editar, e excluir cenas
 
-### Caso de Uso 7: Excluir jogadores
+  ![Cadastro de cena](diagramas/Cadastro_de_cena.drawio.png)
+
+### Caso de Uso 7: Gerenciar Episódio
+
+#### Atores: 
+
+- Adm
+
+#### Fluxo principal: 
+
+- O adm acessa o menu principal do jogo
+
+- O adm acessa a página "Episódios"
+
+- A página exibe uma lista com todos os episódios
+
+- O adm pode criar, editar, e excluir episódios
+
+![Cadastro de episódio](diagramas/cadastro_de_episodio.drawio.png)
+
+### Caso de Uso 8: Gerenciar Item
+
+#### Atores: 
+
+- Adm
+
+#### Fluxo principal: 
+
+- O adm acessa o menu principal do jogo
+
+- O adm acessa a página "Itens"
+
+- A página exibe uma lista com todos os itens
+
+- O adm pode criar, editar, e excluir itens
+
+![Cadastro de item](diagramas/cadastro_de_item.drawio.png)
+
+### Caso de Uso 9: Gerenciar Comerciante
+
+#### Atores: 
+
+- Adm
+
+#### Fluxo principal: 
+
+- O adm acessa o menu principal do jogo
+
+- O adm acessa a página "Comerciantes"
+
+- A página exibe uma lista com todos os comerciantes
+
+- O adm pode criar, editar, e excluir comerciantes
+
+- No momento de criação do comerciante, o adm insere os itens no seu catálogo
+
+![Cadastro de comerciante](diagramas/Cadastrar_comerciante.drawio.png)
+
+### Caso de Uso 10: Gerenciar Catálogo
+
+#### Atores: 
+
+- Adm
+
+#### Fluxo principal: 
+
+- O adm acessa a página "Comerciantes"
+
+- A página exibe uma lista com todos os comerciantes
+
+- O adm seleciona um dos comerciantes e pode adicionar ou remover itens dos seus catálogos
+
+![Cadastro de catalogo](diagramas/cadastro_de_catalogo.drawio.png)
+
+### Caso de Uso 11: Excluir jogadores
 
 #### Atores: 
 
@@ -247,3 +331,5 @@
 - A página exibe uma lista com todos os jogadores
 
 - O adm clica num botão "Excluir jogador" e exclui o jogador correspondente ao botão
+
+  ![Excluir jogador](diagramas/Excluir_jogador.drawio.png)
