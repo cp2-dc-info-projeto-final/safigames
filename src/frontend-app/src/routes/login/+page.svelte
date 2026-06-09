@@ -44,14 +44,14 @@
 
 <div class="h-screen flex flex-col items-center justify-center bg-primary-800 p-4">
   <div class="w-full max-w-sm">
-    <h2 class="text-center text-3xl font-extrabold text-primary-100 mb-6">
+    <h2 class="text-4xl text-center text-3xl font-extrabold text-primary-100 mb-6">
       Login
     </h2>
     
-    <Card class="p-6 w-full bg-primary-900 border-primary-500 text-primary-500">
+    <Card class="text-lg p-6 w-full bg-primary-900 border-primary-500 text-primary-500">
       <form on:submit|preventDefault={handleLogin} class="space-y-6">
           <div>
-            <Label for="login" class="mb-2 text-primary-500">Login</Label>
+            <Label for="login" class="text-lg mb-2 text-primary-500">Login</Label>
             <Input
               id="login"
               type="text"
@@ -63,7 +63,7 @@
           </div>
 
           <div>
-            <Label for="password" class="mb-2 text-primary-500">Senha</Label>
+            <Label for="password" class="text-lg mb-2 text-primary-500">Senha</Label>
             <Input 
               id="password"
               type="password"

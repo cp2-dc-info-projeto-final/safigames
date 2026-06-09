@@ -81,23 +81,23 @@
   <Navbar class="fixed start-0 top-0 z-20 w-full bg-primary-900 px-2 py-2.5 sm:px-4">
     <NavBrand href="/">
       <img src="/images/rato-sem-fundo.png" class="me-6 h-9 sm:h-12" alt="Logo aleatória" />
-      <Heading class="self-center text-xl font-semibold whitespace-nowrap text-primary-500 dark:text-primary-400">Projeto Safigames</Heading>
+      <Heading class="self-center text-2xl font-semibold whitespace-nowrap text-primary-500 dark:text-primary-400">Projeto Safigames</Heading>
     </NavBrand>
     <NavHamburger class="bg-primary-600"/>
     <NavUl>
-      <NavLi href="/" nonActiveClass="text-lg font-bold px-4 py-2 text-primary-500 dark:text-primary-400 hover:text-primary-200 hover:bg-primary-900 focus:text-primary-400 focus:bg-primary-300 transition-colors rounded-lg">Início</NavLi>
-      <NavLi href="/about" nonActiveClass="text-lg font-bold px-4 py-2 text-primary-500 dark:text-primary-400 hover:text-primary-200 hover:bg-primary-900 focus:text-primary-400 focus:bg-primary-300 transition-colors rounded-lg">Sobre</NavLi>
+      <NavLi href="/" nonActiveClass="text-xl font-bold px-4 py-2 text-primary-500 dark:text-primary-400 hover:text-primary-200 hover:bg-primary-900 focus:text-primary-400 focus:bg-primary-300 transition-colors rounded-lg">Início</NavLi>
+      <NavLi href="/about" nonActiveClass="text-xl font-bold px-4 py-2 text-primary-500 dark:text-primary-400 hover:text-primary-200 hover:bg-primary-900 focus:text-primary-400 focus:bg-primary-300 transition-colors rounded-lg">Sobre</NavLi>
       
       
       {#if hasToken}
         {#if user} <!-- se existir usuário é porque conseguiu logar-->
           {#if user.role === 'admin'} <!-- só exibe menu usuários para admin-->
-            <NavLi href="/users" nonActiveClass="text-lg font-bold px-4 py-2 text-primary-500 dark:text-primary-400 hover:text-primary-200 hover:bg-primary-900 focus:text-primary-400 focus:bg-primary-300 transition-colors rounded-lg">Usuários</NavLi>
+            <NavLi href="/users" nonActiveClass="text-xl font-bold px-4 py-2 text-primary-500 dark:text-primary-400 hover:text-primary-200 hover:bg-primary-900 focus:text-primary-400 focus:bg-primary-300 transition-colors rounded-lg">Usuários</NavLi>
           {/if}
           <NavLi>
           
             <div class="flex items-center">
-              <span class="text-primary-500 dark:text-primary-400 px-4 py-2">Olá, {user.login}</span>
+              <span class="text-lg text-primary-500 dark:text-primary-400 px-4">Olá, {user.login}</span>
                 {#if user}
                   {#if user.role === 'jogador'}
                 <button 

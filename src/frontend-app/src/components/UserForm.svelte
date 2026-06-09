@@ -138,7 +138,7 @@
   <!-- Formulário principal -->
   <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={handleSubmit}>
     <!-- Título -->
-    <Heading tag="h3" class="mb-2 text-center text-primary-100">
+    <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
       {id === null ? 'Cadastrar Usuário' : 'Editar Usuário'}
     </Heading>
     <!-- Mensagem de erro -->
@@ -147,7 +147,7 @@
     {/if}
     <!-- Campo login -->
     <div>
-      <Label for="login" class="text-primary-500">Login</Label>
+      <Label for="login" class="text-lg text-primary-500">Login</Label>
       <Input id="login" bind:value={user.login} placeholder="Digite o login" required class="mt-1" />
       {#if errorOf('login')}
         <div class="mt-1 text-sm text-red-500">{errorOf('login')}</div>
@@ -155,7 +155,7 @@
     </div>
     <!-- Campo email -->
     <div>
-      <Label for="email" class="text-primary-500">Email</Label>
+      <Label for="email" class="text-lg text-primary-500">Email</Label>
       <Input id="email" type="email" bind:value={user.email} placeholder="Digite o e-mail" required class="mt-1" />
       {#if errorOf('email')}
         <div class="mt-1 text-sm text-red-500">{errorOf('email')}</div>
@@ -163,7 +163,7 @@
     </div>
     <!-- Campo senha -->
     <div>
-      <Label for="senha" class="text-primary-500">Senha {id !== null ? '(deixe vazio para manter atual)' : ''}</Label>
+      <Label for="senha" class="text-lg text-primary-500">Senha {id !== null ? '(deixe vazio para manter atual)' : ''}</Label>
       <Input 
         id="senha" 
         type={senhaVisivel ? "text" : "password"}
@@ -181,7 +181,7 @@
     </div>
 
     <div>
-      <Label for="confirmarSenha" class="text-primary-500">Confirme a Senha</Label>
+      <Label for="confirmarSenha" class="text-lg text-primary-500">Confirme a Senha</Label>
       <Input 
         id ="confirmarSenha"
         type={senhaVisivel ? "text" : "password"}
@@ -199,7 +199,7 @@
     <!-- Campo role -->
     <div>
         {#if hasToken}
-          <Label for="role" class="text-primary-500">Perfil</Label>
+          <Label for="role" class="text-lg text-primary-500">Perfil</Label>
           <Select id="role" bind:value={user.role} items={roleOptions} class="mt-1" />
 
         {:else}
@@ -214,7 +214,7 @@
     </div>
     <!-- Botões de ação -->
     
-    <div class="flex gap-4 justify-end mt-4">
+    <div class="text-lg flex gap-4 justify-end mt-4">
       <!-- Botão cancelar/voltar -->
       <Button color="light" type="button" onclick={handleCancel} disabled={loading}>
         <ArrowLeftOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
