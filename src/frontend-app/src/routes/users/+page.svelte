@@ -30,6 +30,9 @@
 </script>
 
 <Menu />
+<svelte:head>
+  <title>Usuários</title>
+</svelte:head>
 
 {#if checkingAccess}
   <div class="text-center p-8 pt-32 text-gray-500">Verificando acesso...</div>

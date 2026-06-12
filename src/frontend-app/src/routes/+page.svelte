@@ -10,6 +10,10 @@
 </style>
 <Menu />
 
+<svelte:head>
+  <title>Projeto Safigames</title>
+</svelte:head>
+
 <div class="text-center p-8 pt-32">
 	<Heading tag="h2" class="text-4xl font-extrabold tracking-tight text-primary-200 dark:text-white mb-6">Esgotamento: Um projeto Safigames</Heading>
 	<P class="text-xl leading-relaxed text-primary-50 dark:text-primary-100 mb-4 text-justify">

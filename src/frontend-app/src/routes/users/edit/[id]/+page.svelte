@@ -9,5 +9,6 @@
   const { id } = get(page).params;
 </script>
 <Menu />
+
 <!-- Utiliza o componente UserForm passando id -->
 <UserForm id={Number(id)} />

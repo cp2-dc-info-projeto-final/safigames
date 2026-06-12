@@ -5,6 +5,9 @@
 
 <Menu />
 
+<svelte:head>
+  <title>Sobre</title>
+</svelte:head>
 
 <style>
   img{
