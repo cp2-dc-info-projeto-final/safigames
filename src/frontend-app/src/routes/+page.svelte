@@ -3,7 +3,11 @@
   import Menu from '../components/Menu.svelte';
   import {  P } from "flowbite-svelte";
 </script>
-
+<style>
+	  :global(body) {
+    font-family: 'fonte-topiy';
+  }
+</style>
 <Menu />
 
 <div class="text-center p-8 pt-32">

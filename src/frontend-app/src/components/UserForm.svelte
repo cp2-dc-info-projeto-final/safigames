@@ -1,11 +1,11 @@
 <script lang="ts">
   // Formulário de usuário
-  import { Card, Button, Label, Input, Heading, Select } from 'flowbite-svelte'; // UI
+  import { Card, Button, Label, Input, Heading, Select, A } from 'flowbite-svelte'; // UI
   import { onMount } from 'svelte'; // ciclo de vida
   import api from '$lib/api'; // API backend
   import type { ApiFieldError, ApiResponse } from '$lib/api';
   import { goto } from '$app/navigation'; // navegação
-  import { ArrowLeftOutline, FloppyDiskAltOutline } from 'flowbite-svelte-icons'; // ícones
+  import { ArrowLeftOutline, FloppyDiskAltOutline, EyeSlashSolid, EyeSolid } from 'flowbite-svelte-icons'; // ícones
   import type { User, UserFormData } from '$lib/models/User';
   import { getToken } from "$lib/auth";
 
@@ -24,7 +24,27 @@
   let hasToken = false;
   let confirmarSenha = '';
   let senhaVisivel = false;
-  let confirmarSenhaVisivel = false;
+  let componenteAtivo = EyeSlashSolid ;
+
+  function olhoeSenha(){
+    mudaOlho();
+    mostrarSenha();
+  }
+
+  function mudaOlho() {
+    componenteAtivo = componenteAtivo === EyeSlashSolid ? EyeSolid : EyeSlashSolid;
+  }
+
+  function mostrarSenha(){
+    console.log("entrou")
+    if (senhaVisivel){
+      senhaVisivel = false;
+    }
+    else{
+      senhaVisivel = true;
+    }
+  }
+
 
   function errorOf(field: string): string | null {
     return fieldErrors.find((item) => item.field === field)?.message ?? null;
@@ -146,14 +166,15 @@
       <Label for="senha" class="text-primary-500">Senha {id !== null ? '(deixe vazio para manter atual)' : ''}</Label>
       <Input 
         id="senha" 
-        type="password" 
+        type={senhaVisivel ? "text" : "password"}
         bind:value={user.senha} 
         placeholder={id === null ? 'Digite a senha (mínimo 6 caracteres)' : 'Nova senha (opcional)'} 
         required={id === null}
         minlength={6}
         class="mt-1" 
       />
-    
+      
+        
       {#if errorOf('senha')}
         <div class="mt-1 text-sm text-red-500">{errorOf('senha')}</div>
       {/if}
@@ -163,13 +184,16 @@
       <Label for="confirmarSenha" class="text-primary-500">Confirme a Senha</Label>
       <Input 
         id ="confirmarSenha"
-        type="password"
+        type={senhaVisivel ? "text" : "password"}
         bind:value={confirmarSenha} 
         placeholder={id === null ? 'Confirme sua senha' : 'Confirme sua senha (opcional)'}
         required={id === null}
         minlength={6}
         class="mt-1" 
+        
       />
+      <A type="button" onclick={olhoeSenha} class="text-primary-50 bg-primary-900 transition-colors rounded-lg ml-92 mt-1">
+        <svelte:component this={componenteAtivo} class="shrink-0 h-6 w-6"/></A>
     </div>
 
     <!-- Campo role -->
@@ -203,4 +227,5 @@
       </Button> 
     </div>
   </form>
+  
 </Card>

@@ -2,6 +2,10 @@
 
 @plugin 'flowbite/plugin';
 
+@font-face {
+  font-family: 'fonte-topiy'; /* O nome que você vai usar no CSS */
+  src: url('/fonts/smallest_pixel-7.ttf') format('truetype');}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
