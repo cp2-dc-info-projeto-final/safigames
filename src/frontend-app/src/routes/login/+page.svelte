@@ -56,6 +56,7 @@
               bind:value={login}
               placeholder="Digite seu login"
               required
+              class="border-primary-900"
             />
           </div>
 
@@ -67,6 +68,7 @@
               bind:value={password}
               placeholder="Digite sua senha"
               required
+              class="border-primary-900"
             />
           </div>
 
