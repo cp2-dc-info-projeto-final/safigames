@@ -14,7 +14,9 @@
     width: 150px;
     height: 150px;
   }
-
+  :global(body) {
+    font-family: 'fonte-topiy';
+  }
 
 </style>
 <div class="text-center p-8 pt-32">

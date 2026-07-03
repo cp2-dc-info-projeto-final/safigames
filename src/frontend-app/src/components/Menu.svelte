@@ -91,11 +91,11 @@
       
       {#if hasToken}
         {#if user} <!-- se existir usuário é porque conseguiu logar-->
+          <NavLi href="/perfil" nonActiveClass="text-xl font-bold px-4 py-2 text-primary-500 dark:text-primary-400 hover:text-primary-200 hover:bg-primary-900 focus:text-primary-400 focus:bg-primary-300 transition-colors rounded-lg">Perfil</NavLi>
           {#if user.role === 'admin'} <!-- só exibe menu usuários para admin-->
             <NavLi href="/users" nonActiveClass="text-xl font-bold px-4 py-2 text-primary-500 dark:text-primary-400 hover:text-primary-200 hover:bg-primary-900 focus:text-primary-400 focus:bg-primary-300 transition-colors rounded-lg">Usuários</NavLi>
           {/if}
           <NavLi>
-          
             <div class="flex items-center">
               <span class="text-lg text-primary-500 dark:text-primary-400 px-4">Olá, {user.login}</span>
                 {#if user}
@@ -108,7 +108,6 @@
                 </button>
                   {/if}
                 {/if}
-
               <button 
                 class="ml-2 px-3 py-1 bg-primary-900 hover:bg-primary-200 text-white rounded text-sm flex items-center gap-1"
                 on:click={handleLogout}>

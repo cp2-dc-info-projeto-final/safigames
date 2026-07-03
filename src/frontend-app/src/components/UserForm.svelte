@@ -92,7 +92,6 @@
     error = '';
     try {
       const userData = { ...user };
-      // Remove senha vazia na edição para não sobrescrever indevidamente
       if (id !== null && !userData.senha) {
         delete userData.senha;
       }
@@ -125,7 +124,7 @@
   }
 
   function handleCancel() {
-    goto('/users');
+    history.back();
   }
   void verificaUser();
   async function verificaUser() {
@@ -198,7 +197,7 @@
 
     <!-- Campo role -->
     <div>
-        {#if hasToken}
+        {#if hasToken && user.role == "admin"}
           <Label for="role" class="text-lg text-primary-500">Perfil</Label>
           <Select id="role" bind:value={user.role} items={roleOptions} class="mt-1" />
 

@@ -44,11 +44,12 @@
     :global(body) {
   font-family: 'fonte-topiy';
 }
-</style>
 
+</style>
 <svelte:head>
   <title>Esgotamento</title>
 </svelte:head>
+
 
 <div class="text-center fixed top-4 left-1/2 -translate-x-1/2 z-50 text-white px-4 py-2 rounded">
     <img src="/images/titulo_grafite_sem_fundo_pixelado.png" alt="ESGOTAMENTO">
