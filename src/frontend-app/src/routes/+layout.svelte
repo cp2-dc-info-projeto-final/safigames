@@ -1,11 +1,16 @@
 <script lang="ts">
 	import '../app.css';
-	import Menu from '../components/Menu.svelte';
 	let { children } = $props();
 </script>
 
+<style>
+  :global(body) {
+  font-family: 'fonte-topiy';
+}
+</style>
+
 <main class="flex flex-col items-center justify-center min-h-screen w-full bg-primary-800 dark:bg-gray-800">
-  <Menu />
+
   <div class="w-full max-w-3xl px-4 md:px-8">
     {@render children()}
   </div>

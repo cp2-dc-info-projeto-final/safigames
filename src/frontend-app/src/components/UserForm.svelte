@@ -7,7 +7,9 @@
   import { goto } from '$app/navigation'; // navegação
   import { ArrowLeftOutline, FloppyDiskAltOutline, EyeSlashSolid, EyeSolid } from 'flowbite-svelte-icons'; // ícones
   import type { User, UserFormData } from '$lib/models/User';
-  import { getToken } from "$lib/auth";
+  import { getToken, getCurrentUser } from "$lib/auth";
+  import { login as authLogin } from "$lib/auth";
+  
 
   export let id: number | null = null; // id do usuário
 
@@ -18,13 +20,15 @@
     { value: 'jogador', name: 'Jogador' },
     { value: 'admin', name: 'Administrador' }
   ];
+  
   let loading = false;
   let error = '';
   let fieldErrors: ApiFieldError[] = [];
   let hasToken = false;
   let confirmarSenha = '';
   let senhaVisivel = false;
-  let componenteAtivo = EyeSlashSolid ;
+  let componenteAtivo = EyeSlashSolid;
+  let user_me: User;
 
   function olhoeSenha(){
     mudaOlho();
@@ -36,7 +40,6 @@
   }
 
   function mostrarSenha(){
-    console.log("entrou")
     if (senhaVisivel){
       senhaVisivel = false;
     }
@@ -50,8 +53,13 @@
     return fieldErrors.find((item) => item.field === field)?.message ?? null;
   }
 
+  
+
   // Carrega usuário se for edição
   onMount(async () => {
+    if (user_me){
+      user_me = await getCurrentUser();
+    }
     if (id !== null) {
       loading = true;
       try {
@@ -70,6 +78,35 @@
       }
     } 
   });
+
+  async function handleLogin() {
+    if (!user.login || !user.senha) {
+      error = 'Por favor, preencha todos os campos';
+      return;
+    }
+
+    loading = true;
+    error = '';
+
+    try {
+      let login = user.login;
+      let password = user.senha;
+      const result = await authLogin({ login, password });
+      
+      if (result.success) {
+        await goto('/');
+      } else {
+        error = result.message || 'Credenciais inválidas';
+      }
+    } catch (err) {
+      error = 'Erro interno do servidor';
+      console.error('Erro no login:', err);
+    } finally {
+      loading = false;
+    }
+  }
+
+  
 
   // Submissão do formulário
   async function handleSubmit() {
@@ -92,7 +129,6 @@
     error = '';
     try {
       const userData = { ...user };
-      // Remove senha vazia na edição para não sobrescrever indevidamente
       if (id !== null && !userData.senha) {
         delete userData.senha;
       }
@@ -104,6 +140,9 @@
           error = body.message;
           fieldErrors = body.errors;
           return;
+        }
+        if (!hasToken){
+          await handleLogin();
         }
       } else {
         const res = await api.put(`/users/${id}`, userData);
@@ -125,7 +164,7 @@
   }
 
   function handleCancel() {
-    goto('/users');
+    history.back();
   }
   void verificaUser();
   async function verificaUser() {
@@ -138,7 +177,7 @@
   <!-- Formulário principal -->
   <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={handleSubmit}>
     <!-- Título -->
-    <Heading tag="h3" class="mb-2 text-center text-primary-100">
+    <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
       {id === null ? 'Cadastrar Usuário' : 'Editar Usuário'}
     </Heading>
     <!-- Mensagem de erro -->
@@ -147,7 +186,7 @@
     {/if}
     <!-- Campo login -->
     <div>
-      <Label for="login" class="text-primary-500">Login</Label>
+      <Label for="login" class="text-lg text-primary-500">Login</Label>
       <Input id="login" bind:value={user.login} placeholder="Digite o login" required class="mt-1" />
       {#if errorOf('login')}
         <div class="mt-1 text-sm text-red-500">{errorOf('login')}</div>
@@ -155,7 +194,7 @@
     </div>
     <!-- Campo email -->
     <div>
-      <Label for="email" class="text-primary-500">Email</Label>
+      <Label for="email" class="text-lg text-primary-500">Email</Label>
       <Input id="email" type="email" bind:value={user.email} placeholder="Digite o e-mail" required class="mt-1" />
       {#if errorOf('email')}
         <div class="mt-1 text-sm text-red-500">{errorOf('email')}</div>
@@ -163,7 +202,7 @@
     </div>
     <!-- Campo senha -->
     <div>
-      <Label for="senha" class="text-primary-500">Senha {id !== null ? '(deixe vazio para manter atual)' : ''}</Label>
+      <Label for="senha" class="text-lg text-primary-500">Senha {id !== null ? '(deixe vazio para manter atual)' : ''}</Label>
       <Input 
         id="senha" 
         type={senhaVisivel ? "text" : "password"}
@@ -181,7 +220,7 @@
     </div>
 
     <div>
-      <Label for="confirmarSenha" class="text-primary-500">Confirme a Senha</Label>
+      <Label for="confirmarSenha" class="text-lg text-primary-500">Confirme a Senha</Label>
       <Input 
         id ="confirmarSenha"
         type={senhaVisivel ? "text" : "password"}
@@ -198,8 +237,8 @@
 
     <!-- Campo role -->
     <div>
-        {#if hasToken}
-          <Label for="role" class="text-primary-500">Perfil</Label>
+        {#if hasToken && user_me && user_me.role == "admin"}
+          <Label for="role" class="text-lg text-primary-500">Perfil</Label>
           <Select id="role" bind:value={user.role} items={roleOptions} class="mt-1" />
 
         {:else}
@@ -214,7 +253,7 @@
     </div>
     <!-- Botões de ação -->
     
-    <div class="flex gap-4 justify-end mt-4">
+    <div class="text-lg flex gap-4 justify-end mt-4">
       <!-- Botão cancelar/voltar -->
       <Button color="light" type="button" onclick={handleCancel} disabled={loading}>
         <ArrowLeftOutline class="inline w-5 h-5 mr-2 align-text-bottom" />

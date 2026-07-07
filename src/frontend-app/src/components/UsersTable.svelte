@@ -124,7 +124,7 @@ $:if (filtro) {
      bind:filtro={filtro} />
     <!-- Tabela de usuários -->
     <Table class="w-full max-w-5xl mx-auto my-8 shadow-lg border border-primary-500 rounded-lg ">
-      <TableHead class="bg-primary-900 text-primary-500">
+      <TableHead class="text-lg bg-primary-900 text-primary-500">
         <TableHeadCell class="w-16">ID</TableHeadCell>
         <TableHeadCell class="w-32">Login</TableHeadCell>
         <TableHeadCell class="min-w-0">Email</TableHeadCell>
@@ -133,12 +133,12 @@ $:if (filtro) {
       </TableHead>
       <TableBody >
         {#each users as user}
-          <TableBodyRow class="bg-primary-900 text-primary-500" >
+          <TableBodyRow class="text-lg bg-primary-900 text-primary-500" >
             <TableBodyCell>{user.id}</TableBodyCell>
             <TableBodyCell>{user.login}</TableBodyCell>
             <TableBodyCell class="truncate max-w-0">{user.email}</TableBodyCell>
             <TableBodyCell>
-              <Badge class={user.role === 'admin' ? 'bg-primary-600 text-xs mt-1' : 'text-xs mt-1 bg-primary-200 text-primary-900'}>
+              <Badge class={user.role === 'admin' ? 'bg-primary-600 text-sm mt-1' : 'text-sm mt-1 bg-primary-200 text-primary-900'}>
                 {user.role}
               </Badge>
             </TableBodyCell>

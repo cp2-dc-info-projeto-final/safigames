@@ -5,6 +5,7 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { getCurrentUser } from '$lib/auth';
+  import Menu from '../../components/Menu.svelte';
 
   let checkingAccess = true;
   let canView = false;
@@ -27,6 +28,11 @@
     checkingAccess = false;
   });
 </script>
+
+<Menu />
+<svelte:head>
+  <title>Usuários</title>
+</svelte:head>
 
 {#if checkingAccess}
   <div class="text-center p-8 pt-32 text-gray-500">Verificando acesso...</div>

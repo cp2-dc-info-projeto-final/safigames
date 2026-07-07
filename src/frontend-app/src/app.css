@@ -4,23 +4,24 @@
 
 @font-face {
   font-family: 'fonte-topiy'; /* O nome que você vai usar no CSS */
-  src: url('/fonts/smallest_pixel-7.ttf') format('truetype');}
+  src: url('/fonts/smallest_pixel-7.ttf') format('truetype');
+  }
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --color-primary-50: #FFFFFF;
   --color-primary-100: #9AD9A6;
-  --color-primary-200: #86D994;
+  --color-primary-200: #86D994; 
   --color-primary-300: #6DAD52;
   --color-primary-400: #266100;
-  --color-primary-500: #1EE61E;
+  --color-primary-500: #1EE61E; 
   --color-primary-600: #00CF00;
   --color-primary-700: #006700;
   --color-primary-800: #031703;
   --color-primary-900: #000000;
 
-  --color-secondary-50: #f0f9ff;
+  --color-secondary-50: #B8008A;
   --color-secondary-100: #e0f2fe;
   --color-secondary-200: #bae6fd;
   --color-secondary-300: #7dd3fc;
