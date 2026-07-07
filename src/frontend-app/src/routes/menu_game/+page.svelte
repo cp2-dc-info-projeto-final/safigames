@@ -9,6 +9,9 @@
     let sair = $state("Sair");
     let error = '';
     let fieldErrors: ApiFieldError[] = [];
+    let nome_personagem = $state('');
+    let classe_personagem = $state('');
+ 
 
     async function criaPersonagem() {
     }
@@ -79,7 +82,7 @@
       <!-- Campo Nome -->
       <div>
         <Label for="nome" class="text-lg text-primary-500">Nome</Label>
-        <Input id="nome" placeholder="Digite o nome do personagem" required class="mt-1" />
+        <Input id="nome" bind:value={nome_personagem} placeholder="Digite o nome do personagem" required class="mt-1" />
         {#if errorOf('nome')}
           <div class="mt-1 text-sm text-red-500">{errorOf('nome')}</div>
         {/if}
@@ -88,9 +91,7 @@
       <!-- Campo classe -->
       <div>
             <Label for="classe" class="text-lg text-primary-500">Escolha sua classe</Label>
-            <Select id="classe"  items={classeOptions} class="mt-1" />
-          
-  
+            <Select id="classe" bind:value={classe_personagem}  items={classeOptions} class="mt-1" />
         {#if errorOf('role')}
           <div class="mt-1 text-sm text-red-500">{errorOf('role')}</div>
         {/if}
