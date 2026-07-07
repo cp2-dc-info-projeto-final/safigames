@@ -72,7 +72,7 @@
   }
 
 	function irParaJogo() {
-		goto('/game'); // Caminho do jogo
+		goto('/menu_game'); // Caminho do jogo
 	}
 
 </script>
