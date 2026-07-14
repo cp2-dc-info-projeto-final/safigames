@@ -4,13 +4,14 @@
     import ConfirmModal from '../../components/ConfirmModal.svelte'; // modal de confirmação
     import { Card, P, Heading } from "flowbite-svelte";
     import type { User } from '$lib/models/User';
+    import { logout } from '$lib/auth'; // função de logout
     import api from '$lib/api'; // API backend
     import type { ApiFieldError, ApiResponse } from '$lib/api';
     import { goto } from '$app/navigation'; // navegação
 
     let error = '';
     let user: User;
-    let loading = true;
+
     let deletingId: number | null = null; // id em deleção
     let confirmOpen = false; // modal aberto?
     let confirmTargetId: number | null = null; // id alvo do modal
@@ -63,6 +64,7 @@
     try {
       const res = await api.delete(`/users/${id}`);
       const body = res.data as ApiResponse<null>;
+      await logout();
       goto("/")
       if (!body.success) {
         error = body.message;

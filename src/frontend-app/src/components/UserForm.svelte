@@ -57,7 +57,7 @@
 
   // Carrega usuário se for edição
   onMount(async () => {
-    if (user_me){
+    if (!user_me){
       user_me = await getCurrentUser();
     }
     if (id !== null) {
@@ -237,7 +237,7 @@
 
     <!-- Campo role -->
     <div>
-        {#if hasToken && user_me && user_me.role == "admin"}
+        {#if hasToken && user_me && user_me.role === 'admin'}
           <Label for="role" class="text-lg text-primary-500">Perfil</Label>
           <Select id="role" bind:value={user.role} items={roleOptions} class="mt-1" />
 
