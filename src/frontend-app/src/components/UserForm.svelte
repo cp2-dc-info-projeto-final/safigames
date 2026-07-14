@@ -57,7 +57,7 @@
 
   // Carrega usuário se for edição
   onMount(async () => {
-    if (!user_me){
+    if (hasToken){
       user_me = await getCurrentUser();
     }
     if (id !== null) {

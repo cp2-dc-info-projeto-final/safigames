@@ -10,7 +10,10 @@
     import { goto } from '$app/navigation'; // navegação
 
     let error = '';
-    let user: User;
+    let user: User | null = null;
+    let authRequestId = 0;
+    let hasToken: boolean;
+    let loadingUser: boolean;
 
     let deletingId: number | null = null; // id em deleção
     let confirmOpen = false; // modal aberto?
@@ -53,6 +56,20 @@
     closeConfirm();
   }
 
+  // função para logout (só apaga o token)
+  async function handleLogout() {
+    try {
+      authRequestId += 1;
+      await logout();
+      user = null;
+      hasToken = false;
+      loadingUser = false;
+      goto('/login');
+    } catch (error) {
+      console.error('Erro no logout:', error);
+    }
+  }
+
   // Cancela remoção
   function handleCancel() {
     closeConfirm();
@@ -64,7 +81,7 @@
     try {
       const res = await api.delete(`/users/${id}`);
       const body = res.data as ApiResponse<null>;
-      await logout();
+      await handleLogout();
       goto("/")
       if (!body.success) {
         error = body.message;
