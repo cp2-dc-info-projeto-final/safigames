@@ -260,12 +260,24 @@ router.put('/:id', verifyToken, async function(req, res) {
     if (senha && senha.trim() !== '') {
       // Atualizar com nova senha
       const hashedPassword = await bcrypt.hash(senha, 12);
+      if (req.user.role == 'admin'){
       query = 'UPDATE usuario SET login = $1, email = $2, senha = $3, role = $4 WHERE id = $5 RETURNING id, login, email, role';
       params = [login, email, hashedPassword, role, id];
+      }
+      else {
+        query = 'UPDATE usuario SET login = $1, email = $2, senha = $3 WHERE id = $4 RETURNING id, login, email';
+        params = [login, email, hashedPassword, id];
+      }
     } else {
       // Atualizar sem alterar senha
+      if (req.user.role == 'admin'){
       query = 'UPDATE usuario SET login = $1, email = $2, role = $3 WHERE id = $4 RETURNING id, login, email, role';
       params = [login, email, role, id];
+      }
+      else{
+        query = 'UPDATE usuario SET login = $1, email = $2 WHERE id = $3 RETURNING id, login, email';
+        params = [login, email, id];
+      }
     }
     
     const result = await pool.query(query, params);
