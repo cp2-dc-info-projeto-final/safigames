@@ -1,6 +1,9 @@
 <script lang=ts>
     import { P, A, Heading, Card, Label, Input, Select, Button} from "flowbite-svelte";
     import type { ApiFieldError, ApiResponse } from '$lib/api';
+    import { onMount } from 'svelte'; // ciclo de vida
+    import type { Personagem } from '$lib/models/Personagem';
+    import type { User } from '$lib/models/User';
     import api from '$lib/api'; // API backend
     import { ArrowLeftOutline, FloppyDiskAltOutline } from 'flowbite-svelte-icons'; // ícones
 
@@ -11,11 +14,42 @@
     let fieldErrors: ApiFieldError[] = [];
     let nome_personagem = $state('');
     let classe_personagem = $state('');
+    let loading: boolean;
+    let user: User;
  
 
     async function criaPersonagem() {
-    }
+      fieldErrors = [];
 
+      if (!nome_personagem || !classe_personagem){
+        fieldErrors = [{ field: 'nome', message: 'Nome e classe do personagem não podem ser vazios!' }];
+        error = 'Nome e classe do personagem não podem ser vazios!';
+        return;
+      }
+
+      loading = true;
+      error = '';
+      try{
+        const dadosPersonagem = {
+          nome: nome_personagem, 
+          classe: classe_personagem, 
+          id: user.id
+        }
+
+        const res = await api.post('/game/personagem', dadosPersonagem);
+        const body = res.data as ApiResponse<Personagem>;
+        if (!body.success) {
+          error = body.message;
+          fieldErrors = body.errors;
+          return;
+      } 
+    } catch (e: any){
+      const body = e.response?.data as ApiResponse<Personagem> | undefined;
+        error = body?.message || 'Erro ao criar personagem.';
+      } finally {
+        loading = false;
+    }
+  }
     function errorOf(field: string): string | null {
     return fieldErrors.find((item) => item.field === field)?.message ?? null;
   }
@@ -37,9 +71,24 @@
   // Opções de roles
   const classeOptions = [
     { value: 'Guerreiro', name: 'Guerreiro' },
-    { value: 'Arqueiro', name: 'Arqueiro' },
-    { value: 'Mago', name: 'Mago' }
+    { value: 'Assassino', name: 'Assassino' }
   ];
+
+  onMount(async () => {
+    try {
+        const res = await api.get(`/users/me`);
+        const body = res.data as ApiResponse<User>;
+        if (body.success && body.data) {
+          user = { ...body.data };
+        } else {
+          error = body.message;
+        }
+      } catch (e: any) {
+        const body = e.response?.data as ApiResponse<User> | undefined;
+        error = body?.message || 'Erro ao carregar usuário.';
+      } finally {
+    } 
+  }) 
 
 </script>
 
@@ -100,12 +149,12 @@
       
       <div class="text-lg flex gap-4 justify-end mt-4">
         <!-- Botão cancelar/voltar -->
-        <Button color="light" type="button" onclick={handleCancel} >
+        <Button color="light" type="button" onclick={handleCancel} disabled={loading}>
           <ArrowLeftOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
             Voltar
         </Button>
         <!-- Botão salvar -->
-        <Button type="submit" color="primary" >
+        <Button type="submit" color="primary" disabled={loading}>
           <FloppyDiskAltOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
             Criar
         </Button> 

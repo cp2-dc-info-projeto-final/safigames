@@ -1,4 +1,4 @@
-
+-- Active: 1764609861484@@127.0.0.1@5432@safigames
 DROP TABLE IF EXISTS usuario CASCADE;
 
 CREATE TABLE usuario (
@@ -72,6 +72,18 @@ CREATE TABLE cena (
     CONSTRAINT pk_cena PRIMARY KEY (id)
 );
 
+DROP TABLE IF EXISTS arma CASCADE;
+
+CREATE TABLE arma (
+    id bigint GENERATED ALWAYS AS IDENTITY,
+    nome TEXT NOT NULL,
+    dano INTEGER NOT NULL,
+    descricao TEXT NOT NULL,
+    stamina INTEGER NOT NULL,
+
+    CONSTRAINT pk_arma PRIMARY KEY (id)
+);
+
 DROP TABLE IF EXISTS personagem CASCADE;
 
 CREATE TABLE personagem (
@@ -82,7 +94,6 @@ CREATE TABLE personagem (
     xp INTEGER,
     stamina INTEGER NOT NULL,
     classe TEXT NOT NULL,
-    arma TEXT NOT NULL,
     armadura TEXT,
     dinheiro INTEGER,
     id_usuario INTEGER NOT NULL,
@@ -91,6 +102,9 @@ CREATE TABLE personagem (
     id_cena INTEGER NOT NULL,
     FOREIGN KEY (id_cena)
         REFERENCES cena (id),
+    id_arma INTEGER NOT NULL,
+    FOREIGN KEY (id_arma)
+        REFERENCES arma (id),
 
     CONSTRAINT pk_personagem PRIMARY KEY (id)
 );
