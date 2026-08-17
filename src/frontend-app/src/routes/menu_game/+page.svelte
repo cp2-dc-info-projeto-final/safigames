@@ -1,11 +1,11 @@
 <script lang=ts>
-    import { P, A, Heading, Card, Label, Input, Select, Button} from "flowbite-svelte";
+    import { P, A, Heading, Card, Label, Input, Select, Button,  Table, TableHead, TableHeadCell, TableBody, TableBodyRow, TableBodyCell, Badge} from "flowbite-svelte";
     import type { ApiFieldError, ApiResponse } from '$lib/api';
     import { onMount } from 'svelte'; // ciclo de vida
     import type { Personagem } from '$lib/models/Personagem';
     import type { User } from '$lib/models/User';
     import api from '$lib/api'; // API backend
-    import { ArrowLeftOutline, FloppyDiskAltOutline } from 'flowbite-svelte-icons'; // ícones
+    import { ArrowLeftOutline, FloppyDiskAltOutline, TrashBinOutline, UserEditOutline } from 'flowbite-svelte-icons'; // ícones
 
     let novoJ = $state("Novo jogo");
     let carregarS = $state("Carregar save");
@@ -68,6 +68,10 @@
     formPersonagem.style.display = "block";
   }
 
+  function listaPersonagem(){
+
+  }
+
   // Opções de roles
   const classeOptions = [
     { value: 'Guerreiro', name: 'Guerreiro' },
@@ -107,7 +111,7 @@
 </div>
 <div class="text-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 text-white p-6 rounded-lg" id="menu">
     <A class="text-primary-600 hover:text-secondary-50 text-4xl" onclick={mostraFormPersonagem} onmouseenter={() => novoJ = "> Novo jogo <"} onmouseleave={() => novoJ = "Novo jogo"}>{novoJ}</A><br>
-    <A class="text-primary-600 mt-6 mb-6 text-4xl hover:text-secondary-50" onmouseenter={() => carregarS = "> Carregar save <"} onmouseleave={() => carregarS = "Carregar Save"} >{carregarS}</A><br>
+    <A class="text-primary-600 mt-6 mb-6 text-4xl hover:text-secondary-50" onclick={listaPersonagem} onmouseenter={() => carregarS = "> Carregar save <"} onmouseleave={() => carregarS = "Carregar Save"} >{carregarS}</A><br>
     <A class="text-primary-600 text-4xl hover:text-secondary-50" href="/" onmouseenter={() => sair= "> Sair <"} onmouseleave={() => sair = "Sair"}>{sair}</A>
 </div>
 
@@ -162,4 +166,42 @@
     </form>
     
   </Card>
+</div>
+<div>
+<Table class="w-full max-w-5xl mx-auto my-8 shadow-lg border border-primary-500 rounded-lg  ">
+  <TableHead class="text-lg bg-primary-900 text-primary-500">
+    <TableHeadCell class="w-32">Nome</TableHeadCell>
+    <TableHeadCell class="w-32">Vida</TableHeadCell>
+    <TableHeadCell class="w-32">Defesa</TableHeadCell>
+    <TableHeadCell class="w-32">XP</TableHeadCell>
+    <TableHeadCell class="w-32">Stamina</TableHeadCell>
+    <TableHeadCell class="w-32">Classe</TableHeadCell>
+    <TableHeadCell class="w-32">Armadura</TableHeadCell>
+    <TableHeadCell class="w-32">Dinheiro</TableHeadCell>
+  </TableHead>
+  <TableBody >
+   
+      <TableBodyRow class="text-lg bg-primary-900 text-primary-500" >
+        <TableBodyCell></TableBodyCell>
+        <TableBodyCell></TableBodyCell>
+        <TableBodyCell class="truncate max-w-0"></TableBodyCell>
+        <TableBodyCell>
+          <!-- Botão editar -->
+          <button
+            class="p-2 rounded border border-primary-200 hover:border-primary-400 transition bg-transparent"
+            title="Editar"
+          >
+            <UserEditOutline class="w-5 h-5 text-primary-500" />
+          </button>
+          <!-- Botão remover -->
+          <button
+            title="Remover"
+            class="p-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent"
+          >
+            <TrashBinOutline class="w-5 h-5 text-red-400" />
+          </button>
+        </TableBodyCell>
+      </TableBodyRow>
+  </TableBody>
+</Table>
 </div>

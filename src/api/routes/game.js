@@ -19,9 +19,20 @@ function sendError(res, status, message, errors = []) {
   });
 }
 
+router.get('/personagem', verifyToken, async function(req, res) {
+  try {
+    const result = await pool.query('SELECT * FROM personagem WHERE id_usuario = $1 ORDER BY id', [req.user?.id]);
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar usuários:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
 router.post('/personagem', verifyToken, async function(req, res) {
   try {
-    const { nome, classe, id_user } = req.body;
+    const { nome, classe } = req.body;
+    const id_user  = req.user?.id;
     let personagem = {};
 
     // Validação básica
@@ -33,15 +44,15 @@ router.post('/personagem', verifyToken, async function(req, res) {
       return sendError(res, 400, 'Nome e classe são obrigatórios', errors);
     };
 
-    if (classe == 'guerreiro'){
-     personagem = { nome, vida : 80, defesa : 20, xp, stamina : 3, armadura : 'Armadura de Netherite', dinheiro : 1, id_arma, id_cena : 1, id_user: {id_user}}
+    if (classe == 'Guerreiro'){
+     personagem = { nome, vida : 80, defesa : 20, xp : 0, stamina : 3, classe, armadura : 'Armadura de Netherite', dinheiro : 1, id_arma : 1, id_cena : 1, id_user}
     }
-    else if (classe == 'assassino'){
-      personagem = { nome, vida : 70, defesa, xp, stamina : 6, armadura, dinheiro : 42, id_arma, id_cena : 1, id_user : {id_user}}
+    else if (classe == 'Assassino'){
+      personagem = { nome, vida : 70, defesa : 0, xp : 0, stamina : 5, classe, armadura : 'Sem armadura', dinheiro : 42, id_arma : 2, id_cena : 1, id_user}
     }
     const result = await pool.query(
-      'INSERT INTO personagem (nome, vida, defesa, xp, stamina, armadura, dinheiro, id_arma, id_cena, id_usuario) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING nome, vida, defesa, xp, stamina, armadura, dinheiro, id_arma, id_cena',
-      [personagem.nome, personagem.vida, personagem.defesa, personagem.xp, personagem.stamina, personagem.armadura, personagem.dinheiro, personagem.id_arma, personagem.id_cena, personagem.id_user]
+      'INSERT INTO personagem (nome, vida, defesa, xp, stamina, classe, armadura, dinheiro, id_arma, id_cena, id_usuario) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING nome, vida, defesa, xp, stamina, classe, armadura, dinheiro, id_arma, id_cena',
+      [personagem.nome, personagem.vida, personagem.defesa, personagem.xp, personagem.stamina, personagem.classe, personagem.armadura, personagem.dinheiro, personagem.id_arma, personagem.id_cena, personagem.id_user]
     );
     return sendSuccess(res, 201, 'Personagem criado com sucesso', result.rows[0]);
   } catch (error) {
