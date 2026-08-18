@@ -29,6 +29,16 @@ router.get('/personagem', verifyToken, async function(req, res) {
   }
 });
 
+router.get('/personagemsemid', verifyToken, async function(req, res) {
+  try {
+    const result = await pool.query('SELECT * FROM personagem');
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar usuários:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
 router.post('/personagem', verifyToken, async function(req, res) {
   try {
     const { nome, classe } = req.body;
