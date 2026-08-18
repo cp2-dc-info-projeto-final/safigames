@@ -4,6 +4,7 @@
     import { onMount } from 'svelte'; // ciclo de vida
     import type { Personagem } from '$lib/models/Personagem';
     import type { User } from '$lib/models/User';
+    import ConfirmModal from '../../components/ConfirmModal.svelte'; // modal de confirmação
     import api from '$lib/api'; // API backend
     import { ArrowLeftOutline, FloppyDiskAltOutline, TrashBinOutline, UserEditOutline } from 'flowbite-svelte-icons'; // ícones
 
@@ -19,6 +20,9 @@
     let personagens: Personagem[] = $state([]);
     let formPersonagem: any;
     let menu: any;
+    let deletingId: number | null = $state(null); // id em deleção
+    let confirmOpen = $state(false); // modal aberto?
+    let confirmTargetId: number | null = null; // id alvo do modal
 
     async function criaPersonagem() {
       fieldErrors = [];
@@ -84,6 +88,51 @@
     menu.style.display = "block";
     formPersonagem = document.getElementById('containerForm');
     formPersonagem.style.display = "none";
+  }
+
+  // Abre modal de confirmação
+  function openConfirm(id: number) {
+    confirmTargetId = id;
+    confirmOpen = true;
+  }
+  // Fecha modal
+  function closeConfirm() {
+    console.log("Ta entrando")
+    confirmOpen = false;
+    confirmTargetId = null;
+  }
+
+    // Confirma remoção
+    function handleConfirm() {
+    if (confirmTargetId !== null) {
+      handleDelete(confirmTargetId);
+    }
+    closeConfirm();
+  }
+
+  // Cancela remoção
+  function cancelarDelecao() {
+    closeConfirm();
+  }
+
+  async function handleDelete(id: number) {
+    deletingId = id;
+    error = '';
+    try {
+      const res = await api.delete(`/game/personagem/${id}`);
+      const body = res.data as ApiResponse<null>;
+      if (!body.success) {
+        error = body.message;
+        return;
+      }
+      personagens = personagens.filter(personagem => personagem.id !== id);
+    } catch (e: any) {
+      console.error('Erro ao deletar usuário:', e);
+      const body = e.response?.data as ApiResponse<null> | undefined;
+      error = body?.message || 'Erro ao remover usuário.';
+    } finally {
+      deletingId = null;
+    }
   }
 
   function mostraFormPersonagem(){
@@ -210,10 +259,10 @@
         <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Stamina</TableHeadCell>
         <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Classe</TableHeadCell>
         <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Armadura</TableHeadCell>
-        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Dinheiro</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]" colspan="2">Dinheiro</TableHeadCell>
       </TableHead>
       <TableBody>
-      {#each personagens as personagem}
+      {#each personagens as personagem} 
         <TableBodyRow class="text-sm md:text-base bg-primary-900 text-primary-500">
           <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.nome}</TableBodyCell>
           <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.vida}</TableBodyCell>
@@ -223,6 +272,17 @@
           <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.classe}</TableBodyCell>
           <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.armadura}</TableBodyCell>
           <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.dinheiro}</TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
+          <button
+            title="Remover"
+            class="p-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent"
+            on:click={() => openConfirm(personagem.id)}
+            disabled={deletingId === personagem.id || loading}
+          >
+            <TrashBinOutline class="w-5 h-5 text-red-400" />
+          </button>
+        </TableBodyCell>
+
         </TableBodyRow>
       {/each}
       {#if personagens.length === 0}
@@ -249,3 +309,12 @@
     </button>
   </div>
 </div>
+
+<ConfirmModal
+  open={confirmOpen}
+  message="Tem certeza que deseja remover este usuário?"
+  confirmText="Remover"
+  cancelText="Cancelar"
+  onConfirm={handleConfirm}
+  onCancel={cancelarDelecao}
+/>

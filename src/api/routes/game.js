@@ -61,4 +61,24 @@ router.post('/personagem', verifyToken, async function(req, res) {
   }
 });
 
+/* DELETE - Remover usuário */
+router.delete('/personagem/:id', verifyToken, async function(req, res) {
+  try {
+    const { id } = req.params;
+    
+    // Verificar se o usuário existe
+    const personagemExists = await pool.query('SELECT id FROM personagem WHERE id = $1', [id]);
+    if (personagemExists.rows.length === 0) {
+      return sendError(res, 404, 'Personagem não encontrado');
+    }
+    
+    await pool.query('DELETE FROM personagem WHERE id = $1', [id]);
+    
+    return sendSuccess(res, 200, 'Personagem deletado com sucesso');
+  } catch (error) {
+    console.error('Erro ao deletar personagem:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
 module.exports = router;
