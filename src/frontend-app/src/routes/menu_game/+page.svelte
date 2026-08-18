@@ -16,11 +16,12 @@
     let classe_personagem = $state('');
     let loading: boolean;
     let user: User;
- 
+    let personagens: Personagem[] = $state([]);
+    let formPersonagem: any;
+    let menu: any;
 
     async function criaPersonagem() {
       fieldErrors = [];
-
       if (!nome_personagem || !classe_personagem){
         fieldErrors = [{ field: 'nome', message: 'Nome e classe do personagem não podem ser vazios!' }];
         error = 'Nome e classe do personagem não podem ser vazios!';
@@ -34,41 +35,66 @@
           nome: nome_personagem, 
           classe: classe_personagem, 
           id: user.id
-        }
-
+        };
         const res = await api.post('/game/personagem', dadosPersonagem);
         const body = res.data as ApiResponse<Personagem>;
         if (!body.success) {
           error = body.message;
           fieldErrors = body.errors;
           return;
-      } 
-    } catch (e: any){
+        } 
+      } catch (e: any){
       const body = e.response?.data as ApiResponse<Personagem> | undefined;
         error = body?.message || 'Erro ao criar personagem.';
       } finally {
         loading = false;
+        formPersonagem = document.getElementById('containerForm');
+        formPersonagem.style.display = "none";
+        menu = document.getElementById('menu');
+        menu.style.display = "block"
+        }
     }
+  
+  
+ 
+  async function buscaPersonagem() {
+    try{
+      const res = await api.get('/game/personagem');
+      const body = res.data as ApiResponse<Personagem[]>;
+      if (body.success) {
+        personagens = body.data ?? [];
+      } else {
+        error = body.message;
+      }
+    } catch (e: any) {
+        console.error('Erro ao carregar personagens:', e);
+        const body = e.response?.data as ApiResponse<Personagem[]> | undefined;
+        error = body?.message || 'Erro ao carregar personagens';
+      } finally {
+          loading = false;
+        }
   }
+
     function errorOf(field: string): string | null {
     return fieldErrors.find((item) => item.field === field)?.message ?? null;
   }
 
   function handleCancel() {
-    const menu = document.getElementById('menu');
-    const formPersonagem = document.getElementById('containerForm');
+    menu = document.getElementById('menu');
     menu.style.display = "block";
+    formPersonagem = document.getElementById('containerForm');
     formPersonagem.style.display = "none";
   }
 
   function mostraFormPersonagem(){
-    const formPersonagem = document.getElementById('containerForm');
-    const menu = document.getElementById('menu');
+    menu = document.getElementById('menu');
     menu.style.display = "none"
+    formPersonagem = document.getElementById('containerForm');
     formPersonagem.style.display = "block";
   }
 
-  function listaPersonagem(){
+  async function listaPersonagem(){
+    await buscaPersonagem();
     const tablePersonagem = document.getElementById('personagemContainer');
     const menu = document.getElementById('menu');
     menu.style.display = "none"
@@ -177,26 +203,33 @@
   <div class="w-full overflow-hidden shadow-lg border border-primary-500 rounded-lg">
     <Table id="personagemTable" class="w-full table-fixed border-collapse">
       <TableHead class="text-sm md:text-base bg-primary-900 text-primary-500">
-        <TableHeadCell class="p-2 text-center break-words">Nome</TableHeadCell>
-        <TableHeadCell class="p-2 text-center break-words">Vida</TableHeadCell>
-        <TableHeadCell class="p-2 text-center break-words">Defesa</TableHeadCell>
-        <TableHeadCell class="p-2 text-center break-words">XP</TableHeadCell>
-        <TableHeadCell class="p-2 text-center break-words">Stamina</TableHeadCell>
-        <TableHeadCell class="p-2 text-center break-words">Classe</TableHeadCell>
-        <TableHeadCell class="p-2 text-center break-words">Armadura</TableHeadCell>
-        <TableHeadCell class="p-2 text-center break-words">Dinheiro</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Nome</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Vida</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Defesa</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">XP</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Stamina</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Classe</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Armadura</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Dinheiro</TableHeadCell>
       </TableHead>
       <TableBody>
+      {#each personagens as personagem}
         <TableBodyRow class="text-sm md:text-base bg-primary-900 text-primary-500">
-          <TableBodyCell class="p-2 text-center break-words">El matador</TableBodyCell>
-          <TableBodyCell class="p-2 text-center break-words">100</TableBodyCell>
-          <TableBodyCell class="p-2 text-center break-words">20</TableBodyCell>
-          <TableBodyCell class="p-2 text-center break-words">0</TableBodyCell>
-          <TableBodyCell class="p-2 text-center break-words">5</TableBodyCell>
-          <TableBodyCell class="p-2 text-center break-words">Assassino</TableBodyCell>
-          <TableBodyCell class="p-2 text-center break-words">Sem armadura</TableBodyCell>
-          <TableBodyCell class="p-2 text-center break-words">42</TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.nome}</TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.vida}</TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.defesa}</TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.xp}</TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.stamina}</TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.classe}</TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.armadura}</TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.dinheiro}</TableBodyCell>
         </TableBodyRow>
+      {/each}
+      {#if personagens.length === 0}
+        <TableBodyRow class="text-sm md:text-base bg-primary-900 text-primary-500">
+          <TableBodyCell class="p-2 text-center break-words" colspan="8">Nenhum personagem encontrado!</TableBodyCell>
+        </TableBodyRow>
+      {/if}
       </TableBody>
     </Table>
   </div>
@@ -216,40 +249,3 @@
     </button>
   </div>
 </div>
-
-
-<!-- Div para a tabela de personagens
-<div>
-  <Table id="personagemTable" class="w-full h-full mx-auto shadow-lg border border-primary-500 rounded-lg" style="display:none">
-    <TableHead class="text-lg bg-primary-900 text-primary-500">
-      <TableHeadCell class="w-32">Nome</TableHeadCell>
-      <TableHeadCell class="w-32">Vida</TableHeadCell>
-      <TableHeadCell class="w-32">Defesa</TableHeadCell>
-      <TableHeadCell class="w-24">XP</TableHeadCell>
-      <TableHeadCell class="w-32">Stamina</TableHeadCell>
-      <TableHeadCell class="w-32">Classe</TableHeadCell>
-      <TableHeadCell class="w-32">Armadura</TableHeadCell>
-      <TableHeadCell class="w-32">Dinheiro</TableHeadCell>
-    </TableHead>
-    <TableBody>
-        <TableBodyRow class="text-lg bg-primary-900 text-primary-500" >
-          <TableBodyCell>El matador</TableBodyCell>
-          <TableBodyCell>100</TableBodyCell>
-          <TableBodyCell>20</TableBodyCell>
-          <TableBodyCell>0</TableBodyCell>
-          <TableBodyCell>5</TableBodyCell>
-          <TableBodyCell>Assassino</TableBodyCell>
-          <TableBodyCell>Sem armadura</TableBodyCell>
-          <TableBodyCell>42</TableBodyCell>
-          <TableBodyCell>
-            Botão voltar
-            <button
-              title="voltar"
-              class="p-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent">
-              Voltar
-            </button>
-          </TableBodyCell>
-        </TableBodyRow>
-    </TableBody>
-  </Table>
-</div> -->

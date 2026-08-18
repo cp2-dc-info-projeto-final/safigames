@@ -7,10 +7,11 @@
   import { goto } from '$app/navigation'; // navegação
   import { ArrowLeftOutline, FloppyDiskAltOutline, EyeSlashSolid, EyeSolid } from 'flowbite-svelte-icons'; // ícones
   import type { User, UserFormData } from '$lib/models/User';
-  import { getToken } from "$lib/auth";
+  import { getToken, getCurrentUser } from "$lib/auth";
 
   export let id: number | null = null; // id do usuário
 
+  let user_me: User | null = null; // usuário logado
   let user: UserFormData = { id: 0, login: '', email: '', senha: '', role: 'jogador' }; // dados do form
   
   // Opções de roles
