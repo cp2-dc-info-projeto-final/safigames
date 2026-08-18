@@ -69,7 +69,10 @@
   }
 
   function listaPersonagem(){
-
+    const tablePersonagem = document.getElementById('personagemContainer');
+    const menu = document.getElementById('menu');
+    menu.style.display = "none"
+    tablePersonagem.style.display = "block";
   }
 
   // Opções de roles
@@ -167,41 +170,86 @@
     
   </Card>
 </div>
-<div>
-<Table class="w-full max-w-5xl mx-auto my-8 shadow-lg border border-primary-500 rounded-lg  ">
-  <TableHead class="text-lg bg-primary-900 text-primary-500">
-    <TableHeadCell class="w-32">Nome</TableHeadCell>
-    <TableHeadCell class="w-32">Vida</TableHeadCell>
-    <TableHeadCell class="w-32">Defesa</TableHeadCell>
-    <TableHeadCell class="w-32">XP</TableHeadCell>
-    <TableHeadCell class="w-32">Stamina</TableHeadCell>
-    <TableHeadCell class="w-32">Classe</TableHeadCell>
-    <TableHeadCell class="w-32">Armadura</TableHeadCell>
-    <TableHeadCell class="w-32">Dinheiro</TableHeadCell>
-  </TableHead>
-  <TableBody >
-   
-      <TableBodyRow class="text-lg bg-primary-900 text-primary-500" >
-        <TableBodyCell></TableBodyCell>
-        <TableBodyCell></TableBodyCell>
-        <TableBodyCell class="truncate max-w-0"></TableBodyCell>
-        <TableBodyCell>
-          <!-- Botão editar -->
-          <button
-            class="p-2 rounded border border-primary-200 hover:border-primary-400 transition bg-transparent"
-            title="Editar"
-          >
-            <UserEditOutline class="w-5 h-5 text-primary-500" />
-          </button>
-          <!-- Botão remover -->
-          <button
-            title="Remover"
-            class="p-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent"
-          >
-            <TrashBinOutline class="w-5 h-5 text-red-400" />
-          </button>
-        </TableBodyCell>
-      </TableBodyRow>
-  </TableBody>
-</Table>
+
+<!-- Container de tabela personagem -->
+<div id="personagemContainer" class="flex flex-col gap-4 w-full max-w-full" style="display:none">
+  <!-- Wrapper da Tabela -->
+  <div class="w-full overflow-hidden shadow-lg border border-primary-500 rounded-lg">
+    <Table id="personagemTable" class="w-full table-fixed border-collapse">
+      <TableHead class="text-sm md:text-base bg-primary-900 text-primary-500">
+        <TableHeadCell class="p-2 text-center break-words">Nome</TableHeadCell>
+        <TableHeadCell class="p-2 text-center break-words">Vida</TableHeadCell>
+        <TableHeadCell class="p-2 text-center break-words">Defesa</TableHeadCell>
+        <TableHeadCell class="p-2 text-center break-words">XP</TableHeadCell>
+        <TableHeadCell class="p-2 text-center break-words">Stamina</TableHeadCell>
+        <TableHeadCell class="p-2 text-center break-words">Classe</TableHeadCell>
+        <TableHeadCell class="p-2 text-center break-words">Armadura</TableHeadCell>
+        <TableHeadCell class="p-2 text-center break-words">Dinheiro</TableHeadCell>
+      </TableHead>
+      <TableBody>
+        <TableBodyRow class="text-sm md:text-base bg-primary-900 text-primary-500">
+          <TableBodyCell class="p-2 text-center break-words">El matador</TableBodyCell>
+          <TableBodyCell class="p-2 text-center break-words">100</TableBodyCell>
+          <TableBodyCell class="p-2 text-center break-words">20</TableBodyCell>
+          <TableBodyCell class="p-2 text-center break-words">0</TableBodyCell>
+          <TableBodyCell class="p-2 text-center break-words">5</TableBodyCell>
+          <TableBodyCell class="p-2 text-center break-words">Assassino</TableBodyCell>
+          <TableBodyCell class="p-2 text-center break-words">Sem armadura</TableBodyCell>
+          <TableBodyCell class="p-2 text-center break-words">42</TableBodyCell>
+        </TableBodyRow>
+      </TableBody>
+    </Table>
+  </div>
+
+  <!-- Botão voltar (Fora da tabela, embaixo e à direita) -->
+  <div class="flex justify-end w-full">
+    <button
+      title="voltar"
+      class="px-4 py-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent text-primary-500"
+      on:click={() => {
+        const tablePersonagem = document.getElementById('personagemContainer');
+        const menu = document.getElementById('menu');
+        menu.style.display = "block";
+        tablePersonagem.style.display = "none";
+      }}>
+      Voltar
+    </button>
+  </div>
 </div>
+
+
+<!-- Div para a tabela de personagens
+<div>
+  <Table id="personagemTable" class="w-full h-full mx-auto shadow-lg border border-primary-500 rounded-lg" style="display:none">
+    <TableHead class="text-lg bg-primary-900 text-primary-500">
+      <TableHeadCell class="w-32">Nome</TableHeadCell>
+      <TableHeadCell class="w-32">Vida</TableHeadCell>
+      <TableHeadCell class="w-32">Defesa</TableHeadCell>
+      <TableHeadCell class="w-24">XP</TableHeadCell>
+      <TableHeadCell class="w-32">Stamina</TableHeadCell>
+      <TableHeadCell class="w-32">Classe</TableHeadCell>
+      <TableHeadCell class="w-32">Armadura</TableHeadCell>
+      <TableHeadCell class="w-32">Dinheiro</TableHeadCell>
+    </TableHead>
+    <TableBody>
+        <TableBodyRow class="text-lg bg-primary-900 text-primary-500" >
+          <TableBodyCell>El matador</TableBodyCell>
+          <TableBodyCell>100</TableBodyCell>
+          <TableBodyCell>20</TableBodyCell>
+          <TableBodyCell>0</TableBodyCell>
+          <TableBodyCell>5</TableBodyCell>
+          <TableBodyCell>Assassino</TableBodyCell>
+          <TableBodyCell>Sem armadura</TableBodyCell>
+          <TableBodyCell>42</TableBodyCell>
+          <TableBodyCell>
+            Botão voltar
+            <button
+              title="voltar"
+              class="p-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent">
+              Voltar
+            </button>
+          </TableBodyCell>
+        </TableBodyRow>
+    </TableBody>
+  </Table>
+</div> -->
