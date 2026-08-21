@@ -9,6 +9,7 @@
     import type { Personagem } from '$lib/models/Personagem';
     import { TrashBinOutline, UserEditOutline } from 'flowbite-svelte-icons'; // ícones
     import ConfirmModal from '../../components/ConfirmModal.svelte'; // modal de confirmação
+    import { goto } from '$app/navigation';
 
     let user: User;
     let error = '';
@@ -17,8 +18,6 @@
     let deletingId: number | null = $state(null); // id em deleção
     let confirmOpen = $state(false); // modal aberto?
     let confirmTargetId: number | null = null; // id alvo do modal
-
-
 
 
     onMount(async () => {
@@ -109,8 +108,6 @@
     }
   }
 
-
-
 </script>
 <Menu />
 
@@ -153,6 +150,14 @@
             <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.id_user}</TableBodyCell>
             <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
             <button
+                title="Editar"
+                class="p-2 rounded border border-green-100 hover:border-green-300 transition bg-transparent"
+                on:click={() => goto(`/users/edit/${personagem.id_user}`)}> 
+                <UserEditOutline class="w-5 h-5 text-primary-500" />
+            </button>
+            </TableBodyCell>
+            <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
+            <button
               title="Remover"
               class="p-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent"
               on:click={() => openConfirm(personagem.id)}
@@ -160,7 +165,7 @@
             >
               <TrashBinOutline class="w-5 h-5 text-red-400" />
             </button>
-          </TableBodyCell>
+            </TableBodyCell>
   
           </TableBodyRow>
         {/each}

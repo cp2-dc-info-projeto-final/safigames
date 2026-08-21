@@ -128,9 +128,7 @@
     }
   }
 
-  function handleCancel() {
-    goto('/users');
-  }
+
   void verificaUser();
   async function verificaUser() {
     hasToken = getToken() !== null;
@@ -220,7 +218,7 @@
     
     <div class="text-lg flex gap-4 justify-end mt-4">
       <!-- Botão cancelar/voltar -->
-      <Button color="light" type="button" onclick={handleCancel} disabled={loading}>
+      <Button color="light" type="button" onclick={() => history.back()} disabled={loading}>
         <ArrowLeftOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
         {id === null ? 'Voltar' : 'Cancelar'}
       </Button>
