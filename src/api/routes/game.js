@@ -29,6 +29,17 @@ router.get('/personagem', verifyToken, async function(req, res) {
   }
 });
 
+router.get('/personagem/:id', verifyToken, async function(req, res) {
+  try {
+    const { id } = req.params;
+    const result = await pool.query('SELECT * FROM personagem WHERE id = $1 ORDER BY id', [id]);
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar usuários:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
 router.get('/personagemsemid', verifyToken, async function(req, res) {
   try {
     const result = await pool.query('SELECT * FROM personagem');
@@ -71,7 +82,7 @@ router.post('/personagem', verifyToken, async function(req, res) {
   }
 });
 
-/* DELETE - Remover usuário */
+/* DELETE - Remover personagem */
 router.delete('/personagem/:id', verifyToken, async function(req, res) {
   try {
     const { id } = req.params;
@@ -87,6 +98,43 @@ router.delete('/personagem/:id', verifyToken, async function(req, res) {
     return sendSuccess(res, 200, 'Personagem deletado com sucesso');
   } catch (error) {
     console.error('Erro ao deletar personagem:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+/* PUT - Editar nome do personagem */
+router.put('/personagem/:id', verifyToken, async function(req, res) {
+  try {
+    const { id } = req.params;
+    const { nome } = req.body;
+    
+    // Validação básica
+    if (!nome) {
+      const errors = [];
+      if (!nome) errors.push({ field: 'nome', message: 'Nome é obrigatório', code: 'REQUIRED' });
+
+      return sendError(res, 400, 'Nome é obrigatório', errors);
+    }
+    
+    // Verificar se o personagem existe
+    const personagemExists = await pool.query('SELECT id FROM personagem WHERE id = $1', [id]);
+    if (personagemExists.rows.length === 0) {
+      return sendError(res, 404, 'Personagem não encontrado');
+    }
+    
+    
+    let query, params;
+    
+    
+    const result = await pool.query(query, params);
+    
+    return sendSuccess(res, 200, 'Nome editado com sucesso', result.rows[0]);
+  } catch (error) {
+    console.error('Erro ao editar nome:', error);
+    // Verificar se é erro de constraint
+    if (error.code === '23514') {
+      return sendError(res, 400, 'Dados inválidos. Verifique os campos e tente novamente.');
+    }
     return sendError(res, 500, 'Erro interno do servidor');
   }
 });

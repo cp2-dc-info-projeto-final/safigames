@@ -7,6 +7,7 @@
     import ConfirmModal from '../../components/ConfirmModal.svelte'; // modal de confirmação
     import api from '$lib/api'; // API backend
     import { ArrowLeftOutline, FloppyDiskAltOutline, TrashBinOutline, UserEditOutline } from 'flowbite-svelte-icons'; // ícones
+	import InputModal from "../../components/InputModal.svelte";
 
     let novoJ = $state("Novo jogo");
     let carregarS = $state("Carregar save");
@@ -23,6 +24,14 @@
     let deletingId: number | null = $state(null); // id em deleção
     let confirmOpen = $state(false); // modal aberto?
     let confirmTargetId: number | null = null; // id alvo do modal
+    let inputOpen = $state(false);
+    let editingId: number | null = $state(null); // id em edição
+    let editingName: string = $state('')
+    let personagemEditado = {
+      id: 0,
+      nome: ""
+    }
+
 
     async function criaPersonagem() {
       fieldErrors = [];
@@ -60,7 +69,6 @@
     }
   
   
- 
   async function buscaPersonagem() {
     try{
       const res = await api.get('/game/personagem');
@@ -148,6 +156,20 @@
     const menu = document.getElementById('menu');
     menu.style.display = "none"
     tablePersonagem.style.display = "block";
+  }
+
+  function abrirModalEdit(personagem_id: number, personagem_nome: string) {
+    editingId = personagem_id;
+    editingName = personagem_nome;
+    inputOpen = true;
+  }
+
+  function cancelEdit(){
+    inputOpen = false;
+  }
+
+  function confirmEdit(){
+    
   }
 
   // Opções de roles
@@ -259,12 +281,13 @@
         <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Stamina</TableHeadCell>
         <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Classe</TableHeadCell>
         <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Armadura</TableHeadCell>
-        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]" colspan="2">Dinheiro</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Dinheiro</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]" colspan="2">Gerenciar</TableHeadCell>
       </TableHead>
       <TableBody>
       {#each personagens as personagem} 
         <TableBodyRow class="text-sm md:text-base bg-primary-900 text-primary-500">
-          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.nome}</TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]" id="nomeP">{personagem.nome}</TableBodyCell>
           <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.vida}</TableBodyCell>
           <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.defesa}</TableBodyCell>
           <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.xp}</TableBodyCell>
@@ -273,14 +296,22 @@
           <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.armadura}</TableBodyCell>
           <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.dinheiro}</TableBodyCell>
           <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
-          <button
-            title="Remover"
-            class="p-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent"
-            on:click={() => openConfirm(personagem.id)}
-            disabled={deletingId === personagem.id || loading}
-          >
-            <TrashBinOutline class="w-5 h-5 text-red-400" />
-          </button>
+            <button
+              title="Editar"
+              class="p-2 rounded border border-green-100 hover:border-green-300 transition bg-transparent"
+              on:click={() =>abrirModalEdit(personagemEditado.id = (personagem.id), personagemEditado.nome = (personagem.nome))}>
+              <UserEditOutline class="w-5 h-5 text-primary-500" />
+            </button>
+          </TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
+            <button
+              title="Remover"
+              class="p-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent"
+              on:click={() => openConfirm(personagem.id)}
+              disabled={deletingId === personagem.id || loading}
+            >
+              <TrashBinOutline class="w-5 h-5 text-red-400" />
+            </button>
         </TableBodyCell>
 
         </TableBodyRow>
@@ -317,4 +348,11 @@
   cancelText="Cancelar"
   onConfirm={handleConfirm}
   onCancel={cancelarDelecao}
+/>
+
+<InputModal
+  open={inputOpen}
+  nome_personagem={editingName}
+  onConfirm={confirmEdit}
+  onCancel={cancelEdit}
 />

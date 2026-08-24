@@ -133,7 +133,7 @@
           <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Armadura</TableHeadCell>
           <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Dinheiro</TableHeadCell>
           <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Usuário</TableHeadCell>
-          <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]" colspan="2">Gerenciar</TableHeadCell>
+          <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Excluir</TableHeadCell>
 
         </TableHead>
         <TableBody>
@@ -148,14 +148,6 @@
             <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.armadura}</TableBodyCell>
             <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.dinheiro}</TableBodyCell>
             <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.id_user}</TableBodyCell>
-            <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
-            <button
-                title="Editar"
-                class="p-2 rounded border border-green-100 hover:border-green-300 transition bg-transparent"
-                on:click={() => goto(`/users/edit/${personagem.id_user}`)}> 
-                <UserEditOutline class="w-5 h-5 text-primary-500" />
-            </button>
-            </TableBodyCell>
             <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
             <button
               title="Remover"
@@ -193,6 +185,8 @@
       </button>
     </div>
   </div>
+
+
 
 <ConfirmModal
     open={confirmOpen}
