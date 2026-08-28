@@ -7,7 +7,7 @@
     import ConfirmModal from '../../components/ConfirmModal.svelte'; // modal de confirmação
     import api from '$lib/api'; // API backend
     import { ArrowLeftOutline, FloppyDiskAltOutline, TrashBinOutline, UserEditOutline } from 'flowbite-svelte-icons'; // ícones
-	import InputModal from "../../components/InputModal.svelte";
+	  import InputModal from "../../components/InputModal.svelte";
 
     let novoJ = $state("Novo jogo");
     let carregarS = $state("Carregar save");
@@ -26,7 +26,8 @@
     let confirmTargetId: number | null = null; // id alvo do modal
     let inputOpen = $state(false);
     let editingId: number | null = $state(null); // id em edição
-    let editingName: string = $state('')
+    let editingName: string = $state('');
+    let novoName: string = $state('');
     let personagemEditado = {
       id: 0,
       nome: ""
@@ -168,9 +169,26 @@
     inputOpen = false;
   }
 
-  function confirmEdit(){
-    
+  async function confirmEdit(){
+    novoName = editingName;
+    console.log("editingId:", editingId, "editingName:", novoName);
+    inputOpen = false;
+    try{
+      const res = await api.put(`/game/personagem/${editingId}`, novoName);
+        const body = res.data as ApiResponse<Personagem>;
+        if (!body.success) {
+          error = body.message;
+          fieldErrors = body.errors;
+          return;
+        }
+   } catch (e: any) {
+      const body = e.response?.data as ApiResponse<Personagem> | undefined;
+      error = body?.message || 'Erro ao editar nome.';
+      fieldErrors = body?.errors || [];
+    }
   }
+
+
 
   // Opções de roles
   const classeOptions = [
@@ -352,7 +370,7 @@
 
 <InputModal
   open={inputOpen}
-  nome_personagem={editingName}
+  bind:nome={editingName}
   onConfirm={confirmEdit}
   onCancel={cancelEdit}
 />

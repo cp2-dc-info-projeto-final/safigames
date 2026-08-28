@@ -105,8 +105,9 @@ router.delete('/personagem/:id', verifyToken, async function(req, res) {
 /* PUT - Editar nome do personagem */
 router.put('/personagem/:id', verifyToken, async function(req, res) {
   try {
-    const { id } = req.params;
-    const { nome } = req.body;
+    const id  = req.params;
+    const nome  = req.body;
+    console.log(id, nome);
     
     // Validação básica
     if (!nome) {
@@ -121,9 +122,9 @@ router.put('/personagem/:id', verifyToken, async function(req, res) {
     if (personagemExists.rows.length === 0) {
       return sendError(res, 404, 'Personagem não encontrado');
     }
-    
-    
     let query, params;
+    query = 'UPDATE personagem SET nome = $1 WHERE id = $2 RETURNING id, nome';
+    params = [nome, id];
     
     
     const result = await pool.query(query, params);

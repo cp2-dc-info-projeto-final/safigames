@@ -9,7 +9,7 @@
     export let cancelText = 'Cancelar'; // texto botão cancelar
     export let onConfirm: () => void; // ação confirmar
     export let onCancel: () => void; // ação cancelar
-    export let nome_personagem: string;
+    export let nome: string = '';
 
     function handleClose() {
     if (onCancel) {
@@ -25,7 +25,7 @@
     onclose={handleClose}
 >
 <Label for="nome_personagem">Nome:</Label>
-<Input id="nome_personagem" bind:value={nome_personagem} />
+<Input id="nome_personagem" bind:value={nome} />
 
 <!-- Botão confirmar -->
 <Button color="primary" type="button" onclick={onConfirm}>
