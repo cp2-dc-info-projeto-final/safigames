@@ -8,6 +8,7 @@
     export let confirmText = 'Confirmar'; // texto botão confirmar
     export let cancelText = 'Cancelar'; // texto botão cancelar
     export let onConfirm: () => void; // ação confirmar
+    export let onEnter: () => void; // ação ao pressionar Enter
     export let onCancel: () => void; // ação cancelar
     export let nome: string = '';
 

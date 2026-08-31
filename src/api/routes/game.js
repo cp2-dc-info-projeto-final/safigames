@@ -105,8 +105,8 @@ router.delete('/personagem/:id', verifyToken, async function(req, res) {
 /* PUT - Editar nome do personagem */
 router.put('/personagem/:id', verifyToken, async function(req, res) {
   try {
-    const id  = req.params;
-    const nome  = req.body;
+    const { id }  = req.params;
+    const { nome }  = req.body;
     console.log(id, nome);
     
     // Validação básica

@@ -174,17 +174,20 @@
     console.log("editingId:", editingId, "editingName:", novoName);
     inputOpen = false;
     try{
-      const res = await api.put(`/game/personagem/${editingId}`, novoName);
+      const res = await api.put(`/game/personagem/${editingId}`, { nome: novoName });
         const body = res.data as ApiResponse<Personagem>;
         if (!body.success) {
           error = body.message;
           fieldErrors = body.errors;
           return;
         }
-   } catch (e: any) {
+    } catch (e: any) {
       const body = e.response?.data as ApiResponse<Personagem> | undefined;
       error = body?.message || 'Erro ao editar nome.';
       fieldErrors = body?.errors || [];
+    }
+    finally {
+      buscaPersonagem();
     }
   }
 
@@ -368,9 +371,12 @@
   onCancel={cancelarDelecao}
 />
 
-<InputModal
-  open={inputOpen}
-  bind:nome={editingName}
-  onConfirm={confirmEdit}
-  onCancel={cancelEdit}
-/>
+<form on:submit|preventDefault={confirmEdit}>
+  <InputModal
+    open={inputOpen}
+    bind:nome={editingName}
+    onConfirm={confirmEdit}
+    onEnter={confirmEdit}
+    onCancel={cancelEdit}
+  />
+</form>
