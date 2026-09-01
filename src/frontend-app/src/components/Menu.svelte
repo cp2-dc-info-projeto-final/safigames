@@ -3,7 +3,7 @@
   import { onMount } from "svelte";
   import { logout, getCurrentUser, getToken, type User } from "$lib/auth";
   import { goto } from "$app/navigation";
-  import { ArrowRightToBracketOutline, PlaySolid } from "flowbite-svelte-icons";
+  import { ArrowRightToBracketOutline, PlaySolid, AdjustmentsHorizontalSolid } from "flowbite-svelte-icons";
   import { page } from "$app/stores";
   
   let user: User | null = null;
@@ -75,6 +75,10 @@
 		goto('/menu_game'); // Caminho do jogo
 	}
 
+  function irParaGerenciamento(){
+    goto('/gerenciamento'); // Gerenciamento
+  }
+
 </script>
 
 <div class="relative px-8">
@@ -94,6 +98,12 @@
           <NavLi href="/perfil" nonActiveClass="text-xl font-bold px-4 py-2 text-primary-500 dark:text-primary-400 hover:text-primary-200 hover:bg-primary-900 focus:text-primary-400 focus:bg-primary-300 transition-colors rounded-lg">Perfil</NavLi>
           {#if user.role === 'admin'} <!-- só exibe menu usuários para admin-->
             <NavLi href="/users" nonActiveClass="text-xl font-bold px-4 py-2 text-primary-500 dark:text-primary-400 hover:text-primary-200 hover:bg-primary-900 focus:text-primary-400 focus:bg-primary-300 transition-colors rounded-lg">Usuários</NavLi>
+            <button 
+                  class="ml-2 px-3 py-1 bg-secondary-100 hover:bg-primary-200 text-white rounded text-lg flex items-center gap-1"
+                  on:click={irParaGerenciamento}>
+                  <AdjustmentsHorizontalSolid class="shrink-0 h-6 w-6" />
+                  Gerenciar
+                </button>
           {/if}
           <NavLi>
             <div class="flex items-center">
