@@ -1,103 +1,335 @@
-# Documento de Casos de Uso
+## Casos de Uso:
 
-## Lista dos Casos de Uso
+### Caso de uso 1: Gerenciar cadastro
 
- - [CDU 01](#CDU-01): Quisque id neque a erat imperdiet dictum et ut mauris.
- - [CDU 02](#CDU-02): Morbi fringilla dolor at mattis vestibulum.
- - [CDU 03](#CDU-03): Duis nec orci quis velit faucibus hendrerit tempus vel libero.
+#### Atores:
 
+- User.
+  
+#### Fluxo principal:
 
-## Lista dos Atores
+- O user seleciona a opção “Cadastre-se”.
+  
+- O sistema leva o user até a tela de registro contendo um formulário.
+  
+- O user preenche os campos do formulário (informando nome de usuário e criando uma senha).
+  
+- O sistema consulta o banco de dados para verificar a disponibilidade das informações fornecidas.
+  
+- O banco de dados retorna uma confirmação positiva.
+  
+- O sistema realiza o cadastro, salvando os dados do novo user.
+  
+- O sistema encaminha o user para o menu principal do jogo.
 
- - Cras tempor
- - Donec a lorem
+  ![Cadastro de usuário](diagramas/Cadastro_de_usuario.drawio.png)
 
-## Diagrama de Casos de Uso
+#### Fluxo Alternativo A: O email já está cadastrado
 
-![Diagrama de Casos de Uso](diagramas/diagrama-exemplo.png)
+- O sistema apresenta formulário de cadastro.
+ 
+- O user preenche os campos.
 
-## Descrição dos Casos de Uso
+- O sistema consulta o banco de dados.
 
-### CDU 01
+- O banco de dados retorna que o email informado já está em uso.
 
-Quisque id neque a erat imperdiet dictum et ut mauris.
+- O sistema exibe uma mensagem de erro informando que o email digitado já está em uso.
 
-#### Atores
+#### Fluxo Alternativo B: Campo vazio
 
-1. Cras tempor
-2. Donec a lorem
+- O sistema apresenta formulário de cadastro.
 
-#### Fluxo Principal
+- O user não preenche um dos campos e clica no botão de "Criar Conta"
 
-1. Vivamus nec velit id risus sodales fermentum ut a mi.
-2. Nunc a ligula ac libero pellentesque auctor ornare at sem.
-3. In quis ante scelerisque felis luctus malesuada.
-4. Pellentesque mattis dui quis eleifend accumsan.
+- O sistema analisa os campos de cadastro e pede que o user preencha todos os campos.
 
-**Diagrama de sequência XX**
+#### Fluxo Alternativo C: Senha diferente dos padrões exigidos
 
-![Diagrama de Sequência](diagramas/diagrama-exemplo.png)
+- O sistema apresenta formulário de cadastro.
 
-#### Fluxo Alternativo A
+- O user insere uma senha.
 
-1. Pellentesque id mauris id ex fringilla iaculis.
-2. Maecenas ut dui at sapien rhoncus porttitor in sed turpis.
-3. Maecenas fringilla augue id sodales volutpat.
-4. Nulla vehicula lectus eu eros faucibus porta.
-5. Morbi non sem in diam dictum aliquet sit amet at metus.
-6. Aenean dictum diam in tempus ornare.
+- O sistema analisa se a senha está dentro dos padrões exigidos (mínimo 6 caracteres)
 
-#### Fluxo Alternativo B
+- O sistema exibe uma mensagem de erro e informa ao user que a senha está fora dos padrões.
 
-1. Ut elementum dolor id lorem elementum, et condimentum eros laoreet.
-2. Nulla sollicitudin arcu nec suscipit volutpat.
-3. Aliquam mattis sapien nec ornare faucibus.
-4. Sed eu massa nec enim condimentum commodo at eget ligula.
-5. Nam ultricies velit nec erat feugiat condimentum.
-6. Nam vitae lacus porttitor, sodales orci vel, lobortis arcu.
+- O sistema exibe uma mensagem sugerindo que o user coloque a senha correta.
 
+#### Fluxo Alternativo D: Excluir user
 
-### CDU 02
+- O user acessa o menu do seu perfil com as configurações da sua conta.
 
-Morbi fringilla dolor at mattis vestibulum.
+- O user aperta o botão excluir conta.
 
-#### Atores
+- O sistema solicita a senha do user para proseguir com a exclusão.
+  
+- O usário digita a senha.
+  
+- O sistema analisa a veracidade da senha no banco de dados.
+  
+- O banco de dados retorna uma confirmação positiva.
+  
+- O sistema pergunta se quer confirmar a exclusão.
+  
+- O user aperta o botão confirmar.
+  
+- O sistema apaga os dados do user no banco de dados.
+  
+- O sistema apresenta mensagem de sucesso.
 
-1. Cras tempor
+#### Fluxo Alternativo E: Editar cadastro do user
 
-#### Fluxo Principal
+- O user acessa o menu do seu perfil com as configurações da sua conta.
 
-1. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-2. Mauris varius massa ac fermentum scelerisque.
-3. Morbi in tortor dignissim, bibendum tellus et, varius odio.
-4. Mauris egestas leo a suscipit feugiat.
+- O user aperta o botão "editar dados".
+  
+- O sistema exibe os dados de cadastro do user.
 
-#### Fluxo Alternativo A
+- O user edita dados do seu cadastro e aperta o botão confirmar.
+  
+- O sistema edita os dados do user no banco de dados.
 
-1. Nulla elementum diam eu elementum rutrum.
-2. Aenean scelerisque est at nunc ornare, ac condimentum justo sollicitudin.
-3. Quisque eget risus ut est lacinia sollicitudin ac non diam.
-4. Quisque ac nulla convallis, lobortis nibh ac, tristique enim.
-5. Nulla ultricies metus nec risus mollis, interdum ultrices justo malesuada.
+### Caso de Uso 2: Fazer log-in.
 
-### CDU 03
+#### Atores: 
 
-Duis nec orci quis velit faucibus hendrerit tempus vel libero.
+- User
 
-#### Atores
+#### Fluxo principal:
 
-1. Donec a lorem
+- O user seleciona a opção "Login".
 
-#### Fluxo Principal
+- O sistema leva o user até a tela de preenchimento de senha e nome de usuário.
 
-1. Praesent interdum lectus sit amet augue tincidunt imperdiet.
-2. Duis ac dolor vel nisi imperdiet vehicula et non sem.
-3. Nunc imperdiet tortor consequat, lobortis purus non, interdum risus.
+- User preenche os campos da tela.
 
-#### Fluxo Alternativo A
+- O sistema consulta o banco de dados para a confirmação dos dados inseridos.
 
-1. Aliquam efficitur arcu ac fermentum egestas.
-2. Pellentesque ac diam vitae erat bibendum hendrerit.
-3. Mauris sed purus sit amet lectus efficitur placerat et eu diam.
-4. Aenean ullamcorper tellus quis nibh porttitor congue.
-5. Phasellus laoreet erat eget condimentum dictum.
+- O banco de dados retorna uma confirmação positiva.
+
+- O sistema encaminha o user para o menu principal do jogo.
+
+  ![Fazer login](diagramas/Fazer_login.drawio.png)
+
+#### Fluxo Alternativo A: Email inválido
+
+- O sistema apresenta a página de formulário de Login.
+
+- O user insere um email.
+
+- O sistema consulta o banco de dados.
+
+- O banco de dados retorna que o email informado já está em uso.
+
+- O sistema exibe uma mensagem dizendo que o email está inválido e sugere que o user digite outro email.
+
+#### Fluxo Alternativo B: Senha inválida
+
+- O sistema apresenta a página de formulário de Login.
+
+- O user insere uma senha.
+
+- O sistema consulta o banco de dados.
+
+- O banco de dados retorna que a senha informada está inválida.
+
+- O sistema exibe uma mensagem dizendo que a senha está invalida e sugere que o user insira uma senha correta.
+
+#### Fluxo Alternativo C: Campo vazio
+
+- O sistema apresenta a página de formulário de Login.
+
+- O user não preenche um dos campos e clica no botão de "Login".
+
+- O sistema analisa os campos de cadastro e pede que o user preencha todos os campos.
+
+### Caso de Uso 3: Jogar
+
+#### Atores: 
+
+- Jogador
+
+#### Fluxo principal: 
+
+- O jogador acessa o menu principal do jogo
+
+- O jogador clica no botão "Iniciar jogo"
+
+- O jogador não tem slots de save iniciados
+
+- O jogador inicia um novo save
+
+- O jogador pode interagir dentro do jogo com comandos
+
+  ![Jogar](diagramas/Jogar.drawio.png)
+
+#### Fluxo alternativo A: Carregar save
+
+- O jogador acessa o menu principal do jogo
+
+- O jogador clica no botão "Iniciar jogo"
+
+- O jogador já tem slots de save iniciado (no mínimo 1)
+
+- O jogador inicia o save existente
+
+- O jogador pode interagir dentro do jogo com comandos
+
+### Caso de Uso 4: Excluir save
+
+#### Atores: 
+
+- Jogador
+
+#### Fluxo principal: 
+
+- O jogador acessa o menu principal do jogo 
+
+- O jogador clica em "Saves"
+
+- O jogador escolhe um save e clica em "Excluir save"
+
+- O sistema faz requisição ao banco de dados para excluir os dados do save
+
+- O banco de dados exclui os dados do save e retorna uma mensagem de sucesso
+
+  ![Excluir save](diagramas/Excluir_save.drawio.png)
+
+#### Fluxo alternativo: Não há saves
+
+- O jogador acessa o menu principal do jogo 
+
+- O jogador clica em "Saves"
+
+- A página exibe a mensagem "Não há saves existentes"
+
+- O jogador clica no botão voltar
+
+- O jogador volta para o menu inicial
+
+### Caso de Uso 5: Gerenciar inimigos
+
+#### Atores: 
+
+- Adm
+
+#### Fluxo principal: 
+
+- O adm acessa o menu principal do jogo
+
+- O adm acessa a página "Inimigos"
+
+- A página exibe uma lista com todos os inimigos
+
+- O adm pode criar, editar, e excluir inimigos
+
+  ![Cadastro de inimigo](diagramas/cadastro_de_inimigo.drawio.png)
+ 
+### Caso de Uso 6: Gerenciar Cena
+
+#### Atores: 
+
+- Adm
+
+#### Fluxo principal: 
+
+- O adm acessa o menu principal do jogo
+
+- O adm acessa a página "Cenas"
+
+- A página exibe uma lista com todas as cenas
+
+- O adm pode criar, editar, e excluir cenas
+
+  ![Cadastro de cena](diagramas/Cadastro_de_cena.drawio.png)
+
+### Caso de Uso 7: Gerenciar Episódio
+
+#### Atores: 
+
+- Adm
+
+#### Fluxo principal: 
+
+- O adm acessa o menu principal do jogo
+
+- O adm acessa a página "Episódios"
+
+- A página exibe uma lista com todos os episódios
+
+- O adm pode criar, editar, e excluir episódios
+
+![Cadastro de episódio](diagramas/cadastro_de_episodio.drawio.png)
+
+### Caso de Uso 8: Gerenciar Item
+
+#### Atores: 
+
+- Adm
+
+#### Fluxo principal: 
+
+- O adm acessa o menu principal do jogo
+
+- O adm acessa a página "Itens"
+
+- A página exibe uma lista com todos os itens
+
+- O adm pode criar, editar, e excluir itens
+
+![Cadastro de item](diagramas/cadastro_de_item.drawio.png)
+
+### Caso de Uso 9: Gerenciar Comerciante
+
+#### Atores: 
+
+- Adm
+
+#### Fluxo principal: 
+
+- O adm acessa o menu principal do jogo
+
+- O adm acessa a página "Comerciantes"
+
+- A página exibe uma lista com todos os comerciantes
+
+- O adm pode criar, editar, e excluir comerciantes
+
+- No momento de criação do comerciante, o adm insere os itens no seu catálogo
+
+![Cadastro de comerciante](diagramas/Cadastrar_comerciante.drawio.png)
+
+### Caso de Uso 10: Gerenciar Catálogo
+
+#### Atores: 
+
+- Adm
+
+#### Fluxo principal: 
+
+- O adm acessa a página "Comerciantes"
+
+- A página exibe uma lista com todos os comerciantes
+
+- O adm seleciona um dos comerciantes e pode adicionar ou remover itens dos seus catálogos
+
+![Cadastro de catalogo](diagramas/cadastro_de_catalogo.drawio.png)
+
+### Caso de Uso 11: Excluir jogadores
+
+#### Atores: 
+
+- Adm
+
+#### Fluxo principal: 
+
+- O adm acessa o menu principal do jogo
+
+- O adm acessa a página "jogadores"
+
+- A página exibe uma lista com todos os jogadores
+
+- O adm clica num botão "Excluir jogador" e exclui o jogador correspondente ao botão
+
+  ![Excluir jogador](diagramas/Excluir_jogador.drawio.png)

@@ -37,6 +37,12 @@
 
 </script>
 
+<style>
+	  :global(body) {
+    font-family: 'fonte-topiy';
+  }
+</style>
+
 <Menu />
 <svelte:head>
   <title>Login - Projeto Safigames</title>

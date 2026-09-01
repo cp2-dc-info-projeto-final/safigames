@@ -1,21 +1,42 @@
-# Documento de Requisitos
+-- Active: 1764609861484@@127.0.0.1@5432
+# Especificações de requisitos 
 
 ## Requisitos Funcionais
 
-### RF 01
+RF01: Cadastro de usuário, administrador, personagem, inimigo e NPC
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec blandit nulla vel diam vehicula, eu porttitor nulla aliquam.
+RF02: Remover usuário, administrador, personagem, inimigo e NPC
 
-### RF 02
+RF03: Editar usuário, administrador, personagem, inimigo e NPC
 
-Nullam laoreet, mauris ac tempor vulputate, orci metus aliquet augue, at accumsan odio mi eu sapien. Aliquam tincidunt metus ut aliquet vehicula. Aliquam vitae arcu sed lacus fermentum sagittis.
+RF04: Login usuário e administrador
 
-## Requisitos Não-Funcionais
+RF05: Criar save (criar personagem)
 
-### RNF 01
+RF06: Carregar, pesquisar e deletar save
 
-Nulla facilisi. Etiam tempus dolor et odio tincidunt fermentum. Donec pharetra nulla eu euismod maximus. Maecenas eu mauris tincidunt, pulvinar tellus sed, blandit eros.
+RF07: Atribuir pontos de habilidades ao personagem
 
-### RNF 02
+RF08: Seleção de classes do personagem 
 
-Nam id enim ut quam faucibus scelerisque at non diam. Morbi eget eleifend lectus, quis fringilla elit. Morbi iaculis, elit vel accumsan hendrerit, ipsum purus varius lacus, eget facilisis massa mauris ac ipsum.
+RF09: Criar, editar, e deletar classes
+
+RF10: Sistema de aleatoriedade, dano, cura, defesa e interação
+
+RF11: Sistema de nível e de upgrade de personagem
+
+RF12: Sistema de loja in-game
+
+## Requisitos não funcionais
+
+RNF01: Desempenho 
+
+RNF02: Segurança
+
+RNF03: Usabilidade
+
+RNF04: Armazenamento em banco de dados
+
+RNF05: Compatibilidade
+
+RNF06: Responsividade

@@ -8,6 +8,8 @@
   import { ArrowLeftOutline, FloppyDiskAltOutline, EyeSlashSolid, EyeSolid } from 'flowbite-svelte-icons'; // ícones
   import type { User, UserFormData } from '$lib/models/User';
   import { getToken, getCurrentUser } from "$lib/auth";
+  import { login as authLogin } from "$lib/auth";
+  
 
   export let id: number | null = null; // id do usuário
 
@@ -19,13 +21,15 @@
     { value: 'jogador', name: 'Jogador' },
     { value: 'admin', name: 'Administrador' }
   ];
+  
   let loading = false;
   let error = '';
   let fieldErrors: ApiFieldError[] = [];
   let hasToken = false;
   let confirmarSenha = '';
   let senhaVisivel = false;
-  let componenteAtivo = EyeSlashSolid ;
+  let componenteAtivo = EyeSlashSolid;
+  let user_me: User;
 
   function olhoeSenha(){
     mudaOlho();
@@ -37,7 +41,6 @@
   }
 
   function mostrarSenha(){
-    console.log("entrou")
     if (senhaVisivel){
       senhaVisivel = false;
     }
@@ -51,9 +54,11 @@
     return fieldErrors.find((item) => item.field === field)?.message ?? null;
   }
 
+  
+
   // Carrega usuário se for edição
   onMount(async () => {
-    if (user_me){
+    if (hasToken){
       user_me = await getCurrentUser();
     }
     if (id !== null) {
@@ -74,6 +79,35 @@
       }
     } 
   });
+
+  async function handleLogin() {
+    if (!user.login || !user.senha) {
+      error = 'Por favor, preencha todos os campos';
+      return;
+    }
+
+    loading = true;
+    error = '';
+
+    try {
+      let login = user.login;
+      let password = user.senha;
+      const result = await authLogin({ login, password });
+      
+      if (result.success) {
+        await goto('/');
+      } else {
+        error = result.message || 'Credenciais inválidas';
+      }
+    } catch (err) {
+      error = 'Erro interno do servidor';
+      console.error('Erro no login:', err);
+    } finally {
+      loading = false;
+    }
+  }
+
+  
 
   // Submissão do formulário
   async function handleSubmit() {
@@ -96,7 +130,6 @@
     error = '';
     try {
       const userData = { ...user };
-      // Remove senha vazia na edição para não sobrescrever indevidamente
       if (id !== null && !userData.senha) {
         delete userData.senha;
       }
@@ -108,6 +141,9 @@
           error = body.message;
           fieldErrors = body.errors;
           return;
+        }
+        if (!hasToken){
+          await handleLogin();
         }
       } else {
         const res = await api.put(`/users/${id}`, userData);
@@ -128,7 +164,9 @@
     }
   }
 
-
+  function handleCancel() {
+    history.back();
+  }
   void verificaUser();
   async function verificaUser() {
     hasToken = getToken() !== null;
@@ -200,7 +238,7 @@
 
     <!-- Campo role -->
     <div>
-        {#if hasToken && user_me && user_me.role == "admin"}
+        {#if hasToken && user_me && user_me.role === 'admin'}
           <Label for="role" class="text-lg text-primary-500">Perfil</Label>
           <Select id="role" bind:value={user.role} items={roleOptions} class="mt-1" />
 

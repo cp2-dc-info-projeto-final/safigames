@@ -32,6 +32,27 @@ router.get('/', verifyToken, isAdmin, async function(req, res) {
   }
 });
 
+/* DELETE - Remover usuário */
+router.delete('/:id', verifyToken, async function(req, res) {
+  try {
+    const { id } = req.params;
+    
+    // Verificar se o usuário existe
+    const userExists = await pool.query('SELECT id FROM usuario WHERE id = $1', [id]);
+    if (userExists.rows.length === 0) {
+      return sendError(res, 404, 'Usuário não encontrado');
+    }
+    
+    await pool.query('DELETE FROM usuario WHERE id = $1', [id]);
+    
+    return sendSuccess(res, 200, 'Usuário deletado com sucesso');
+  } catch (error) {
+    console.error('Erro ao deletar usuário:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+
 /* GET parametrizado - Buscar usuário autenticado */
 router.get('/me', verifyToken, async function(req, res) {
   try {
@@ -66,7 +87,7 @@ router.get('/pesquisa/:login', verifyToken, isAdmin, async function(req, res) {
 });
 
 /* GET parametrizado - Buscar usuário por ID */
-router.get('/:id', verifyToken, isAdmin, async function(req, res) {
+router.get('/:id', verifyToken, async function(req, res) {
   try {
     const { id } = req.params;
     const result = await pool.query('SELECT id, login, email, role FROM usuario WHERE id = $1', [id]);
@@ -197,7 +218,7 @@ router.post('/login', async function(req, res) {
 
 
 /* PUT - Atualizar usuário */
-router.put('/:id', verifyToken, isAdmin, async function(req, res) {
+router.put('/:id', verifyToken, async function(req, res) {
   try {
     const { id } = req.params;
     const { login, email, senha, role } = req.body;
@@ -239,12 +260,24 @@ router.put('/:id', verifyToken, isAdmin, async function(req, res) {
     if (senha && senha.trim() !== '') {
       // Atualizar com nova senha
       const hashedPassword = await bcrypt.hash(senha, 12);
+      if (req.user.role == 'admin'){
       query = 'UPDATE usuario SET login = $1, email = $2, senha = $3, role = $4 WHERE id = $5 RETURNING id, login, email, role';
       params = [login, email, hashedPassword, role, id];
+      }
+      else {
+        query = 'UPDATE usuario SET login = $1, email = $2, senha = $3 WHERE id = $4 RETURNING id, login, email';
+        params = [login, email, hashedPassword, id];
+      }
     } else {
       // Atualizar sem alterar senha
+      if (req.user.role == 'admin'){
       query = 'UPDATE usuario SET login = $1, email = $2, role = $3 WHERE id = $4 RETURNING id, login, email, role';
       params = [login, email, role, id];
+      }
+      else{
+        query = 'UPDATE usuario SET login = $1, email = $2 WHERE id = $3 RETURNING id, login, email';
+        params = [login, email, id];
+      }
     }
     
     const result = await pool.query(query, params);
@@ -260,24 +293,6 @@ router.put('/:id', verifyToken, isAdmin, async function(req, res) {
   }
 });
 
-/* DELETE - Remover usuário */
-router.delete('/:id', verifyToken, isAdmin, async function(req, res) {
-  try {
-    const { id } = req.params;
-    
-    // Verificar se o usuário existe
-    const userExists = await pool.query('SELECT id FROM usuario WHERE id = $1', [id]);
-    if (userExists.rows.length === 0) {
-      return sendError(res, 404, 'Usuário não encontrado');
-    }
-    
-    await pool.query('DELETE FROM usuario WHERE id = $1', [id]);
-    
-    return sendSuccess(res, 200, 'Usuário deletado com sucesso');
-  } catch (error) {
-    console.error('Erro ao deletar usuário:', error);
-    return sendError(res, 500, 'Erro interno do servidor');
-  }
-});
+
 
 module.exports = router;
