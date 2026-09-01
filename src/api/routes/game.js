@@ -45,7 +45,7 @@ router.get('/personagemsemid', verifyToken, async function(req, res) {
     const result = await pool.query('SELECT * FROM personagem');
     return sendSuccess(res, 200, null, result.rows);
   } catch (error) {
-    console.error('Erro ao buscar usuários:', error);
+    console.error('Erro ao buscar personagens:', error);
     return sendError(res, 500, 'Erro interno do servidor');
   }
 });
@@ -107,7 +107,6 @@ router.put('/personagem/:id', verifyToken, async function(req, res) {
   try {
     const { id }  = req.params;
     const { nome }  = req.body;
-    console.log(id, nome);
     
     // Validação básica
     if (!nome) {
@@ -138,6 +137,64 @@ router.put('/personagem/:id', verifyToken, async function(req, res) {
     }
     return sendError(res, 500, 'Erro interno do servidor');
   }
+});
+
+router.post('/episodio', verifyToken, async function(req, res) {
+  try {
+    const { titulo } = req.body;
+
+    // Validação básica
+    if (!titulo) {
+      const errors = [];
+      if (!titulo) errors.push({ field: 'titulo', message: 'Título é obrigatório', code: 'REQUIRED' });
+
+      return sendError(res, 400, 'Título é obrigatório', errors);
+    };
+
+    const result = await pool.query(
+      'INSERT INTO episodio (titulo) VALUES ($1) RETURNING titulo',
+      [titulo]
+    );
+    return sendSuccess(res, 201, 'Episódio criado com sucesso', result.rows[0]);
+  } catch (error) {
+    console.error('Erro ao criar episódio:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+router.get('/episodio', verifyToken, async function(req, res) {
+  try {
+    const result = await pool.query('SELECT * FROM episodio');
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar episodios:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+/* DELETE - Remover episodio */
+router.delete('/episodio/:id', verifyToken, async function(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (id == 1){
+      return sendError(res, 400, 'Não é possível deletar o episódio inicial');
+    }
+
+    // Verificar se o episódio existe
+    const episodioExists = await pool.query('SELECT id FROM episodio WHERE id = $1', [id]);
+    if (episodioExists.rows.length === 0) {
+      return sendError(res, 404, 'Episódio não encontrado');
+    }
+    
+    await pool.query('DELETE FROM episodio WHERE id = $1', [id]);
+    
+    return sendSuccess(res, 200, 'Episódio deletado com sucesso');
+  } catch (error) {
+    console.error('Erro ao deletar episodio:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+
 });
 
 module.exports = router;
