@@ -162,6 +162,7 @@ router.post('/episodio', verifyToken, async function(req, res) {
   }
 });
 
+/* Busca todos os episodios */
 router.get('/episodio', verifyToken, async function(req, res) {
   try {
     const result = await pool.query('SELECT * FROM episodio');

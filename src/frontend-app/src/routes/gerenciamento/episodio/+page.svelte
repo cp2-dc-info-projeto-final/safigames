@@ -1,13 +1,13 @@
 <script lang="ts">
 
-    import { Table, TableHead, TableHeadCell, TableBody, TableBodyRow, TableBodyCell } from "flowbite-svelte";
+    import { Table, TableHead, TableHeadCell, TableBody, TableBodyRow, TableBodyCell, Button, Card, Heading, Label, Input } from "flowbite-svelte";
     import Menu from '../../../components/Menu.svelte';
     import { onMount } from 'svelte'; // ciclo de vida
     import api from '$lib/api'; // API backend
-    import type { ApiResponse } from '$lib/api';
+    import type { ApiResponse, ApiFieldError } from '$lib/api';
     import type { User } from '$lib/models/User';
     import type { Episodio } from '$lib/models/Episodio';
-    import { TrashBinOutline } from 'flowbite-svelte-icons'; // ícones
+    import { TrashBinOutline, FloppyDiskAltOutline, ArrowLeftOutline } from 'flowbite-svelte-icons'; // ícones
     import ConfirmModal from '../../../components/ConfirmModal.svelte'; // modal de confirmação
     import { goto } from '$app/navigation';
 
@@ -18,6 +18,10 @@
     let deletingId: number | null = $state(null); // id em deleção
     let confirmOpen = $state(false); // modal aberto?
     let confirmTargetId: number | null = null; // id alvo do modal
+    let fieldErrors: ApiFieldError[] = [];
+    let tabelaEpisodio: HTMLElement;
+    let formEpisodio: HTMLElement;
+    let titulo_episodio: string = $state('');
 
 
     onMount(async () => {
@@ -38,6 +42,10 @@
     } 
   })
 
+  function errorOf(field: string): string | null {
+    return fieldErrors.find((item) => item.field === field)?.message ?? null;
+  }
+
 
   async function buscaEpisodio() {
     try{
@@ -57,6 +65,30 @@
         }
   }
 
+  async function criaEpisodio() {
+    loading = true;
+    error = '';
+    fieldErrors = [];
+    try {
+      const res = await api.post('/game/episodio', { titulo: titulo_episodio });
+      const body = res.data as ApiResponse<Episodio>;
+      if (body.success && body.data) {
+        episodios.push(body.data);
+        titulo_episodio = '';
+        handleCancel();
+      } else {
+        error = body.message;
+        fieldErrors = body.fieldErrors ?? [];
+      }
+    } catch (e: any) {
+      console.error('Erro ao criar episódio:', e);
+      const body = e.response?.data as ApiResponse<Episodio> | undefined;
+      error = body?.message || 'Erro ao criar episódio.';
+    } finally {
+      loading = false;
+    }
+  }
+
   // Abre modal de confirmação
   function openConfirm(id: number) {
     confirmTargetId = id;
@@ -64,7 +96,6 @@
   }
   // Fecha modal
   function closeConfirm() {
-    console.log("Ta entrando")
     confirmOpen = false;
     confirmTargetId = null;
   }
@@ -102,9 +133,58 @@
     }
   }
 
+  function handleCancel() {
+    tabelaEpisodio = document.getElementById('episodioContainer');
+    tabelaEpisodio.style.display = "block";
+    formEpisodio = document.getElementById('containerForm');
+    formEpisodio.style.display = "none";
+  }
+
 
 </script>
 <Menu />
+
+<div class="mt-auto mb-auto" style="display:none" id="containerForm">
+  <!-- Card do formulário -->
+  <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
+      <!-- Formulário principal -->
+      <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={criaEpisodio}>
+        <!-- Título -->
+        <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
+          Crie um episódio
+        </Heading>
+        <!-- Mensagem de erro -->
+        {#if error}
+          <div class="text-red-500 text-center">{error}</div>
+        {/if}
+        <!-- Campo Título -->
+        <div>
+          <Label for="titulo" class="text-lg text-primary-500">Título</Label>
+          <Input id="titulo" bind:value={titulo_episodio} placeholder="Digite o titulo do episodio" required class="mt-1" />
+          {#if errorOf('titulo')}
+            <div class="mt-1 text-sm text-red-500">{errorOf('titulo')}</div>
+          {/if}
+        </div>
+    
+        <!-- Botões de ação -->
+        
+        <div class="text-lg flex gap-4 justify-end mt-4">
+          <!-- Botão cancelar/voltar -->
+          <Button color="light" type="button" onclick={handleCancel} disabled={loading}>
+            <ArrowLeftOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+              Voltar
+          </Button>
+          <!-- Botão salvar -->
+          <Button type="submit" color="primary" disabled={loading}>
+            <FloppyDiskAltOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+              Criar
+          </Button> 
+        </div>
+      </form>
+      
+    </Card>
+  </div>
+
 
 
 <!-- Container de tabela episodio -->
@@ -115,11 +195,13 @@
         <TableHead class="text-sm md:text-base bg-primary-900 text-primary-500">
           <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Título</TableHeadCell>
           <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Cenas</TableHeadCell>
+          <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Excluir</TableHeadCell>
         </TableHead>
         <TableBody>
         {#each episodios as episodio} 
           <TableBodyRow class="text-sm md:text-base bg-primary-900 text-primary-500">
             <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{episodio.titulo}</TableBodyCell>
+            <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Algumas cenas </TableBodyCell> <!-- Célula de cenas não integrada ao banco de dados -->
             <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
             <button
               title="Remover"
@@ -142,16 +224,29 @@
       </Table>
     </div>
   
-    <!-- Botão voltar (Fora da tabela, embaixo e à direita) -->
-    <div class="flex justify-end w-full">
+    
+    <div class="flex justify-between">
+      <!-- Botão adicionar -->
       <button
-        title="voltar"
-        class="px-4 py-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent text-primary-500"
-        on:click={goto('/gerenciamento')}>
-        Voltar
-      </button>
-    </div>
-  </div>
+      title="adicionar"
+      class="px-4 py-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent text-primary-500"
+      on:click={() => {
+        tabelaEpisodio = document.getElementById('episodioContainer');
+        tabelaEpisodio.style.display = "none";
+        formEpisodio = document.getElementById('containerForm');
+        formEpisodio.style.display = "block";
+      }}>
+      Adicionar
+    </button>
+      <!-- Botão voltar -->
+        <button
+          title="voltar"
+          class="px-4 py-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent text-primary-500"
+          on:click={goto('/gerenciamento')}>
+          Voltar
+        </button>
+    </div>   
+</div>
 
 
 

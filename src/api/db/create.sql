@@ -106,7 +106,7 @@ CREATE TABLE personagem (
     id_cena INTEGER NOT NULL DEFAULT 1,
     FOREIGN KEY (id_cena)
         REFERENCES cena (id)
-        ON DELETE DEFAULT,
+        ON DELETE SET DEFAULT,
 
     CONSTRAINT pk_personagem PRIMARY KEY (id)
 );

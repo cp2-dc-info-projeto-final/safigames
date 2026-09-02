@@ -29,7 +29,6 @@
   let confirmarSenha = '';
   let senhaVisivel = false;
   let componenteAtivo = EyeSlashSolid;
-  let user_me: User;
 
   function olhoeSenha(){
     mudaOlho();
