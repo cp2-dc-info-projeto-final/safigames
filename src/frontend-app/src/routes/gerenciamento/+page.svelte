@@ -50,5 +50,6 @@
     on:click={goto('/gerenciamento/episodio')}>
     Episódio
 </button>
+<!-- insira botão de comerciante aqui -->
 
 </div>

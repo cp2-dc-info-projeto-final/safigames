@@ -238,4 +238,6 @@ router.put('/episodio/:id', verifyToken, async function(req, res) {
   }
 });
 
+// rota get de comerciante
+
 module.exports = router;
