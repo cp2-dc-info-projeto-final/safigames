@@ -2,12 +2,13 @@
 
     import { Table, TableHead, TableHeadCell, TableBody, TableBodyRow, TableBodyCell, Button, Card, Heading, Label, Input } from "flowbite-svelte";
     import Menu from '../../../components/Menu.svelte';
+    import InputModal from '../../../components/InputModal.svelte';
     import { onMount } from 'svelte'; // ciclo de vida
     import api from '$lib/api'; // API backend
     import type { ApiResponse, ApiFieldError } from '$lib/api';
     import type { User } from '$lib/models/User';
     import type { Episodio } from '$lib/models/Episodio';
-    import { TrashBinOutline, FloppyDiskAltOutline, ArrowLeftOutline } from 'flowbite-svelte-icons'; // ícones
+    import { TrashBinOutline, FloppyDiskAltOutline, ArrowLeftOutline, UserEditOutline } from 'flowbite-svelte-icons'; // ícones
     import ConfirmModal from '../../../components/ConfirmModal.svelte'; // modal de confirmação
     import { goto } from '$app/navigation';
 
@@ -21,7 +22,15 @@
     let fieldErrors: ApiFieldError[] = [];
     let tabelaEpisodio: HTMLElement;
     let formEpisodio: HTMLElement;
-    let titulo_episodio: string = $state('');
+    let titulo_episodio: string = $state(''); // titulo digitado no form de cadastro de episódio
+    let inputOpen = $state(false);
+    let editingId: number | null = $state(null); // id em edição
+    let editingTitle: string = $state(''); // titulo em edição
+    let novoTitulo: string = $state(''); // titulo digitado que substituirá o antigo
+    let episodioEditado = {
+      id: 0,
+      titulo: ""
+    }
 
 
     onMount(async () => {
@@ -140,6 +149,40 @@
     formEpisodio.style.display = "none";
   }
 
+  function abrirModalEdit(personagem_id: number, personagem_nome: string) {
+    tabelaEpisodio = document.getElementById('episodioContainer');
+    tabelaEpisodio.style.display = "none";
+    editingId = personagem_id;
+    editingTitle = personagem_nome;
+    inputOpen = true;
+  }
+
+  async function confirmEdit(){
+    novoTitulo = editingTitle;
+    inputOpen = false;
+    goto('/gerenciamento/episodio')
+    try{
+      const res = await api.put(`/game/episodio/${editingId}`, { titulo: novoTitulo });
+        const body = res.data as ApiResponse<Episodio>;
+        if (!body.success) {
+          error = body.message;
+          fieldErrors = body.errors;
+          return;
+        }
+    } catch (e: any) {
+      const body = e.response?.data as ApiResponse<Episodio> | undefined;
+      error = body?.message || 'Erro ao editar titulo.';
+      fieldErrors = body?.errors || [];
+    }
+    finally {
+      buscaEpisodio();
+    }
+  }
+
+  function cancelEdit(){
+    inputOpen = false;
+  }
+
 
 </script>
 <Menu />
@@ -195,7 +238,7 @@
         <TableHead class="text-sm md:text-base bg-primary-900 text-primary-500">
           <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Título</TableHeadCell>
           <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Cenas</TableHeadCell>
-          <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Excluir</TableHeadCell>
+          <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]" colspan="2">Gerenciar</TableHeadCell>
         </TableHead>
         <TableBody>
         {#each episodios as episodio} 
@@ -203,15 +246,23 @@
             <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{episodio.titulo}</TableBodyCell>
             <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Algumas cenas </TableBodyCell> <!-- Célula de cenas não integrada ao banco de dados -->
             <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
-            <button
-              title="Remover"
-              class="p-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent"
-              on:click={() => openConfirm(episodio.id)}
-              disabled={deletingId === episodio.id || loading}
-            >
-              <TrashBinOutline class="w-5 h-5 text-red-400" />
-            </button>
+              <button
+                title="Remover"
+                class="p-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent"
+                on:click={() => openConfirm(episodio.id)}
+                disabled={deletingId === episodio.id || loading}>
+                <TrashBinOutline class="w-5 h-5 text-red-400" />
+              </button>
+             </TableBodyCell>
+            <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
+              <button
+                title="Editar"
+                class="p-2 rounded border border-green-100 hover:border-green-300 transition bg-transparent"
+                on:click={() =>abrirModalEdit(episodioEditado.id = (episodio.id), episodioEditado.titulo = (episodio.titulo))}>
+                <UserEditOutline class="w-5 h-5 text-primary-500" />
+              </button>
             </TableBodyCell>
+            
   
           </TableBodyRow>
         {/each}
@@ -258,3 +309,13 @@
     onConfirm={handleConfirm}
     onCancel={cancelarDelecao}
 />
+
+<form on:submit|preventDefault={confirmEdit}>
+  <InputModal
+    open={inputOpen}
+    bind:nome={editingTitle}
+    onConfirm={confirmEdit}
+    onEnter={confirmEdit}
+    onCancel={cancelEdit}
+  />
+</form>
