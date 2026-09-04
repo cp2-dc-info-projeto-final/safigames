@@ -33,6 +33,11 @@
 
 </script>
 <Menu />
+
+<svelte:head>
+  <title>Gerenciamento</title>
+</svelte:head>
+
 <div>
 <button
     class="ml-2 px-3 py-1 bg-secondary-100 hover:bg-primary-200 text-white rounded text-lg flex items-center gap-1"

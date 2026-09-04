@@ -187,6 +187,10 @@
 </script>
 <Menu />
 
+<svelte:head>
+  <title>Gerenciamento</title>
+</svelte:head>
+
 <div class="mt-auto mb-auto" style="display:none" id="containerForm">
   <!-- Card do formulário -->
   <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">

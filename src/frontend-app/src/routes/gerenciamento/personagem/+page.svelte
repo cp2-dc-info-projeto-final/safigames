@@ -106,6 +106,10 @@
 </script>
 <Menu />
 
+<svelte:head>
+  <title>Gerenciamento</title>
+</svelte:head>
+
 
 <!-- Container de tabela personagem -->
 <div id="personagemContainer" class="flex flex-col gap-4 w-full max-w-full">
