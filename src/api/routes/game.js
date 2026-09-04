@@ -19,6 +19,7 @@ function sendError(res, status, message, errors = []) {
   });
 }
 
+// Busca personagem pelo id do usuario
 router.get('/personagem', verifyToken, async function(req, res) {
   try {
     const result = await pool.query('SELECT * FROM personagem WHERE id_usuario = $1 ORDER BY id', [req.user?.id]);
@@ -29,6 +30,7 @@ router.get('/personagem', verifyToken, async function(req, res) {
   }
 });
 
+// Busca personagens por id
 router.get('/personagem/:id', verifyToken, async function(req, res) {
   try {
     const { id } = req.params;
@@ -40,12 +42,13 @@ router.get('/personagem/:id', verifyToken, async function(req, res) {
   }
 });
 
+// Busca todos os personagens
 router.get('/personagemsemid', verifyToken, async function(req, res) {
   try {
     const result = await pool.query('SELECT * FROM personagem');
     return sendSuccess(res, 200, null, result.rows);
   } catch (error) {
-    console.error('Erro ao buscar usuários:', error);
+    console.error('Erro ao buscar personagens:', error);
     return sendError(res, 500, 'Erro interno do servidor');
   }
 });
@@ -107,7 +110,6 @@ router.put('/personagem/:id', verifyToken, async function(req, res) {
   try {
     const { id }  = req.params;
     const { nome }  = req.body;
-    console.log(id, nome);
     
     // Validação básica
     if (!nome) {
@@ -132,6 +134,102 @@ router.put('/personagem/:id', verifyToken, async function(req, res) {
     return sendSuccess(res, 200, 'Nome editado com sucesso', result.rows[0]);
   } catch (error) {
     console.error('Erro ao editar nome:', error);
+    // Verificar se é erro de constraint
+    if (error.code === '23514') {
+      return sendError(res, 400, 'Dados inválidos. Verifique os campos e tente novamente.');
+    }
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+router.post('/episodio', verifyToken, async function(req, res) {
+  try {
+    const { titulo } = req.body;
+
+    // Validação básica
+    if (!titulo) {
+      const errors = [];
+      if (!titulo) errors.push({ field: 'titulo', message: 'Título é obrigatório', code: 'REQUIRED' });
+
+      return sendError(res, 400, 'Título é obrigatório', errors);
+    };
+
+    const result = await pool.query(
+      'INSERT INTO episodio (titulo) VALUES ($1) RETURNING titulo',
+      [titulo]
+    );
+    return sendSuccess(res, 201, 'Episódio criado com sucesso', result.rows[0]);
+  } catch (error) {
+    console.error('Erro ao criar episódio:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+/* Busca todos os episodios */
+router.get('/episodio', verifyToken, async function(req, res) {
+  try {
+    const result = await pool.query('SELECT * FROM episodio');
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar episodios:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+/* DELETE - Remover episodio */
+router.delete('/episodio/:id', verifyToken, async function(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (id == 1){
+      return sendError(res, 400, 'Não é possível deletar o episódio inicial');
+    }
+
+    // Verificar se o episódio existe
+    const episodioExists = await pool.query('SELECT id FROM episodio WHERE id = $1', [id]);
+    if (episodioExists.rows.length === 0) {
+      return sendError(res, 404, 'Episódio não encontrado');
+    }
+    
+    await pool.query('DELETE FROM episodio WHERE id = $1', [id]);
+    
+    return sendSuccess(res, 200, 'Episódio deletado com sucesso');
+  } catch (error) {
+    console.error('Erro ao deletar episodio:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+
+});
+
+/* PUT - Editar título do episódio*/
+router.put('/episodio/:id', verifyToken, async function(req, res) {
+  try {
+    const { id }  = req.params;
+    const { titulo }  = req.body;
+    
+    // Validação básica
+    if (!titulo) {
+      const errors = [];
+      if (!titulo) errors.push({ field: 'titulo', message: 'Título é obrigatório', code: 'REQUIRED' });
+
+      return sendError(res, 400, 'Título é obrigatório', errors);
+    }
+    
+    // Verificar se o episodio existe
+    const episodioExists = await pool.query('SELECT id FROM episodio WHERE id = $1', [id]);
+    if (episodioExists.rows.length === 0) {
+      return sendError(res, 404, 'Episódio não encontrado');
+    }
+    let query, params;
+    query = 'UPDATE episodio SET titulo = $1 WHERE id = $2 RETURNING id, titulo';
+    params = [titulo, id];
+    
+    
+    const result = await pool.query(query, params);
+    
+    return sendSuccess(res, 200, 'Título editado com sucesso', result.rows[0]);
+  } catch (error) {
+    console.error('Erro ao editar título:', error);
     // Verificar se é erro de constraint
     if (error.code === '23514') {
       return sendError(res, 400, 'Dados inválidos. Verifique os campos e tente novamente.');

@@ -67,7 +67,8 @@ CREATE TABLE cena (
         REFERENCES comerciante (id),
     id_episodio INTEGER NOT NULL,
     FOREIGN KEY (id_episodio)
-        REFERENCES episodio (id),
+        REFERENCES episodio (id)
+        ON DELETE CASCADE,
 
     CONSTRAINT pk_cena PRIMARY KEY (id)
 );
@@ -99,12 +100,13 @@ CREATE TABLE personagem (
     id_usuario INTEGER NOT NULL,
     FOREIGN KEY (id_usuario)
         REFERENCES usuario (id),
-    id_cena INTEGER NOT NULL,
-    FOREIGN KEY (id_cena)
-        REFERENCES cena (id),
     id_arma INTEGER NOT NULL,
     FOREIGN KEY (id_arma)
         REFERENCES arma (id),
+    id_cena INTEGER NOT NULL DEFAULT 1,
+    FOREIGN KEY (id_cena)
+        REFERENCES cena (id)
+        ON DELETE SET DEFAULT,
 
     CONSTRAINT pk_personagem PRIMARY KEY (id)
 );
@@ -162,13 +164,18 @@ INSERT INTO comerciante(nome, descricao)
 VALUES('Stefany da empadinha bem safadinha', 'Ela vende empadas que regeneram sua vida (e é bem safadinha)');
 
 INSERT INTO episodio(titulo)
-VALUES('Episódio 1: A RATIFICAÇÃO');
+VALUES('Episódio 1: A RATIFICAÇÃO'),
+('Episódio 2: O DESPERTAR DO GORDINHO');
 
 INSERT INTO cena(npc, dialogo, tipo, id_episodio)
-VALUES('Vini do soep', 'Vini: OI! Você: Oi! Como vai? Vini: Vou bem.', 'Diálogo', 1);
+VALUES('Vini do soep', 'Vini: OI! Você: Oi! Como vai? Vini: Vou bem.', 'Diálogo', 1),
+('Clécio', 'Clécio: 4 tempos! Você: Di guÊ? Clécio: Di bandi dadus.', 'Diálogo', 1);
 
-INSERT INTO personagem(nome, vida, stamina, classe, arma, id_usuario, id_cena)
-VALUES('Jâo, o garoto de programa', 90, 3, 'Mago', 'Cajado', 1, 1);
+INSERT INTO arma(nome, dano, descricao, stamina)
+VALUES('Espada de esmeralda', 30, 'Os aldeões adoram', 2);
+
+INSERT INTO personagem(nome, vida, stamina, classe, id_usuario, id_cena, id_arma)
+VALUES('Jâo, o garoto de programa', 90, 3, 'Mago', 1, 2, 1);
 
 INSERT INTO item(descricao, tipo, fator_vida, preco)
 VALUES('Deliciosa empadinha de queijo que te dá mais vontade de viver', 'Cura', 50, 5);
