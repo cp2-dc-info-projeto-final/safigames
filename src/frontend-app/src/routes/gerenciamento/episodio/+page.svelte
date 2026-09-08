@@ -181,6 +181,7 @@
 
   function cancelEdit(){
     inputOpen = false;
+    handleCancel();
   }
 
 

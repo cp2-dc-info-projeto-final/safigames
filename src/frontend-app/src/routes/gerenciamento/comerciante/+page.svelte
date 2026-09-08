@@ -2,6 +2,7 @@
 
     import { Table, TableHead, TableHeadCell, TableBody, TableBodyRow, TableBodyCell, Button, Card, Heading, Label, Input } from "flowbite-svelte";
     import Menu from '../../../components/Menu.svelte';
+    import InputModal from '../../../components/InputModal.svelte';
     import { onMount } from 'svelte'; // ciclo de vida
     import api from '$lib/api'; // API backend
     import type { ApiResponse, ApiFieldError } from '$lib/api';
@@ -21,18 +22,15 @@
     let fieldErrors: ApiFieldError[] = [];
     let tabelaComerciante: HTMLElement;
     let formComerciante: HTMLElement;
+    let formEditComerciante: HTMLElement;
     let nome_comerciante: string = $state(''); // nome digitado no form de cadastro de episódio
     let descricao_comerciante: string = $state(''); 
-    let inputOpen = $state(false);
+    let menu: any;
     let editingId: number | null = $state(null); // id em edição
-    let editingName: string = $state(''); // nome em edição
-    let novoNome: string = $state(''); // nome digitado que substituirá o antigo
-    let comercianteEditado = {
-      id: 0,
-      nome: "",
-      descricao: ""
-    };
-
+    let editingName: string = $state('');
+    let editingDesc: string = $state('');
+    let novoName: string = $state('');
+    let novoDesc: string = $state('');
 
     onMount(async () => {
     try {
@@ -100,6 +98,28 @@
     }
   }
 
+  async function editaComerciante() {
+    novoName = editingName;
+    novoDesc = editingDesc;
+
+    try{
+      const res = await api.put(`/game/comerciante/${editingId}`, { nome: novoName, descricao: novoDesc });
+        const body = res.data as ApiResponse<Comerciante>;
+        if (!body.success) {
+          error = body.message;
+          fieldErrors = body.errors;
+          return;
+        }
+    } catch (e: any) {
+      const body = e.response?.data as ApiResponse<Comerciante> | undefined;
+      error = body?.message || 'Erro ao editar nome.';
+      fieldErrors = body?.errors || [];
+    }
+    finally {
+      buscaComerciante();
+    }
+  }
+
   // Abre modal de confirmação
   function openConfirm(id: number) {
     confirmTargetId = id;
@@ -136,11 +156,12 @@
       }
       comerciantes = comerciantes.filter(comerciante => comerciante.id !== id);
     } catch (e: any) {
-      console.error('Erro ao deletar episódio:', e);
+      console.error('Erro ao deletar comerciante:', e);
       const body = e.response?.data as ApiResponse<null> | undefined;
-      error = body?.message || 'Erro ao remover episódio.';
+      error = body?.message || 'Erro ao remover comerciante.';
     } finally {
       deletingId = null;
+      buscaComerciante();
     }
   }
 
@@ -149,42 +170,17 @@
     tabelaComerciante.style.display = "block";
     formComerciante = document.getElementById('containerForm');
     formComerciante.style.display = "none";
+    formEditComerciante = document.getElementById('containerFormEdit');
+    formEditComerciante.style.display = "none";
+    
   }
 
-  function abrirModalEdit(comerciante_id: number, comerciante_nome: string, ) {
-    tabelaComerciante = document.getElementById('comercianteContainer');
-    tabelaComerciante.style.display = "none";
-    editingId = comerciante_id;
-    editingName = comerciante_nome;
-    inputOpen = true;
+  function mostraFormEdit(){
+    menu = document.getElementById('comercianteContainer');
+    menu.style.display = "none"
+    formEditComerciante = document.getElementById('containerFormEdit');
+    formEditComerciante.style.display = "block";
   }
-
-  async function confirmEdit(){
-    novoNome = editingName;
-    inputOpen = false;
-    goto('/gerenciamento/comerciante')
-    try{
-      const res = await api.put(`/game/comerciante/${editingId}`, { nome: novoNome });
-        const body = res.data as ApiResponse<Comerciante>;
-        if (!body.success) {
-          error = body.message;
-          fieldErrors = body.errors;
-          return;
-        }
-    } catch (e: any) {
-      const body = e.response?.data as ApiResponse<Comerciante> | undefined;
-      error = body?.message || 'Erro ao editar nome.';
-      fieldErrors = body?.errors || [];
-    }
-    finally {
-      buscaComerciante();
-    }
-  }
-
-  function cancelEdit(){
-    inputOpen = false;
-  }
-
 
 </script>
 <Menu />
@@ -240,6 +236,53 @@
     </Card>
   </div>
 
+<!-- Card do formulário de ediçao -->
+<div class="mt-auto mb-auto" style="display:none" id="containerFormEdit">
+
+  <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
+      <!-- Formulário principal -->
+      <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={editaComerciante}>
+        <!-- Nome  -->
+        <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
+          Edite o comerciante
+        </Heading>
+        <!-- Mensagem de erro -->
+        {#if error}
+          <div class="text-red-500 text-center">{error}</div>
+        {/if}
+        <!-- Campo Nome -->
+        <div>
+          <Label for="nome" class="text-lg text-primary-500">Nome</Label>
+          <Input id="nome" bind:value={nome_comerciante} placeholder="Digite o nome do comerciante" required class="mt-1" />
+          {#if errorOf('nome')}
+            <div class="mt-1 text-sm text-red-500">{errorOf('nome')}</div>
+          {/if}
+        </div>
+        <div>
+          <Label for="descricao" class="text-lg text-primary-500">Descrição</Label>
+          <Input id="descricao" bind:value={descricao_comerciante} placeholder="Digite a descrição do comerciante" required class="mt-1" />
+          {#if errorOf('descricao')}
+            <div class="mt-1 text-sm text-red-500">{errorOf('descricao')}</div>
+          {/if}
+        </div>
+    
+        <!-- Botões de ação -->
+        <div class="text-lg flex gap-4 justify-end mt-4">
+          <!-- Botão cancelar/voltar -->
+          <Button color="light" type="button" onclick={handleCancel} disabled={loading}>
+            <ArrowLeftOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+              Voltar
+          </Button>
+          <!-- Botão salvar -->
+          <Button type="submit" color="primary" onclick={editaComerciante} disabled={loading}>
+            <FloppyDiskAltOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+              Salvar
+          </Button> 
+        </div>
+      </form>
+      
+    </Card>
+  </div>
 
 
 <!-- Container de tabela comerciante -->
@@ -266,11 +309,11 @@
                 <TrashBinOutline class="w-5 h-5 text-red-400" />
               </button>
              </TableBodyCell>
-            <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
+             <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
               <button
                 title="Editar"
                 class="p-2 rounded border border-green-100 hover:border-green-300 transition bg-transparent"
-                on:click={() =>abrirModalEdit(comercianteEditado.id = (comerciante.id), comercianteEditado.nome = (comerciante.nome), comercianteEditado.descricao = (comerciante.descricao))}>
+                on:click={mostraFormEdit}>
                 <UserEditOutline class="w-5 h-5 text-primary-500" />
               </button>
             </TableBodyCell>
@@ -311,8 +354,6 @@
     </div>   
 </div>
 
-
-
 <ConfirmModal
     open={confirmOpen}
     message="Tem certeza que deseja remover este comerciante?"
@@ -322,7 +363,3 @@
     onCancel={cancelarDelecao}
 />
 
-<form on:submit|preventDefault={confirmEdit}>
-
-<Input/>
-</form>

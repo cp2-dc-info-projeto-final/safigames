@@ -279,7 +279,7 @@ router.delete('/comerciante/:id', verifyToken, async function(req, res) {
   try {
     const { id } = req.params;
 
-    // Verificar se o episódio existe
+    // Verificar se o comerciante existe
     const comercianteExists = await pool.query('SELECT id FROM comerciante WHERE id = $1', [id]);
     if (comercianteExists.rows.length === 0) {
       return sendError(res, 404, 'Comerciante não encontrado');
@@ -292,7 +292,45 @@ router.delete('/comerciante/:id', verifyToken, async function(req, res) {
     console.error('Erro ao deletar comerciante:', error);
     return sendError(res, 500, 'Erro interno do servidor');
   }
-
+// obs: o primeiro comerciante criado nao esta sendo excluido
 });
+
+// *PUT editar comerciante
+router.put('/comerciante/:id', verifyToken, async function(req, res) {
+  try {
+    const { id }  = req.params;
+    const { nome, descricao }  = req.body;
+    
+    // Validação básica
+    if (!nome || !descricao) {
+      const errors = [];
+      if (!nome) errors.push({ field: 'nome', message: 'Nome é obrigatório', code: 'REQUIRED' });
+      if (!descricao) errors.push({ field: 'descricao', message: 'Descrição é obrigatório', code: 'REQUIRED' });
+
+      return sendError(res, 400, 'Nome e descrição são obrigatórios', errors);
+    }
+    
+    // Verificar se o comerciante existe
+    const comercianteExists = await pool.query('SELECT id FROM comerciante WHERE id = $1', [id]);
+    if (comercianteExists.rows.length === 0) {
+      return sendError(res, 404, 'Comerciante não encontrado');
+    }
+    let query, params;
+    query = 'UPDATE comerciante SET nome = $1, descricao = $2 WHERE id = $3 RETURNING id, nome, descricao';
+    params = [nome, id, descricao];
+    
+    const result = await pool.query(query, params);
+    
+    return sendSuccess(res, 200, 'Nome e descrição editados com sucesso', result.rows[0]);
+  } catch (error) {
+    console.error('Erro ao editar nome e descrição:', error);
+    // Verificar se é erro de constraint
+    if (error.code === '23514') {
+      return sendError(res, 400, 'Dados inválidos. Verifique os campos e tente novamente.');
+    }
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
 
 module.exports = router;
