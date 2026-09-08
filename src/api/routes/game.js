@@ -238,7 +238,7 @@ router.put('/episodio/:id', verifyToken, async function(req, res) {
   }
 });
 
-// rota get de comerciante
+// *GET busca todos os comerciantes
 router.get('/comerciante', verifyToken, async function(req, res) {
   try {
     const result = await pool.query('SELECT * FROM comerciante');
@@ -272,6 +272,27 @@ router.post('/comerciante', verifyToken, async function(req, res) {
     console.error('Erro ao criar comerciante:', error);
     return sendError(res, 500, 'Erro interno do servidor');
   }
+});
+
+// *DELETE excluir comerciante
+router.delete('/comerciante/:id', verifyToken, async function(req, res) {
+  try {
+    const { id } = req.params;
+
+    // Verificar se o episódio existe
+    const comercianteExists = await pool.query('SELECT id FROM comerciante WHERE id = $1', [id]);
+    if (comercianteExists.rows.length === 0) {
+      return sendError(res, 404, 'Comerciante não encontrado');
+    }
+    
+    await pool.query('DELETE FROM comerciante WHERE id = $1', [id]);
+    
+    return sendSuccess(res, 200, 'Comerciante deletado com sucesso');
+  } catch (error) {
+    console.error('Erro ao deletar comerciante:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+
 });
 
 module.exports = router;
