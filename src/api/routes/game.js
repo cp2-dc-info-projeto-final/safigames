@@ -239,5 +239,39 @@ router.put('/episodio/:id', verifyToken, async function(req, res) {
 });
 
 // rota get de comerciante
+router.get('/comerciante', verifyToken, async function(req, res) {
+  try {
+    const result = await pool.query('SELECT * FROM comerciante');
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar comerciantes:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+// *POST criar comerciante
+router.post('/comerciante', verifyToken, async function(req, res) {
+  try {
+    const { nome, descricao } = req.body;
+
+    // Validação básica
+    if (!nome || !descricao ) {
+      const errors = [];
+      if (!nome) errors.push({ field: 'nome', message: 'Nome é obrigatório', code: 'REQUIRED' });
+      if (!descricao) errors.push({ field: 'descricao', message: 'Descrição é obrigatório', code: 'REQUIRED' });
+
+      return sendError(res, 400, 'Nome e descrição são obrigatórios', errors);
+    };
+
+    const result = await pool.query(
+      'INSERT INTO comerciante (nome, descricao) VALUES ($1, $2) RETURNING nome, descricao',
+      [nome, descricao]
+    );
+    return sendSuccess(res, 201, 'Comerciante criado com sucesso', result.rows[0]);
+  } catch (error) {
+    console.error('Erro ao criar comerciante:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
 
 module.exports = router;

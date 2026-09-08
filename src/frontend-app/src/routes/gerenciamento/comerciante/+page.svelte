@@ -22,6 +22,7 @@
     let tabelaComerciante: HTMLElement;
     let formComerciante: HTMLElement;
     let nome_comerciante: string = $state(''); // nome digitado no form de cadastro de episódio
+    let descricao_comerciante: string = $state(''); 
     let inputOpen = $state(false);
     let editingId: number | null = $state(null); // id em edição
     let editingName: string = $state(''); // nome em edição
@@ -79,11 +80,12 @@
     error = '';
     fieldErrors = [];
     try {
-      const res = await api.post('/game/comerciante', { nome: nome_comerciante });
+      const res = await api.post('/game/comerciante', { nome: nome_comerciante, descricao: descricao_comerciante });
       const body = res.data as ApiResponse<Comerciante>;
       if (body.success && body.data) {
         comerciantes.push(body.data);
         nome_comerciante = '';
+        descricao_comerciante = '';
         handleCancel();
       } else {
         error = body.message;
@@ -196,20 +198,27 @@
   <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
       <!-- Formulário principal -->
       <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={criaComerciante}>
-        <!-- Título -->
+        <!-- Nome  -->
         <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
-          Crie um episódio
+          Crie um comerciante
         </Heading>
         <!-- Mensagem de erro -->
         {#if error}
           <div class="text-red-500 text-center">{error}</div>
         {/if}
-        <!-- Campo Título -->
+        <!-- Campo Nome -->
         <div>
-          <Label for="nome" class="text-lg text-primary-500">Título</Label>
+          <Label for="nome" class="text-lg text-primary-500">Nome</Label>
           <Input id="nome" bind:value={nome_comerciante} placeholder="Digite o nome do comerciante" required class="mt-1" />
           {#if errorOf('nome')}
             <div class="mt-1 text-sm text-red-500">{errorOf('nome')}</div>
+          {/if}
+        </div>
+        <div>
+          <Label for="descricao" class="text-lg text-primary-500">Descrição</Label>
+          <Input id="descricao" bind:value={descricao_comerciante} placeholder="Digite a descrição do comerciante" required class="mt-1" />
+          {#if errorOf('descricao')}
+            <div class="mt-1 text-sm text-red-500">{errorOf('descricao')}</div>
           {/if}
         </div>
     
