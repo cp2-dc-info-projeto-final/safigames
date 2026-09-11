@@ -3,6 +3,7 @@
     import { Table, TableHead, TableHeadCell, TableBody, TableBodyRow, TableBodyCell, Button, Card, Heading, Label, Input } from "flowbite-svelte";
     import Menu from '../../../components/Menu.svelte';
     import InputModal from '../../../components/InputModal.svelte';
+    import { getToken, getCurrentUser } from "$lib/auth";
     import { onMount } from 'svelte'; // ciclo de vida
     import api from '$lib/api'; // API backend
     import type { ApiResponse, ApiFieldError } from '$lib/api';
@@ -31,6 +32,12 @@
     let editingDesc: string = $state('');
     let novoName: string = $state('');
     let novoDesc: string = $state('');
+    let comercianteEditado = {
+      id: 0,
+      nome: "",
+      descricao: ""
+    }
+   
 
     onMount(async () => {
     try {
@@ -98,27 +105,7 @@
     }
   }
 
-  async function editaComerciante() {
-    novoName = editingName;
-    novoDesc = editingDesc;
 
-    try{
-      const res = await api.put(`/game/comerciante/${editingId}`, { nome: novoName, descricao: novoDesc });
-        const body = res.data as ApiResponse<Comerciante>;
-        if (!body.success) {
-          error = body.message;
-          fieldErrors = body.errors;
-          return;
-        }
-    } catch (e: any) {
-      const body = e.response?.data as ApiResponse<Comerciante> | undefined;
-      error = body?.message || 'Erro ao editar nome.';
-      fieldErrors = body?.errors || [];
-    }
-    finally {
-      buscaComerciante();
-    }
-  }
 
   // Abre modal de confirmação
   function openConfirm(id: number) {
@@ -175,11 +162,14 @@
     
   }
 
-  function mostraFormEdit(){
+  function mostraFormEdit(comerciante_id: number, comerciante_nome: string, comerciante_descricao: string){
     menu = document.getElementById('comercianteContainer');
     menu.style.display = "none"
     formEditComerciante = document.getElementById('containerFormEdit');
     formEditComerciante.style.display = "block";
+    editingId = comerciante_id;
+    editingName = comerciante_nome;
+    editingDesc = comerciante_descricao;
   }
 
 </script>
@@ -238,10 +228,9 @@
 
 <!-- Card do formulário de ediçao -->
 <div class="mt-auto mb-auto" style="display:none" id="containerFormEdit">
-
   <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
       <!-- Formulário principal -->
-      <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={editaComerciante}>
+      <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={handleSubmit}>
         <!-- Nome  -->
         <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
           Edite o comerciante
@@ -253,14 +242,14 @@
         <!-- Campo Nome -->
         <div>
           <Label for="nome" class="text-lg text-primary-500">Nome</Label>
-          <Input id="nome" bind:value={nome_comerciante} placeholder="Digite o nome do comerciante" required class="mt-1" />
+          <Input id="nome" bind:value={editingName} placeholder="Digite o nome do comerciante" required class="mt-1" />
           {#if errorOf('nome')}
             <div class="mt-1 text-sm text-red-500">{errorOf('nome')}</div>
           {/if}
         </div>
         <div>
           <Label for="descricao" class="text-lg text-primary-500">Descrição</Label>
-          <Input id="descricao" bind:value={descricao_comerciante} placeholder="Digite a descrição do comerciante" required class="mt-1" />
+          <Input id="descricao" bind:value={editingDesc} placeholder="Digite a descrição do comerciante" required class="mt-1" />
           {#if errorOf('descricao')}
             <div class="mt-1 text-sm text-red-500">{errorOf('descricao')}</div>
           {/if}
@@ -274,7 +263,7 @@
               Voltar
           </Button>
           <!-- Botão salvar -->
-          <Button type="submit" color="primary" onclick={editaComerciante} disabled={loading}>
+          <Button type="submit" color="primary"  disabled={loading}>
             <FloppyDiskAltOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
               Salvar
           </Button> 
@@ -291,6 +280,7 @@
     <div class="w-full overflow-hidden shadow-lg border border-primary-500 rounded-lg">
       <Table id="comercianteTable" class="w-full table-fixed border-collapse">
         <TableHead class="text-sm md:text-base bg-primary-900 text-primary-500">
+          <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Id</TableHeadCell>
           <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Nome</TableHeadCell>
           <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Descrição</TableHeadCell>
           <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]" colspan="2">Gerenciar</TableHeadCell>
@@ -298,6 +288,7 @@
         <TableBody>
         {#each comerciantes as comerciante} 
           <TableBodyRow class="text-sm md:text-base bg-primary-900 text-primary-500">
+            <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{comerciante.id}</TableBodyCell>
             <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{comerciante.nome}</TableBodyCell>
             <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{comerciante.descricao}</TableBodyCell>
             <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
@@ -313,7 +304,7 @@
               <button
                 title="Editar"
                 class="p-2 rounded border border-green-100 hover:border-green-300 transition bg-transparent"
-                on:click={mostraFormEdit}>
+                on:click={() => mostraFormEdit(comercianteEditado.id = (comerciante.id), comercianteEditado.nome = (comerciante.nome), comercianteEditado.descricao = (comerciante.descricao))}>
                 <UserEditOutline class="w-5 h-5 text-primary-500" />
               </button>
             </TableBodyCell>
