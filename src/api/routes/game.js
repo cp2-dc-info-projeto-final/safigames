@@ -317,7 +317,7 @@ router.put('/comerciante/:id', verifyToken, async function(req, res) {
     }
     let query, params;
     query = 'UPDATE comerciante SET nome = $1, descricao = $2 WHERE id = $3 RETURNING id, nome, descricao';
-    params = [nome, id, descricao];
+    params = [nome, descricao, id];
     
     const result = await pool.query(query, params);
     

@@ -30,7 +30,7 @@
     let editingId: number | null = $state(null); // id em edição
     let editingName: string = $state('');
     let editingDesc: string = $state('');
-    let novoName: string = $state('');
+    let novoNome: string = $state('');
     let novoDesc: string = $state('');
     let comercianteEditado = {
       id: 0,
@@ -102,6 +102,32 @@
       error = body?.message || 'Erro ao criar episódio.';
     } finally {
       loading = false;
+    }
+  }
+
+  async function editaComerciante(){
+    novoNome = editingName;
+    novoDesc = editingDesc;
+    formEditComerciante = document.getElementById('containerFormEdit');
+    formEditComerciante.style.display = "none";
+    tabelaComerciante = document.getElementById('comercianteContainer');
+    tabelaComerciante.style.display = "block";
+    goto('/gerenciamento/comerciante')
+    try{
+      const res = await api.put(`/game/comerciante/${editingId}`, { nome: novoNome, descricao: novoDesc });
+        const body = res.data as ApiResponse<Comerciante>;
+        if (!body.success) {
+          error = body.message;
+          fieldErrors = body.errors;
+          return;
+        }
+    } catch (e: any) {
+      const body = e.response?.data as ApiResponse<Comerciante> | undefined;
+      error = body?.message || 'Erro ao editar titulo.';
+      fieldErrors = body?.errors || [];
+    }
+    finally {
+      buscaComerciante();
     }
   }
 
@@ -230,7 +256,7 @@
 <div class="mt-auto mb-auto" style="display:none" id="containerFormEdit">
   <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
       <!-- Formulário principal -->
-      <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={handleSubmit}>
+      <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={editaComerciante}>
         <!-- Nome  -->
         <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
           Edite o comerciante
