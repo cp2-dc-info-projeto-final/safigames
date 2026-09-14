@@ -238,4 +238,99 @@ router.put('/episodio/:id', verifyToken, async function(req, res) {
   }
 });
 
+// *GET busca todos os comerciantes
+router.get('/comerciante', verifyToken, async function(req, res) {
+  try {
+    const result = await pool.query('SELECT * FROM comerciante');
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar comerciantes:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+// *POST criar comerciante
+router.post('/comerciante', verifyToken, async function(req, res) {
+  try {
+    const { nome, descricao } = req.body;
+
+    // Validação básica
+    if (!nome || !descricao ) {
+      const errors = [];
+      if (!nome) errors.push({ field: 'nome', message: 'Nome é obrigatório', code: 'REQUIRED' });
+      if (!descricao) errors.push({ field: 'descricao', message: 'Descrição é obrigatório', code: 'REQUIRED' });
+
+      return sendError(res, 400, 'Nome e descrição são obrigatórios', errors);
+    };
+
+    const result = await pool.query(
+      'INSERT INTO comerciante (nome, descricao) VALUES ($1, $2) RETURNING nome, descricao',
+      [nome, descricao]
+    );
+    return sendSuccess(res, 201, 'Comerciante criado com sucesso', result.rows[0]);
+  } catch (error) {
+    console.error('Erro ao criar comerciante:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+// *DELETE excluir comerciante
+router.delete('/comerciante/:id', verifyToken, async function(req, res) {
+  try {
+    const { id } = req.params;
+
+    // Verificar se o comerciante existe
+    const comercianteExists = await pool.query('SELECT id FROM comerciante WHERE id = $1', [id]);
+    if (comercianteExists.rows.length === 0) {
+      return sendError(res, 404, 'Comerciante não encontrado');
+    }
+    
+    await pool.query('DELETE FROM comerciante WHERE id = $1', [id]);
+    
+    return sendSuccess(res, 200, 'Comerciante deletado com sucesso');
+  } catch (error) {
+    console.error('Erro ao deletar comerciante:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+// obs: o primeiro comerciante criado nao esta sendo excluido
+});
+
+// *PUT editar comerciante
+router.put('/comerciante/:id', verifyToken, async function(req, res) {
+  try {
+    const { id }  = req.params;
+    const { nome, descricao }  = req.body;
+    
+    // Validação básica
+    if (!nome || !descricao) {
+      const errors = [];
+      if (!nome) errors.push({ field: 'nome', message: 'Nome é obrigatório', code: 'REQUIRED' });
+      if (!descricao) errors.push({ field: 'descricao', message: 'Descrição é obrigatório', code: 'REQUIRED' });
+
+      return sendError(res, 400, 'Nome e descrição são obrigatórios', errors);
+    }
+    
+    // Verificar se o comerciante existe
+    const comercianteExists = await pool.query('SELECT id FROM comerciante WHERE id = $1', [id]);
+    if (comercianteExists.rows.length === 0) {
+      return sendError(res, 404, 'Comerciante não encontrado');
+    }
+    let query, params;
+    query = 'UPDATE comerciante SET nome = $1, descricao = $2 WHERE id = $3 RETURNING id, nome, descricao';
+    params = [nome, descricao, id];
+    
+    const result = await pool.query(query, params);
+    
+    return sendSuccess(res, 200, 'Nome e descrição editados com sucesso', result.rows[0]);
+  } catch (error) {
+    console.error('Erro ao editar nome e descrição:', error);
+    // Verificar se é erro de constraint
+    if (error.code === '23514') {
+      return sendError(res, 400, 'Dados inválidos. Verifique os campos e tente novamente.');
+    }
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+
 module.exports = router;

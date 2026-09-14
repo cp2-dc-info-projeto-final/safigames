@@ -148,7 +148,8 @@ CREATE TABLE catalogo(
         REFERENCES item (id),
     id_comerciante INTEGER NOT NULL,
     FOREIGN KEY (id_comerciante)
-        REFERENCES comerciante (id),
+        REFERENCES comerciante (id)
+        ON DELETE CASCADE,
 
     CONSTRAINT pk_catalogo PRIMARY KEY (id)
 );

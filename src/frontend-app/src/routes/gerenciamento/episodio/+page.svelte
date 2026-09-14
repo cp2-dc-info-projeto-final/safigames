@@ -149,11 +149,11 @@
     formEpisodio.style.display = "none";
   }
 
-  function abrirModalEdit(personagem_id: number, personagem_nome: string) {
+  function abrirModalEdit(episodio_id: number, episodio_nome: string) {
     tabelaEpisodio = document.getElementById('episodioContainer');
     tabelaEpisodio.style.display = "none";
-    editingId = personagem_id;
-    editingTitle = personagem_nome;
+    editingId = episodio_id;
+    editingTitle = episodio_nome;
     inputOpen = true;
   }
 
@@ -181,6 +181,7 @@
 
   function cancelEdit(){
     inputOpen = false;
+    handleCancel();
   }
 
 
