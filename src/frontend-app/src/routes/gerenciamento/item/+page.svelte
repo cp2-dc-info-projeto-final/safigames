@@ -146,9 +146,9 @@
       }
       itens = itens.filter(item => item.id !== id);
     } catch (e: any) {
-      console.error('Erro ao deletar episódio:', e);
+      console.error('Erro ao deletar item:', e);
       const body = e.response?.data as ApiResponse<null> | undefined;
-      error = body?.message || 'Erro ao remover episódio.';
+      error = body?.message || 'Erro ao remover item.';
     } finally {
       deletingId = null;
     }
@@ -363,3 +363,12 @@
     </form>  
   </Card>
 </div>
+
+<ConfirmModal
+    open={confirmOpen}
+    message="Tem certeza que deseja remover este item?"
+    confirmText="Remover"
+    cancelText="Cancelar"
+    onConfirm={handleConfirm}
+    onCancel={cancelarDelecao}
+/>

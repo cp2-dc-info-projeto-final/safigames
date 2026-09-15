@@ -292,7 +292,6 @@ router.delete('/comerciante/:id', verifyToken, async function(req, res) {
     console.error('Erro ao deletar comerciante:', error);
     return sendError(res, 500, 'Erro interno do servidor');
   }
-// obs: o primeiro comerciante criado nao esta sendo excluido
 });
 
 // *PUT editar comerciante
@@ -368,6 +367,61 @@ router.post('/item', verifyToken, async function(req, res) {
     return sendSuccess(res, 201, 'Item criado com sucesso', result.rows[0]);
   } catch (error) {
     console.error('Erro ao criar item:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+// *DELETE excluir item
+router.delete('/item/:id', verifyToken, async function(req, res) {
+  try {
+    const { id } = req.params;
+
+    // Verificar se o item existe
+    const itemExists = await pool.query('SELECT id FROM item WHERE id = $1', [id]);
+    if (itemExists.rows.length === 0) {
+      return sendError(res, 404, 'Item não encontrado');
+    }
+    
+    await pool.query('DELETE FROM item WHERE id = $1', [id]);
+    
+    return sendSuccess(res, 200, 'Item deletado com sucesso');
+  } catch (error) {
+    console.error('Erro ao deletar item:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+// *PUT editar item
+router.put('/item', verifyToken, async function(req, res) {
+  try {
+    const { id }  = req.params;
+    const { nome, descricao, tipo, fator_vida, fator_dano, fator_defesa, preco } = req.body;
+
+    // Validação básica
+    if (!nome || !descricao || !tipo && !fator_vida && !fator_dano && !fator_defesa) {
+      const errors = [];
+      if (!nome) errors.push({ field: 'nome', message: 'Nome é obrigatório', code: 'REQUIRED' });
+      if (!descricao) errors.push({ field: 'descricao', message: 'Descrição é obrigatório', code: 'REQUIRED' });
+      if (!tipo) errors.push({ field: 'descricao', message: 'Tipo é obrigatório', code: 'REQUIRED' });
+      if (!fator_vida) errors.push({ field: 'descricao', message: 'Fator de vida é obrigatório', code: 'REQUIRED' });
+      if (!fator_dano) errors.push({ field: 'descricao', message: 'Fator de dano é obrigatório', code: 'REQUIRED' });
+      if (!fator_defesa) errors.push({ field: 'descricao', message: 'Fator de defesa é obrigatório', code: 'REQUIRED' });
+
+      return sendError(res, 400, 'Nome, descrição, tipo e pelo menos um dos fatores são obrigatórios', errors);
+    };
+
+    // Verificar se o item existe
+    const itemExists = await pool.query('SELECT id FROM item WHERE id = $1', [id]);
+    if (itemExists.rows.length === 0) {
+      return sendError(res, 404, 'Comerciante não encontrado');
+    }
+    const result = await pool.query(
+      'UPDATE item SET nome = $1, descricao = $2, tipo = $3, fator_vida = $4, fator_dano = $5, fator_defesa = $6, preco = $7 WHERE id = $8 RETURNING nome, descricao, tipo, fator_vida, fator_dano, fator_defesa, preco',
+      [nome, descricao, tipo, fator_vida, fator_dano, fator_defesa, preco, id]
+    );
+    return sendSuccess(res, 201, 'Item editado com sucesso', result.rows[0]);
+  } catch (error) {
+    console.error('Erro ao editar item:', error);
     return sendError(res, 500, 'Erro interno do servidor');
   }
 });
