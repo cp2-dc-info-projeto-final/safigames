@@ -21,7 +21,16 @@
     let fieldErrors: ApiFieldError[] = [];
     let tabelaItem: HTMLElement;
     let formItem: HTMLElement;
-    let titulo_item: string = $state(''); // titulo digitado no form de cadastro de episódio
+    let itemDados: Item = $state({
+      id: 0,
+      nome: "",
+      descricao: "",
+      tipo: "",
+      fator_vida: 0,
+      fator_dano: 0,
+      fator_defesa: 0,
+      preco: 0
+    })
     let inputOpen = $state(false);
     let editingId: number | null = $state(null); // id em edição
     let editingTitle: string = $state(''); // titulo em edição
@@ -77,20 +86,25 @@
     error = '';
     fieldErrors = [];
     try {
-      const res = await api.post('/game/item', { titulo: titulo_item });
+      const res = await api.post('/game/item', itemDados);
       const body = res.data as ApiResponse<Item>;
       if (body.success && body.data) {
         itens.push(body.data);
-        titulo_item = '';
+        for (let chave in itemDados) {
+            // Passamos o objeto como 1º argumento e a chave como 2º argumento
+            if (Object.hasOwn(itemDados, chave)) {
+                itemDados[chave] = null; // Limpa o valor de forma segura
+            }
+        }
         handleCancel();
       } else {
         error = body.message;
         fieldErrors = body.fieldErrors ?? [];
       }
     } catch (e: any) {
-      console.error('Erro ao criar episódio:', e);
+      console.error('Erro ao criar item:', e);
       const body = e.response?.data as ApiResponse<Item> | undefined;
-      error = body?.message || 'Erro ao criar episódio.';
+      error = body?.message || 'Erro ao criar item.';
     } finally {
       loading = false;
     }
@@ -182,7 +196,7 @@
     handleCancel();
   }
 </script>
-
+<Menu/>
 <!-- Container de tabela  -->
 <div id="itemContainer" class="flex flex-col gap-4 w-full max-w-full">
   <!-- Wrapper da Tabela -->
@@ -190,14 +204,24 @@
     <Table id="itemTable" class="w-full table-fixed border-collapse">
       <TableHead class="text-sm md:text-base bg-primary-900 text-primary-500">
         <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Nome</TableHeadCell>
-        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Cenas</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Descrição</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Tipo</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Fator vida</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Fator dano</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Fator defesa</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Preço</TableHeadCell>
         <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]" colspan="2">Gerenciar</TableHeadCell>
       </TableHead>
       <TableBody>
       {#each itens as item} 
         <TableBodyRow class="text-sm md:text-base bg-primary-900 text-primary-500">
-          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{item.titulo}</TableBodyCell>
-          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Algumas cenas </TableBodyCell> <!-- Célula de cenas não integrada ao banco de dados -->
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{item.nome}</TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{item.descricao}</TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{item.tipo}</TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{item.fator_vida}</TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{item.fator_dano}</TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{item.fator_defesa}</TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{item.preco}</TableBodyCell>
           <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
             <button
               title="Remover"
@@ -219,7 +243,7 @@
 
         </TableBodyRow>
       {/each}
-      {#if items.length === 0}
+      {#if itens.length === 0}
         <TableBodyRow class="text-sm md:text-base bg-primary-900 text-primary-500">
           <TableBodyCell class="p-2 text-center break-words" colspan="8">Nenhum item encontrado!</TableBodyCell>
         </TableBodyRow>
@@ -250,4 +274,92 @@
         Voltar
       </button>
   </div>   
+</div>
+
+<div class="mt-auto mb-auto" style="display:none" id="containerForm">
+  <!-- Card do formulário -->
+  <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
+    <!-- Formulário principal -->
+    <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={criaItem}>
+      <!-- Título -->
+      <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
+        Crie um item
+      </Heading>
+      <!-- Mensagem de erro -->
+      {#if error}
+        <div class="text-red-500 text-center">{error}</div>
+      {/if}
+      <!-- Campo Título -->
+      <div>
+        <Label for="nome" class="text-lg text-primary-500">Nome</Label>
+        <Input id="nome" bind:value={itemDados.nome} placeholder="Digite o nome do item" required class="mt-1" />
+        {#if errorOf('nome')}
+          <div class="mt-1 text-sm text-red-500">{errorOf('nome')}</div>
+        {/if}
+      </div>
+      <!-- Campo Título -->
+      <div>
+        <Label for="descricao" class="text-lg text-primary-500">Descrição</Label>
+        <Input id="descricao" bind:value={itemDados.descricao} placeholder="Digite a descrição do item" required class="mt-1" />
+        {#if errorOf('descricao')}
+          <div class="mt-1 text-sm text-red-500">{errorOf('descricao')}</div>
+        {/if}
+      </div>
+      <!-- Campo Título -->
+      <div>
+        <Label for="tipo" class="text-lg text-primary-500">Tipo</Label>
+        <Input id="tipo" bind:value={itemDados.tipo} placeholder="Digite o tipo do item" required class="mt-1" />
+        {#if errorOf('tipo')}
+          <div class="mt-1 text-sm text-red-500">{errorOf('tipo')}</div>
+        {/if}
+      </div>
+      <!-- Campo Título -->
+      <div>
+        <Label for="fator_vida" class="text-lg text-primary-500">Fator de vida</Label>
+        <Input id="fator_vida" bind:value={itemDados.fator_vida} type="number" placeholder="Digite o fator de vida do item" required class="mt-1" />
+        {#if errorOf('fator_vida')}
+          <div class="mt-1 text-sm text-red-500">{errorOf('fator_vida')}</div>
+        {/if}
+      </div>
+      <!-- Campo Título -->
+      <div>
+        <Label for="fator_dano" class="text-lg text-primary-500">Fator de dano</Label>
+        <Input id="fator_dano" bind:value={itemDados.fator_dano} type="number" placeholder="Digite o fator de dano do item" required class="mt-1" />
+        {#if errorOf('fator_dano')}
+          <div class="mt-1 text-sm text-red-500">{errorOf('fator_dano')}</div>
+        {/if}
+      </div>
+      <!-- Campo Título -->
+      <div>
+        <Label for="fator_defesa" class="text-lg text-primary-500">Fator de defesa</Label>
+        <Input id="fator_defesa" bind:value={itemDados.fator_defesa} type="number" placeholder="Digite o fator de defesa do item" required class="mt-1" />
+        {#if errorOf('fator_defesa')}
+          <div class="mt-1 text-sm text-red-500">{errorOf('fator_defesa')}</div>
+        {/if}
+      </div>
+      <!-- Campo Título -->
+      <div>
+        <Label for="preco" class="text-lg text-primary-500">Preço</Label>
+        <Input id="preco" bind:value={itemDados.preco} type="number" placeholder="Digite o preço do item" required class="mt-1" />
+        {#if errorOf('preco')}
+          <div class="mt-1 text-sm text-red-500">{errorOf('preco')}</div>
+        {/if}
+      </div>
+  
+      <!-- Botões de ação -->
+      
+      <div class="text-lg flex gap-4 justify-end mt-4">
+        <!-- Botão cancelar/voltar -->
+        <Button color="light" type="button" onclick={handleCancel} disabled={loading}>
+          <ArrowLeftOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+            Voltar
+        </Button>
+        <!-- Botão salvar -->
+        <Button type="submit" color="primary" disabled={loading}>
+          <FloppyDiskAltOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+            Criar
+        </Button> 
+      </div>
+    </form>  
+  </Card>
 </div>

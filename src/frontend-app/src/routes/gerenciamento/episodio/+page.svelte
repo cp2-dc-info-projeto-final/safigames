@@ -195,43 +195,43 @@
 <div class="mt-auto mb-auto" style="display:none" id="containerForm">
   <!-- Card do formulário -->
   <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
-      <!-- Formulário principal -->
-      <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={criaEpisodio}>
-        <!-- Título -->
-        <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
-          Crie um episódio
-        </Heading>
-        <!-- Mensagem de erro -->
-        {#if error}
-          <div class="text-red-500 text-center">{error}</div>
+    <!-- Formulário principal -->
+    <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={criaEpisodio}>
+      <!-- Título -->
+      <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
+        Crie um episódio
+      </Heading>
+      <!-- Mensagem de erro -->
+      {#if error}
+        <div class="text-red-500 text-center">{error}</div>
+      {/if}
+      <!-- Campo Título -->
+      <div>
+        <Label for="titulo" class="text-lg text-primary-500">Título</Label>
+        <Input id="titulo" bind:value={titulo_episodio} placeholder="Digite o titulo do episodio" required class="mt-1" />
+        {#if errorOf('titulo')}
+          <div class="mt-1 text-sm text-red-500">{errorOf('titulo')}</div>
         {/if}
-        <!-- Campo Título -->
-        <div>
-          <Label for="titulo" class="text-lg text-primary-500">Título</Label>
-          <Input id="titulo" bind:value={titulo_episodio} placeholder="Digite o titulo do episodio" required class="mt-1" />
-          {#if errorOf('titulo')}
-            <div class="mt-1 text-sm text-red-500">{errorOf('titulo')}</div>
-          {/if}
-        </div>
-    
-        <!-- Botões de ação -->
-        
-        <div class="text-lg flex gap-4 justify-end mt-4">
-          <!-- Botão cancelar/voltar -->
-          <Button color="light" type="button" onclick={handleCancel} disabled={loading}>
-            <ArrowLeftOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
-              Voltar
-          </Button>
-          <!-- Botão salvar -->
-          <Button type="submit" color="primary" disabled={loading}>
-            <FloppyDiskAltOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
-              Criar
-          </Button> 
-        </div>
-      </form>
+      </div>
+  
+      <!-- Botões de ação -->
       
-    </Card>
-  </div>
+      <div class="text-lg flex gap-4 justify-end mt-4">
+        <!-- Botão cancelar/voltar -->
+        <Button color="light" type="button" onclick={handleCancel} disabled={loading}>
+          <ArrowLeftOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+            Voltar
+        </Button>
+        <!-- Botão salvar -->
+        <Button type="submit" color="primary" disabled={loading}>
+          <FloppyDiskAltOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+            Criar
+        </Button> 
+      </div>
+    </form>
+    
+  </Card>
+</div>
 
 
 

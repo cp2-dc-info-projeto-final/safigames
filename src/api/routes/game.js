@@ -343,6 +343,35 @@ router.get('/item', verifyToken, async function(req, res) {
   }
 });
 
+// *POST criar item
+router.post('/item', verifyToken, async function(req, res) {
+  try {
+    const { nome, descricao, tipo, fator_vida, fator_dano, fator_defesa, preco } = req.body;
+
+    // Validação básica
+    if (!nome || !descricao || !tipo && !fator_vida && !fator_dano && !fator_defesa) {
+      const errors = [];
+      if (!nome) errors.push({ field: 'nome', message: 'Nome é obrigatório', code: 'REQUIRED' });
+      if (!descricao) errors.push({ field: 'descricao', message: 'Descrição é obrigatório', code: 'REQUIRED' });
+      if (!tipo) errors.push({ field: 'descricao', message: 'Tipo é obrigatório', code: 'REQUIRED' });
+      if (!fator_vida) errors.push({ field: 'descricao', message: 'Fator de vida é obrigatório', code: 'REQUIRED' });
+      if (!fator_dano) errors.push({ field: 'descricao', message: 'Fator de dano é obrigatório', code: 'REQUIRED' });
+      if (!fator_defesa) errors.push({ field: 'descricao', message: 'Fator de defesa é obrigatório', code: 'REQUIRED' });
+
+      return sendError(res, 400, 'Nome, descrição, tipo e pelo menos um dos fatores são obrigatórios', errors);
+    };
+
+    const result = await pool.query(
+      'INSERT INTO item (nome, descricao, tipo, fator_vida, fator_dano, fator_defesa, preco) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING nome, descricao, tipo, fator_vida, fator_dano, fator_defesa, preco',
+      [nome, descricao, tipo, fator_vida, fator_dano, fator_defesa, preco]
+    );
+    return sendSuccess(res, 201, 'Item criado com sucesso', result.rows[0]);
+  } catch (error) {
+    console.error('Erro ao criar item:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
 // Unificar CRUD de episodio com cena e for para dar insert em cenas
 // Unificar CRUD de comerciante e catálogo na mesma tela com select
 
