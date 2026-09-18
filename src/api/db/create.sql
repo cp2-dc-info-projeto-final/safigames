@@ -115,6 +115,7 @@ DROP TABLE IF EXISTS item CASCADE;
 
 CREATE TABLE item(
     id bigint GENERATED ALWAYS AS IDENTITY,
+    nome TEXT NOT NULL,
     descricao TEXT NOT NULL,
     tipo TEXT NOT NULL,
     fator_vida INTEGER,
@@ -178,8 +179,8 @@ VALUES('Espada de esmeralda', 30, 'Os aldeões adoram', 2);
 INSERT INTO personagem(nome, vida, stamina, classe, id_usuario, id_cena, id_arma)
 VALUES('Jâo, o garoto de programa', 90, 3, 'Mago', 1, 2, 1);
 
-INSERT INTO item(descricao, tipo, fator_vida, preco)
-VALUES('Deliciosa empadinha de queijo que te dá mais vontade de viver', 'Cura', 50, 5);
+INSERT INTO item(nome, descricao, tipo, fator_vida, preco)
+VALUES('Empadinha safadinha de queijo', 'Deliciosa empadinha de queijo que te dá mais vontade de viver', 'Cura', 50, 5);
 
 INSERT INTO inventario(id_item, id_personagem)
 VALUES(1, 1);
