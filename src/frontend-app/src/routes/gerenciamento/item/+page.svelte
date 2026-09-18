@@ -21,6 +21,7 @@
     let fieldErrors: ApiFieldError[] = [];
     let tabelaItem: HTMLElement;
     let formItem: HTMLElement;
+    let formEdit: HTMLElement;
     let itemDados: Item = $state({
       id: 0,
       nome: "",
@@ -33,11 +34,30 @@
     })
     let inputOpen = $state(false);
     let editingId: number | null = $state(null); // id em edição
-    let editingTitle: string = $state(''); // titulo em edição
-    let novoTitulo: string = $state(''); // titulo digitado que substituirá o antigo
+    let editingName: string = $state('');
+    let editingDesc: string = $state('');
+    let editingTipo: string = $state('');
+    let editingFatorVida: number = $state(0);
+    let editingFatorDano: number = $state(0);
+    let editingFatorDefesa: number = $state(0);
+    let editingPreco: number = $state(0);
+    let novoNome: string = $state('');
+    let novoDesc: string = $state('');
+    let novoTipo: string = $state('');
+    let novoFatorVida: number = $state(0);
+    let novoFatorDano: number = $state(0);
+    let novoFatorDefesa: number = $state(0);
+    let novoPreco: number = $state(0);
+
     let itemEditado = {
       id: 0,
-      titulo: ""
+      nome: "",
+      descricao: "",
+      tipo: "",
+      fator_vida: 0,
+      fator_dano: 0,
+      fator_defesa: 0,
+      preco: 0
     }
 
     onMount(async () => {
@@ -110,6 +130,38 @@
     }
   }
 
+  async function editaItem(){
+    novoNome = editingName;
+    novoDesc = editingDesc;
+    novoTipo = editingTipo;
+    novoFatorVida = editingFatorVida;
+    novoFatorDano = editingFatorDano;
+    novoFatorDefesa = editingFatorDefesa;
+    novoPreco = editingPreco;
+
+    formEdit = document.getElementById('containerFormEdit');
+    formEdit.style.display = "none";
+    tabelaItem = document.getElementById('itemContainer');
+    tabelaItem.style.display = "block";
+    goto('/gerenciamento/item')
+    try{
+      const res = await api.put(`/game/item/${editingId}`, { nome: novoNome, descricao: novoDesc, tipo: novoTipo, fator_vida: novoFatorVida, fator_dano: novoFatorDano, fator_defesa: novoFatorDefesa, preco: novoPreco  });
+        const body = res.data as ApiResponse<Item>;
+        if (!body.success) {
+          error = body.message;
+          fieldErrors = body.errors;
+          return;
+        }
+    } catch (e: any) {
+      const body = e.response?.data as ApiResponse<Item> | undefined;
+      error = body?.message || 'Erro ao editar item.';
+      fieldErrors = body?.errors || [];
+    }
+    finally {
+      buscaItem();
+    }
+  }
+
   // Abre modal de confirmação
   function openConfirm(id: number) {
     confirmTargetId = id;
@@ -157,39 +209,26 @@
   function handleCancel() {
     tabelaItem = document.getElementById('itemContainer');
     tabelaItem.style.display = "block";
-    formItem = document.getElementById('containerForm');
-    formItem.style.display = "none";
+    formEdit = document.getElementById('containerFormEdit');
+    formEdit.style.display = "none";
   }
 
-  function abrirModalEdit(item_id: number, item_nome: string) {
+
+  function mostraFormEdit(item_id: number, item_nome: string, item_descricao: string, item_tipo: string, item_fatorVida: number, item_fatorDano: number, item_fatorDefesa: number, item_preco: number){
     tabelaItem = document.getElementById('itemContainer');
-    tabelaItem.style.display = "none";
+    tabelaItem.style.display = "none"
+    formEdit = document.getElementById('containerFormEdit');
+    formEdit.style.display = "block";
     editingId = item_id;
-    editingTitle = item_nome;
-    inputOpen = true;
+    editingName = item_nome;
+    editingDesc = item_descricao;
+    editingTipo = item_tipo;
+    editingFatorVida = item_fatorVida;
+    editingFatorDano = item_fatorDano;
+    editingFatorDefesa = item_fatorDefesa;
+    editingPreco = item_preco;
   }
 
-  async function confirmEdit(){
-    novoTitulo = editingTitle;
-    inputOpen = false;
-    goto('/gerenciamento/item')
-    try{
-      const res = await api.put(`/game/item/${editingId}`, { titulo: novoTitulo });
-        const body = res.data as ApiResponse<Item>;
-        if (!body.success) {
-          error = body.message;
-          fieldErrors = body.errors;
-          return;
-        }
-    } catch (e: any) {
-      const body = e.response?.data as ApiResponse<Item> | undefined;
-      error = body?.message || 'Erro ao editar titulo.';
-      fieldErrors = body?.errors || [];
-    }
-    finally {
-      buscaItem();
-    }
-  }
 
   function cancelEdit(){
     inputOpen = false;
@@ -235,7 +274,7 @@
             <button
               title="Editar"
               class="p-2 rounded border border-green-100 hover:border-green-300 transition bg-transparent"
-              on:click={() =>abrirModalEdit(itemEditado.id = (item.id), itemEditado.titulo = (item.titulo))}>
+              on:click={() =>mostraFormEdit(itemEditado.id = (item.id), itemEditado.nome = (item.nome), itemEditado.descricao = (item.descricao), itemEditado.tipo = (item.tipo), itemEditado.fator_vida = (item.fator_vida), itemEditado.fator_dano = (item.fator_dano), itemEditado.fator_defesa = (item.fator_defesa), itemEditado.preco = (item.preco) )}>
               <UserEditOutline class="w-5 h-5 text-primary-500" />
             </button>
           </TableBodyCell>
@@ -358,6 +397,95 @@
         <Button type="submit" color="primary" disabled={loading}>
           <FloppyDiskAltOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
             Criar
+        </Button> 
+      </div>
+    </form>  
+  </Card>
+</div>
+
+
+<div class="mt-auto mb-auto" style="display:none" id="containerFormEdit">
+  <!-- Card do formulário de editar -->
+  <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
+    <!-- Formulário principal -->
+    <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={editaItem}>
+      <!-- Título -->
+      <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
+        Edite um item
+      </Heading>
+      <!-- Mensagem de erro -->
+      {#if error}
+        <div class="text-red-500 text-center">{error}</div>
+      {/if}
+      <!-- Campo Título -->
+      <div>
+        <Label for="nome" class="text-lg text-primary-500">Nome</Label>
+        <Input id="nome" bind:value={editingName} placeholder="Digite o nome do item" required class="mt-1" />
+        {#if errorOf('nome')}
+          <div class="mt-1 text-sm text-red-500">{errorOf('nome')}</div>
+        {/if}
+      </div>
+      <!-- Campo Título -->
+      <div>
+        <Label for="descricao" class="text-lg text-primary-500">Descrição</Label>
+        <Input id="descricao" bind:value={editingDesc} placeholder="Digite a descrição do item" required class="mt-1" />
+        {#if errorOf('descricao')}
+          <div class="mt-1 text-sm text-red-500">{errorOf('descricao')}</div>
+        {/if}
+      </div>
+      <!-- Campo Título -->
+      <div>
+        <Label for="tipo" class="text-lg text-primary-500">Tipo</Label>
+        <Input id="tipo" bind:value={editingTipo} placeholder="Digite o tipo do item" required class="mt-1" />
+        {#if errorOf('tipo')}
+          <div class="mt-1 text-sm text-red-500">{errorOf('tipo')}</div>
+        {/if}
+      </div>
+      <!-- Campo Título -->
+      <div>
+        <Label for="fator_vida" class="text-lg text-primary-500">Fator de vida</Label>
+        <Input id="fator_vida" bind:value={editingFatorVida} type="number" placeholder="Digite o fator de vida do item" required class="mt-1" />
+        {#if errorOf('fator_vida')}
+          <div class="mt-1 text-sm text-red-500">{errorOf('fator_vida')}</div>
+        {/if}
+      </div>
+      <!-- Campo Título -->
+      <div>
+        <Label for="fator_dano" class="text-lg text-primary-500">Fator de dano</Label>
+        <Input id="fator_dano" bind:value={editingFatorDano} type="number" placeholder="Digite o fator de dano do item" required class="mt-1" />
+        {#if errorOf('fator_dano')}
+          <div class="mt-1 text-sm text-red-500">{errorOf('fator_dano')}</div>
+        {/if}
+      </div>
+      <!-- Campo Título -->
+      <div>
+        <Label for="fator_defesa" class="text-lg text-primary-500">Fator de defesa</Label>
+        <Input id="fator_defesa" bind:value={editingFatorDefesa} type="number" placeholder="Digite o fator de defesa do item" required class="mt-1" />
+        {#if errorOf('fator_defesa')}
+          <div class="mt-1 text-sm text-red-500">{errorOf('fator_defesa')}</div>
+        {/if}
+      </div>
+      <!-- Campo Título -->
+      <div>
+        <Label for="preco" class="text-lg text-primary-500">Preço</Label>
+        <Input id="preco" bind:value={editingPreco} type="number" placeholder="Digite o preço do item" required class="mt-1" />
+        {#if errorOf('preco')}
+          <div class="mt-1 text-sm text-red-500">{errorOf('preco')}</div>
+        {/if}
+      </div>
+  
+      <!-- Botões de ação -->
+      
+      <div class="text-lg flex gap-4 justify-end mt-4">
+        <!-- Botão cancelar/voltar -->
+        <Button color="light" type="button" onclick={handleCancel} disabled={loading}>
+          <ArrowLeftOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+            Voltar
+        </Button>
+        <!-- Botão salvar -->
+        <Button type="submit" color="primary" disabled={loading}>
+          <FloppyDiskAltOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+            Salvar
         </Button> 
       </div>
     </form>  

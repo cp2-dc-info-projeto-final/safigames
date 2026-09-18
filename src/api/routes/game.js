@@ -392,22 +392,23 @@ router.delete('/item/:id', verifyToken, async function(req, res) {
 });
 
 // *PUT editar item
-router.put('/item', verifyToken, async function(req, res) {
+router.put('/item/:id', verifyToken, async function(req, res) {
   try {
     const { id }  = req.params;
     const { nome, descricao, tipo, fator_vida, fator_dano, fator_defesa, preco } = req.body;
 
     // Validação básica
-    if (!nome || !descricao || !tipo && !fator_vida && !fator_dano && !fator_defesa) {
+    if (!nome || !descricao || !tipo && !fator_vida && !fator_dano && !fator_defesa || !preco) {
       const errors = [];
       if (!nome) errors.push({ field: 'nome', message: 'Nome é obrigatório', code: 'REQUIRED' });
       if (!descricao) errors.push({ field: 'descricao', message: 'Descrição é obrigatório', code: 'REQUIRED' });
-      if (!tipo) errors.push({ field: 'descricao', message: 'Tipo é obrigatório', code: 'REQUIRED' });
-      if (!fator_vida) errors.push({ field: 'descricao', message: 'Fator de vida é obrigatório', code: 'REQUIRED' });
-      if (!fator_dano) errors.push({ field: 'descricao', message: 'Fator de dano é obrigatório', code: 'REQUIRED' });
-      if (!fator_defesa) errors.push({ field: 'descricao', message: 'Fator de defesa é obrigatório', code: 'REQUIRED' });
+      if (!tipo) errors.push({ field: 'tipo', message: 'Tipo é obrigatório', code: 'REQUIRED' });
+      if (!fator_vida) errors.push({ field: 'fator_vida', message: 'Fator de vida é obrigatório', code: 'REQUIRED' });
+      if (!fator_dano) errors.push({ field: 'fator_dano', message: 'Fator de dano é obrigatório', code: 'REQUIRED' });
+      if (!fator_defesa) errors.push({ field: 'fator_defesa', message: 'Fator de defesa é obrigatório', code: 'REQUIRED' });
+      if (!preco) errors.push({ field: 'preco', message: 'Preço é obrigatório', code: 'REQUIRED' });
 
-      return sendError(res, 400, 'Nome, descrição, tipo e pelo menos um dos fatores são obrigatórios', errors);
+      return sendError(res, 400, 'Nome, descrição, tipo, preço e pelo menos um dos fatores são obrigatórios', errors);
     };
 
     // Verificar se o item existe
