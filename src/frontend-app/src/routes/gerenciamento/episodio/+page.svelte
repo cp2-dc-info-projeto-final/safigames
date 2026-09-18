@@ -1,6 +1,6 @@
 <script lang="ts">
 
-    import { Table, TableHead, TableHeadCell, TableBody, TableBodyRow, TableBodyCell, Button, Card, Heading, Label, Input } from "flowbite-svelte";
+    import { Table, TableHead, TableHeadCell, TableBody, TableBodyRow, TableBodyCell, Button, Card, Heading, Label, Input, Select } from "flowbite-svelte";
     import Menu from '../../../components/Menu.svelte';
     import InputModal from '../../../components/InputModal.svelte';
     import { onMount } from 'svelte'; // ciclo de vida
@@ -27,6 +27,7 @@
     let editingId: number | null = $state(null); // id em edição
     let editingTitle: string = $state(''); // titulo em edição
     let novoTitulo: string = $state(''); // titulo digitado que substituirá o antigo
+    let itensSelect: any = $state([]);
     let episodioEditado = {
       id: 0,
       titulo: ""
@@ -71,8 +72,12 @@
         error = body?.message || 'Erro ao carregar episodios';
       } finally {
           loading = false;
+          itensSelect = episodios.map(episodio => ({
+            value: episodio.id.toString(),
+            name: episodio.titulo 
+          }))
         }
-  }
+    }
 
   async function criaEpisodio() {
     loading = true;
@@ -233,10 +238,19 @@
   </Card>
 </div>
 
-
+<div>
+  <div>
+  <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
+  Selecione o episodio:
+  {#if itensSelect.length > 0}
+    <Select items={itensSelect}></Select>
+  {/if}
+  </Heading>
+  </div>
+</div>
 
 <!-- Container de tabela episodio -->
-<div id="episodioContainer" class="flex flex-col gap-4 w-full max-w-full">
+<div id="episodioContainer" class="flex hidden flex-col gap-4 w-full max-w-full">
     <!-- Wrapper da Tabela -->
     <div class="w-full overflow-hidden shadow-lg border border-primary-500 rounded-lg">
       <Table id="episodioTable" class="w-full table-fixed border-collapse">

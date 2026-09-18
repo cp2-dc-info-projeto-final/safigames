@@ -427,6 +427,16 @@ router.put('/item/:id', verifyToken, async function(req, res) {
   }
 });
 
+// *GET busca todos os itens
+router.get('/cena/:idEpisodio', verifyToken, async function(req, res) {
+  try {
+    const result = await pool.query('SELECT * FROM cena WHERE id');
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar itens:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
 // Unificar CRUD de episodio com cena e for para dar insert em cenas
 // Unificar CRUD de comerciante e catálogo na mesma tela com select
 
