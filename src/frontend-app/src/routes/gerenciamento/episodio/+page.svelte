@@ -8,6 +8,7 @@
     import type { ApiResponse, ApiFieldError } from '$lib/api';
     import type { User } from '$lib/models/User';
     import type { Episodio } from '$lib/models/Episodio';
+    import type { Cena } from '$lib/models/Cena';
     import { TrashBinOutline, FloppyDiskAltOutline, ArrowLeftOutline, UserEditOutline } from 'flowbite-svelte-icons'; // ícones
     import ConfirmModal from '../../../components/ConfirmModal.svelte'; // modal de confirmação
     import { goto } from '$app/navigation';
@@ -15,6 +16,8 @@
     let user: User;
     let error = '';
     let episodios: Episodio[] = $state([]);
+    let selectedEpisodio: number | null = $state(null);
+    let cenas: Cena[] = $state([]);
     let loading: boolean;
     let deletingId: number | null = $state(null); // id em deleção
     let confirmOpen = $state(false); // modal aberto?
@@ -78,6 +81,32 @@
           }))
         }
     }
+
+    async function buscaCena(idEpisodio: number) {
+    try{
+      console.log("entrou")
+      const res = await api.get(`/game/cena/${idEpisodio}`);
+      const body = res.data as ApiResponse<Cena[]>;
+      if (body.success) {
+        cenas = body.data ?? [];
+      } else {
+        error = body.message;
+      }
+    } catch (e: any) {
+        console.error('Erro ao carregar cenas:', e);
+        const body = e.response?.data as ApiResponse<Cena[]> | undefined;
+        error = body?.message || 'Erro ao carregar cenas';
+      } finally {
+          loading = false;
+        }
+    }
+
+    $effect(() => {
+      if (selectedEpisodio !== null && selectedEpisodio !== undefined) {
+        buscaCena(selectedEpisodio);
+      }
+    });
+
 
   async function criaEpisodio() {
     loading = true;
@@ -243,81 +272,53 @@
   <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
   Selecione o episodio:
   {#if itensSelect.length > 0}
-    <Select items={itensSelect}></Select>
+    <Select 
+    items={itensSelect}
+    bind:value={selectedEpisodio}
+    ></Select>
   {/if}
   </Heading>
   </div>
-</div>
-
-<!-- Container de tabela episodio -->
-<div id="episodioContainer" class="flex hidden flex-col gap-4 w-full max-w-full">
-    <!-- Wrapper da Tabela -->
-    <div class="w-full overflow-hidden shadow-lg border border-primary-500 rounded-lg">
-      <Table id="episodioTable" class="w-full table-fixed border-collapse">
-        <TableHead class="text-sm md:text-base bg-primary-900 text-primary-500">
-          <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Título</TableHeadCell>
-          <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Cenas</TableHeadCell>
-          <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]" colspan="2">Gerenciar</TableHeadCell>
-        </TableHead>
-        <TableBody>
-        {#each episodios as episodio} 
-          <TableBodyRow class="text-sm md:text-base bg-primary-900 text-primary-500">
-            <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{episodio.titulo}</TableBodyCell>
-            <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Algumas cenas </TableBodyCell> <!-- Célula de cenas não integrada ao banco de dados -->
-            <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
-              <button
-                title="Remover"
-                class="p-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent"
-                on:click={() => openConfirm(episodio.id)}
-                disabled={deletingId === episodio.id || loading}>
-                <TrashBinOutline class="w-5 h-5 text-red-400" />
-              </button>
-             </TableBodyCell>
-            <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
-              <button
-                title="Editar"
-                class="p-2 rounded border border-green-100 hover:border-green-300 transition bg-transparent"
-                on:click={() =>abrirModalEdit(episodioEditado.id = (episodio.id), episodioEditado.titulo = (episodio.titulo))}>
-                <UserEditOutline class="w-5 h-5 text-primary-500" />
-              </button>
-            </TableBodyCell>
-            
+</div>   
+ 
+<!--Div container card cenas-->
+{#if cenas.length > 0}
   
-          </TableBodyRow>
-        {/each}
-        {#if episodios.length === 0}
-          <TableBodyRow class="text-sm md:text-base bg-primary-900 text-primary-500">
-            <TableBodyCell class="p-2 text-center break-words" colspan="8">Nenhum episodio encontrado!</TableBodyCell>
-          </TableBodyRow>
-        {/if}
-        </TableBody>
-      </Table>
-    </div>
-  
-    
-    <div class="flex justify-between">
-      <!-- Botão adicionar -->
-      <button
-      title="adicionar"
-      class="px-4 py-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent text-primary-500"
-      on:click={() => {
-        tabelaEpisodio = document.getElementById('episodioContainer');
-        tabelaEpisodio.style.display = "none";
-        formEpisodio = document.getElementById('containerForm');
-        formEpisodio.style.display = "block";
-      }}>
-      Adicionar
-    </button>
-      <!-- Botão voltar -->
-        <button
-          title="voltar"
-          class="px-4 py-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent text-primary-500"
-          on:click={goto('/gerenciamento')}>
-          Voltar
-        </button>
-    </div>   
+<div class="block">
+  <div class="flex flex-col items-center gap-4 my-8 max-w-3xl mx-auto md:grid md:grid-cols-2">
+    {#each cenas as cena}
+      <!-- Card de usuário -->
+      <Card class="max-w-sm w-full p-0 overflow-hidden shadow-lg border border-primary-500">
+        <div class="px-4 pt-4 pb-2 bg-primary-900 text-left flex items-center justify-between">
+          <div>
+            <div class="text-lg font-semibold text-primary-500 text-left">{cena.NPC}</div>
+            <div class="text-xs text-gray-400 text-left">ID: {cena.dialogo}</div>
+          </div>
+          <div class="flex gap-2">
+            <!-- Botão editar -->
+            <!-- Botão remover -->
+            <button
+              title="Remover"
+              class="p-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent"
+              on:click={() => openConfirm(user.id)}
+              disabled={deletingId === user.id || loading}
+            >
+              <TrashBinOutline class="w-5 h-5 text-red-400" />
+            </button>
+          </div>
+        </div>
+        <div class="px-4 pb-4 pt-2 flex flex-col gap-2 text-left bg-primary-900">
+          <div class="flex items-center gap-2 text-left">
+            <!-- Ícone de email -->
+            <svg class="w-4 h-4 text-primary-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 12A4 4 0 1 0 8 12a4 4 0 0 0 8 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14v7m-7-7v7m14-7v7"/></svg>
+            <span class="text-primary-600 text-sm">{user.email}</span>
+          </div>
+        </div>
+      </Card>
+    {/each}
+  </div>
 </div>
-
+{/if}
 
 
 <ConfirmModal

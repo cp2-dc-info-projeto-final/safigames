@@ -427,13 +427,14 @@ router.put('/item/:id', verifyToken, async function(req, res) {
   }
 });
 
-// *GET busca todos os itens
+// *GET busca cenas com filtro por id do episodio
 router.get('/cena/:idEpisodio', verifyToken, async function(req, res) {
+  const { idEpisodio } = req.params;
   try {
-    const result = await pool.query('SELECT * FROM cena WHERE id');
+    const result = await pool.query('SELECT * FROM cena WHERE id_episodio = $1', [idEpisodio]);
     return sendSuccess(res, 200, null, result.rows);
   } catch (error) {
-    console.error('Erro ao buscar itens:', error);
+    console.error('Erro ao buscar cenas:', error);
     return sendError(res, 500, 'Erro interno do servidor');
   }
 });
