@@ -9,7 +9,7 @@
     import type { User } from '$lib/models/User';
     import type { Episodio } from '$lib/models/Episodio';
     import type { Cena } from '$lib/models/Cena';
-    import { TrashBinOutline, FloppyDiskAltOutline, ArrowLeftOutline, UserEditOutline } from 'flowbite-svelte-icons'; // ícones
+    import { TrashBinOutline, FloppyDiskAltOutline, ArrowLeftOutline, UserEditOutline, CirclePlusSolid } from 'flowbite-svelte-icons'; // ícones
     import ConfirmModal from '../../../components/ConfirmModal.svelte'; // modal de confirmação
     import { goto } from '$app/navigation';
 
@@ -23,14 +23,17 @@
     let confirmOpen = $state(false); // modal aberto?
     let confirmTargetId: number | null = null; // id alvo do modal
     let fieldErrors: ApiFieldError[] = [];
-    let tabelaEpisodio: HTMLElement;
+    let divCards: HTMLElement;
+    let divSelect: HTMLElement;
     let formEpisodio: HTMLElement;
     let titulo_episodio: string = $state(''); // titulo digitado no form de cadastro de episódio
     let inputOpen = $state(false);
     let editingId: number | null = $state(null); // id em edição
     let editingTitle: string = $state(''); // titulo em edição
     let novoTitulo: string = $state(''); // titulo digitado que substituirá o antigo
-    let itensSelect: any = $state([]);
+    let itensSelect: any = $state([
+      {value:"", name:"Escolha um episódio.."}
+    ]);
     let episodioEditado = {
       id: 0,
       titulo: ""
@@ -73,39 +76,40 @@
         console.error('Erro ao carregar episodios:', e);
         const body = e.response?.data as ApiResponse<Episodio[]> | undefined;
         error = body?.message || 'Erro ao carregar episodios';
-      } finally {
-          loading = false;
-          itensSelect = episodios.map(episodio => ({
+    } finally {
+        loading = false;
+        itensSelect = 
+          episodios.map(episodio => ({
             value: episodio.id.toString(),
             name: episodio.titulo 
-          }))
-        }
+          }));
+      }
     }
 
-    async function buscaCena(idEpisodio: number) {
-    try{
-      console.log("entrou")
-      const res = await api.get(`/game/cena/${idEpisodio}`);
-      const body = res.data as ApiResponse<Cena[]>;
-      if (body.success) {
-        cenas = body.data ?? [];
-      } else {
-        error = body.message;
-      }
-    } catch (e: any) {
-        console.error('Erro ao carregar cenas:', e);
-        const body = e.response?.data as ApiResponse<Cena[]> | undefined;
-        error = body?.message || 'Erro ao carregar cenas';
-      } finally {
-          loading = false;
-        }
+  async function buscaCena(idEpisodio: number) {
+  try{
+    console.log("entrou")
+    const res = await api.get(`/game/cena/${idEpisodio}`);
+    const body = res.data as ApiResponse<Cena[]>;
+    if (body.success) {
+      cenas = body.data ?? [];
+    } else {
+      error = body.message;
     }
-
-    $effect(() => {
-      if (selectedEpisodio !== null && selectedEpisodio !== undefined) {
-        buscaCena(selectedEpisodio);
+  } catch (e: any) {
+      console.error('Erro ao carregar cenas:', e);
+      const body = e.response?.data as ApiResponse<Cena[]> | undefined;
+      error = body?.message || 'Erro ao carregar cenas';
+    } finally {
+        loading = false;
       }
-    });
+  }
+
+  $effect(() => {
+    if (selectedEpisodio !== null && selectedEpisodio !== undefined) {
+      buscaCena(selectedEpisodio);
+    }
+  });
 
 
   async function criaEpisodio() {
@@ -128,12 +132,14 @@
       const body = e.response?.data as ApiResponse<Episodio> | undefined;
       error = body?.message || 'Erro ao criar episódio.';
     } finally {
+      buscaEpisodio();
       loading = false;
     }
   }
 
   // Abre modal de confirmação
   function openConfirm(id: number) {
+    console.log("entrou no openconfirm")
     confirmTargetId = id;
     confirmOpen = true;
   }
@@ -177,15 +183,15 @@
   }
 
   function handleCancel() {
-    tabelaEpisodio = document.getElementById('episodioContainer');
-    tabelaEpisodio.style.display = "block";
+    document.getElementById('divCards') && (document.getElementById('divCards').style.display = "block");
+    document.getElementById('divSelect') && (document.getElementById('divSelect').style.display = "block");
     formEpisodio = document.getElementById('containerForm');
     formEpisodio.style.display = "none";
   }
 
   function abrirModalEdit(episodio_id: number, episodio_nome: string) {
-    tabelaEpisodio = document.getElementById('episodioContainer');
-    tabelaEpisodio.style.display = "none";
+    divCards = document.getElementById('divCards');
+    divCards.style.display = "none";
     editingId = episodio_id;
     editingTitle = episodio_nome;
     inputOpen = true;
@@ -268,31 +274,49 @@
 </div>
 
 <div>
-  <div>
-  <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
-  Selecione o episodio:
-  {#if itensSelect.length > 0}
-    <Select 
-    items={itensSelect}
-    bind:value={selectedEpisodio}
-    ></Select>
-  {/if}
-  </Heading>
+  <div id="divSelect">
+    <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
+      Selecione o episodio:
+    </Heading>
+
+    <!-- Contêiner Flexbox para alinhar o select e o botão lado a lado -->
+    <div class="flex items-center justify-center gap-2">
+      {#if itensSelect.length > 0}
+        <Select 
+          class="w-80"
+          items={itensSelect}
+          bind:value={selectedEpisodio}
+          clearable
+        ></Select>
+      {/if}
+
+      <button class="px-4 py-2 rounded border-none transition bg-transparent text-primary-50 inline" on:click={() => {
+      document.getElementById('divCards') && (document.getElementById('divCards').style.display = "none");
+      divSelect = document.getElementById('divSelect');
+      divSelect.style.display = "none";
+      formEpisodio = document.getElementById('containerForm');
+      formEpisodio.style.display = "block";}}>
+        <CirclePlusSolid class="shrink-0 h-6 w-6" />
+      </button>
+    </div>
   </div>
-</div>   
- 
+</div>
 <!--Div container card cenas-->
-{#if cenas.length > 0}
+{#if selectedEpisodio && cenas.length > 0}
   
 <div class="block">
-  <div class="flex flex-col items-center gap-4 my-8 max-w-3xl mx-auto md:grid md:grid-cols-2">
+  <div class="flex flex-col items-center gap-4 my-8 max-w-3xl mx-auto md:grid md:grid-cols-2" id="divCards">
     {#each cenas as cena}
       <!-- Card de usuário -->
       <Card class="max-w-sm w-full p-0 overflow-hidden shadow-lg border border-primary-500">
         <div class="px-4 pt-4 pb-2 bg-primary-900 text-left flex items-center justify-between">
           <div>
-            <div class="text-lg font-semibold text-primary-500 text-left">{cena.NPC}</div>
-            <div class="text-xs text-gray-400 text-left">ID: {cena.dialogo}</div>
+            <div class="text-lg font-semibold text-primary-500 text-left inline">ID:</div>
+            <div class="text-lg text-gray-400 text-left inline">{cena.id}</div> <br>
+            <div class="text-lg font-semibold text-primary-500 text-left inline">NPC:</div>
+            <div class="text-lg font-semibold text-primary-500 text-left inline">{cena.NPC}</div> <br>
+            <div class="text-lg font-semibold text-primary-500 text-left inline">Diálogo:</div>
+            <div class="text-lg text-gray-400 text-left inline"> {cena.dialogo}</div>
           </div>
           <div class="flex gap-2">
             <!-- Botão editar -->
@@ -300,25 +324,43 @@
             <button
               title="Remover"
               class="p-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent"
-              on:click={() => openConfirm(user.id)}
-              disabled={deletingId === user.id || loading}
+              on:click={() => openConfirm(cena.id)}
+              disabled={cena.id === cena.id || loading}
             >
               <TrashBinOutline class="w-5 h-5 text-red-400" />
             </button>
           </div>
         </div>
-        <div class="px-4 pb-4 pt-2 flex flex-col gap-2 text-left bg-primary-900">
-          <div class="flex items-center gap-2 text-left">
-            <!-- Ícone de email -->
-            <svg class="w-4 h-4 text-primary-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 12A4 4 0 1 0 8 12a4 4 0 0 0 8 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14v7m-7-7v7m14-7v7"/></svg>
-            <span class="text-primary-600 text-sm">{user.email}</span>
-          </div>
-        </div>
       </Card>
     {/each}
   </div>
-</div>
+</div>  
+{:else if selectedEpisodio && cenas.length == 0}
+  <div class="px-4 pt-4 pb-2 bg-primary-900 text-left flex items-center justify-between">
+      <div class="text-lg font-semibold text-primary-500 text-left text-center w-full inline">Não há cenas para esse episódio!</div>
+  </div>
 {/if}
+<div class="flex justify-between">
+  <!-- Botão adicionar -->
+  {#if selectedEpisodio}
+  <button
+  title="adicionar"
+  class="px-4 py-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent text-primary-500"
+  on:click={() => {
+
+  }}>
+  Adicionar
+</button>
+{/if}
+  <!-- Botão voltar -->
+    <button
+      title="voltar"
+      class="px-4 py-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent text-primary-500"
+      on:click={goto('/gerenciamento')}>
+      Voltar
+    </button>
+</div> 
+
 
 
 <ConfirmModal
