@@ -26,8 +26,12 @@
     let divCards: HTMLElement;
     let divSelect: HTMLElement;
     let formEpisodio: HTMLElement;
+    let formCena: HTMLElement;
     let titulo_episodio: string = $state(''); // titulo digitado no form de cadastro de episódio
     let inputOpen = $state(false);
+    let exibeFormCena = $state(false); 
+    let exibeSelect = $state(false);
+    let exibeCards = $state(false);
     let editingId: number | null = $state(null); // id em edição
     let editingTitle: string = $state(''); // titulo em edição
     let novoTitulo: string = $state(''); // titulo digitado que substituirá o antigo
@@ -88,7 +92,6 @@
 
   async function buscaCena(idEpisodio: number) {
   try{
-    console.log("entrou")
     const res = await api.get(`/game/cena/${idEpisodio}`);
     const body = res.data as ApiResponse<Cena[]>;
     if (body.success) {
@@ -103,6 +106,10 @@
     } finally {
         loading = false;
       }
+  }
+
+  async function criaCena(idEpisodio: number){
+
   }
 
   $effect(() => {
@@ -183,10 +190,13 @@
   }
 
   function handleCancel() {
+
+    // mudar a exibição para ocultar ou exibir com if
     document.getElementById('divCards') && (document.getElementById('divCards').style.display = "block");
     document.getElementById('divSelect') && (document.getElementById('divSelect').style.display = "block");
     formEpisodio = document.getElementById('containerForm');
     formEpisodio.style.display = "none";
+    exibeFormCena = false;
   }
 
   function abrirModalEdit(episodio_id: number, episodio_nome: string) {
@@ -272,7 +282,50 @@
     
   </Card>
 </div>
+{#if exibeFormCena}
+<div class="mt-auto mb-auto" style="display:none" id="containerFormCena">
+  <!-- Card do formulário -->
+  <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
+    <!-- Formulário principal -->
+    <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={criaCena(idEpisodio)}>
+      <!-- Título -->
+      <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
+        Crie um episódio
+      </Heading>
+      <!-- Mensagem de erro -->
+      {#if error}
+        <div class="text-red-500 text-center">{error}</div>
+      {/if}
+      <!-- Campo Título -->
+      <div>
+        <Label for="titulo" class="text-lg text-primary-500">Título</Label>
+        <Input id="titulo" bind:value={titulo_episodio} placeholder="Digite o titulo do episodio" required class="mt-1" />
+        {#if errorOf('titulo')}
+          <div class="mt-1 text-sm text-red-500">{errorOf('titulo')}</div>
+        {/if}
+      </div>
+  
+      <!-- Botões de ação -->
+      
+      <div class="text-lg flex gap-4 justify-end mt-4">
+        <!-- Botão cancelar/voltar -->
+        <Button color="light" type="button" onclick={handleCancel} disabled={loading}>
+          <ArrowLeftOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+            Voltar
+        </Button>
+        <!-- Botão salvar -->
+        <Button type="submit" color="primary" disabled={loading}>
+          <FloppyDiskAltOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+            Criar
+        </Button> 
+      </div>
+    </form>
+    
+  </Card>
+</div>
+{/if}
 
+{#if exibeSelect}
 <div>
   <div id="divSelect">
     <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
@@ -301,9 +354,11 @@
     </div>
   </div>
 </div>
+{/if}
+
 <!--Div container card cenas-->
 {#if selectedEpisodio && cenas.length > 0}
-  
+  {#if exibeCards}
 <div class="block">
   <div class="flex flex-col items-center gap-4 my-8 max-w-3xl mx-auto md:grid md:grid-cols-2" id="divCards">
     {#each cenas as cena}
@@ -335,6 +390,7 @@
     {/each}
   </div>
 </div>  
+  {/if}
 {:else if selectedEpisodio && cenas.length == 0}
   <div class="px-4 pt-4 pb-2 bg-primary-900 text-left flex items-center justify-between">
       <div class="text-lg font-semibold text-primary-500 text-left text-center w-full inline">Não há cenas para esse episódio!</div>
@@ -347,7 +403,10 @@
   title="adicionar"
   class="px-4 py-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent text-primary-500"
   on:click={() => {
-
+    exibeFormCena = true;
+    divSelect = document.getElementById('divSelect');
+    divSelect.style.display = "none";
+    document.getElementById('divCards') && (document.getElementById('divCards').style.display = "none");
   }}>
   Adicionar
 </button>
