@@ -438,6 +438,18 @@ router.get('/cena/:idEpisodio', verifyToken, async function(req, res) {
     return sendError(res, 500, 'Erro interno do servidor');
   }
 });
+
+// GET inimigo
+router.get('/inimigo', verifyToken, async function(req, res) {
+  try {
+    const result = await pool.query('SELECT * FROM inimigo');
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar inimigo:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
 // Unificar CRUD de episodio com cena e for para dar insert em cenas
 // Unificar CRUD de comerciante e catálogo na mesma tela com select
 

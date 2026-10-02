@@ -8,7 +8,9 @@
     import type { ApiResponse, ApiFieldError } from '$lib/api';
     import type { User } from '$lib/models/User';
     import type { Episodio } from '$lib/models/Episodio';
-    import type { Cena } from '$lib/models/Cena';
+    import type { Inimigo } from '$lib/models/Inimigo';
+    import type { Comerciante } from '$lib/models/Comerciante';
+    import type { Cena, CenaFormData } from '$lib/models/Cena';
     import { TrashBinOutline, FloppyDiskAltOutline, ArrowLeftOutline, UserEditOutline, CirclePlusSolid } from 'flowbite-svelte-icons'; // ícones
     import ConfirmModal from '../../../components/ConfirmModal.svelte'; // modal de confirmação
     import { goto } from '$app/navigation';
@@ -19,17 +21,29 @@
     let exibeSelect = $state(true);
     let exibeCards = $state(true);
     let selectedEpisodio: number | null = $state(null);
+    let selectedTipo: string | null = $state(null);
+    let selectedInimigo: Inimigo | null = $state(null);
+    let selectedComerciante: Comerciante | null = $state(null);
     let confirmOpen = $state(false); // modal aberto?
     let exibeFormEpisodio = $state(false); 
 
     // Arrays
     let episodios: Episodio[] = $state([]);
-    let itensSelect: any = $state([
-      {value:"", name:"Escolha um episódio.."}
-    ]);
+    let itensSelect: any = $state([]);
+    let itensSelectInimigo: any = $state([])
+    let itensSelectTipo: any = $state([
+      {value:"combate", name:"Combate"},
+      {value:"dialogo", name:"Diálogo"},
+      {value:"comercio", name:"Comércio"}
+    ])
+    let itensSelectComerciante: any = $state([])
     let cenas: Cena[] = $state([]);
+    let inimigos: Inimigo[] = $state([]);
+    let comerciantes: Comerciante[] = $state([]);
     let fieldErrors: ApiFieldError[] = [];
 
+
+    let cena: CenaFormData = { id: 0, NPC: '', dialogo: '', tipo: '', id_inimigo: 0, id_comerciante: 0, id_episodio: 0}
     let user: User;
     let error = '';
     let loading: boolean;
@@ -60,6 +74,8 @@
       } finally {
         loading = true;
         buscaEpisodio();
+        buscaInimigo();
+        buscaComerciante();
     } 
   })
 
@@ -90,6 +106,52 @@
           }));
       }
     }
+
+  async function buscaInimigo() {
+    try{
+      const res = await api.get('/game/inimigo');
+      const body = res.data as ApiResponse<Inimigo[]>;
+      if (body.success) {
+        inimigos = body.data ?? [];
+      } else {
+        error = body.message;
+      }
+    } catch (e: any) {
+        console.error('Erro ao carregar inimigos:', e);
+        const body = e.response?.data as ApiResponse<Inimigo[]> | undefined;
+        error = body?.message || 'Erro ao carregar inimigos';
+    } finally {
+        loading = false;
+        itensSelectInimigo = 
+          inimigos.map(inimigo => ({
+            value: inimigo.id.toString(),
+            name: inimigo.nome
+          }));
+      }
+  }
+
+  async function buscaComerciante() {
+    try{
+      const res = await api.get('/game/comerciante');
+      const body = res.data as ApiResponse<Comerciante[]>;
+      if (body.success) {
+        comerciantes = body.data ?? [];
+      } else {
+        error = body.message;
+      }
+    } catch (e: any) {
+        console.error('Erro ao carregar comerciantes:', e);
+        const body = e.response?.data as ApiResponse<Comerciante[]> | undefined;
+        error = body?.message || 'Erro ao carregar comerciantes';
+    } finally {
+        loading = false;
+        itensSelectComerciante = 
+          comerciantes.map(comerciante => ({
+            value: comerciante.id.toString(),
+            name: comerciante.nome
+          }));
+      }
+  }
 
   async function buscaCena(idEpisodio: number) {
   try{
@@ -297,14 +359,72 @@
         {#if error}
           <div class="text-red-500 text-center">{error}</div>
         {/if}
-        <!-- Campo Título -->
+        <!-- Campo tipo -->
         <div>
-          <Label for="titulo" class="text-lg text-primary-500">Título</Label>
-          <Input id="titulo" bind:value={titulo_episodio} placeholder="Digite o titulo do episodio" required class="mt-1" />
-          {#if errorOf('titulo')}
-            <div class="mt-1 text-sm text-red-500">{errorOf('titulo')}</div>
+          <Label for="tipo" class="text-lg text-primary-500">Tipo</Label>
+          <Select 
+            id="tipo"
+            class="w-80"
+            items={itensSelectTipo}
+            bind:value={selectedTipo}
+            clearable
+          ></Select>
+      </div>
+      {#if selectedTipo == 'dialogo'}
+        <!-- Campo NPC -->
+        <div>
+          <Label for="npc" class="text-lg text-primary-500">NPC</Label>
+          <Input id="npc" bind:value={cena.NPC} placeholder="Digite o nome do NPC da cena" required class="mt-1" />
+          {#if errorOf('npc')}
+            <div class="mt-1 text-sm text-red-500">{errorOf('npc')}</div>
           {/if}
         </div>
+        <!-- Campo diálogo -->
+        <div>
+          <Label for="dialogo" class="text-lg text-primary-500">Diálogo</Label>
+          <textarea id="dialogo" bind:value={cena.dialogo} placeholder="Digite o diálogo da cena" required class="mt-1 w-full resize-y min-h-[80px]">
+          </textarea>
+          {#if errorOf('dialogo')}
+            <div class="mt-1 text-sm text-red-500">{errorOf('dialogo')}</div>
+          {/if}
+        </div>
+      {/if}
+      {#if selectedTipo == 'combate'}
+       <!-- Campo inimigo -->
+      <div>
+        <Label for="inimigo" class="text-lg text-primary-500">Inimigo</Label>
+        <Select 
+          id="inimigo"
+          class="w-80"
+          items={itensSelectInimigo}
+          bind:value={selectedInimigo}
+          clearable
+        ></Select>
+      </div>
+      {/if}
+      {#if selectedTipo == 'comercio'}
+       <!-- Campo comerciante -->
+      <div>
+        <Label for="comerciante" class="text-lg text-primary-500">Comerciante</Label>
+        <Select 
+          id="comerciante"
+          class="w-80"
+          items={itensSelectComerciante}
+          bind:value={selectedComerciante}
+          clearable
+        ></Select>
+      </div>
+      <!-- Campo diálogo -->
+      <div>
+        <Label for="dialogo" class="text-lg text-primary-500">Diálogo</Label>
+        <textarea id="dialogo" bind:value={cena.dialogo} placeholder="Digite o diálogo da cena" required class="mt-1 w-full resize-y min-h-[80px]">
+        </textarea>
+        {#if errorOf('dialogo')}
+          <div class="mt-1 text-sm text-red-500">{errorOf('dialogo')}</div>
+        {/if}
+      </div>
+      {/if}
+        
     
         <!-- Botões de ação -->
         
@@ -376,7 +496,7 @@
           </div>
           <div class="flex gap-2">
             <!-- Botão editar -->
-            
+
             <!--inserir botão editar aqui-->
 
             <!-- Botão remover -->
