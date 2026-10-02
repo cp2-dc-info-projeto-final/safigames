@@ -13,31 +13,32 @@
     import ConfirmModal from '../../../components/ConfirmModal.svelte'; // modal de confirmação
     import { goto } from '$app/navigation';
 
-    let user: User;
-    let error = '';
-    let episodios: Episodio[] = $state([]);
-    let selectedEpisodio: number | null = $state(null);
-    let cenas: Cena[] = $state([]);
-    let loading: boolean;
-    let deletingId: number | null = $state(null); // id em deleção
-    let confirmOpen = $state(false); // modal aberto?
-    let confirmTargetId: number | null = null; // id alvo do modal
-    let fieldErrors: ApiFieldError[] = [];
-    let divCards: HTMLElement;
-    let divSelect: HTMLElement;
-    let formEpisodio: HTMLElement;
-    let formCena: HTMLElement;
-    let titulo_episodio: string = $state(''); // titulo digitado no form de cadastro de episódio
+    // Variáveis de controle
     let inputOpen = $state(false);
     let exibeFormCena = $state(false); 
-    let exibeSelect = $state(false);
-    let exibeCards = $state(false);
-    let editingId: number | null = $state(null); // id em edição
-    let editingTitle: string = $state(''); // titulo em edição
-    let novoTitulo: string = $state(''); // titulo digitado que substituirá o antigo
+    let exibeSelect = $state(true);
+    let exibeCards = $state(true);
+    let selectedEpisodio: number | null = $state(null);
+    let confirmOpen = $state(false); // modal aberto?
+    let exibeFormEpisodio = $state(false); 
+
+    // Arrays
+    let episodios: Episodio[] = $state([]);
     let itensSelect: any = $state([
       {value:"", name:"Escolha um episódio.."}
     ]);
+    let cenas: Cena[] = $state([]);
+    let fieldErrors: ApiFieldError[] = [];
+
+    let user: User;
+    let error = '';
+    let loading: boolean;
+    let deletingId: number | null = $state(null); // id em deleção
+    let confirmTargetId: number | null = null; // id alvo do modal
+    let titulo_episodio: string = $state(''); // titulo digitado no form de cadastro de episódio
+    let editingId: number | null = $state(null); // id em edição
+    let editingTitle: string = $state(''); // titulo em edição
+    let novoTitulo: string = $state(''); // titulo digitado que substituirá o antigo
     let episodioEditado = {
       id: 0,
       titulo: ""
@@ -190,12 +191,9 @@
   }
 
   function handleCancel() {
-
-    // mudar a exibição para ocultar ou exibir com if
-    document.getElementById('divCards') && (document.getElementById('divCards').style.display = "block");
-    document.getElementById('divSelect') && (document.getElementById('divSelect').style.display = "block");
-    formEpisodio = document.getElementById('containerForm');
-    formEpisodio.style.display = "none";
+    exibeCards = true;
+    exibeSelect = true;
+    exibeFormEpisodio = false;
     exibeFormCena = false;
   }
 
@@ -242,87 +240,90 @@
   <title>Gerenciamento</title>
 </svelte:head>
 
-<div class="mt-auto mb-auto" style="display:none" id="containerForm">
-  <!-- Card do formulário -->
-  <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
-    <!-- Formulário principal -->
-    <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={criaEpisodio}>
-      <!-- Título -->
-      <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
-        Crie um episódio
-      </Heading>
-      <!-- Mensagem de erro -->
-      {#if error}
-        <div class="text-red-500 text-center">{error}</div>
-      {/if}
-      <!-- Campo Título -->
-      <div>
-        <Label for="titulo" class="text-lg text-primary-500">Título</Label>
-        <Input id="titulo" bind:value={titulo_episodio} placeholder="Digite o titulo do episodio" required class="mt-1" />
-        {#if errorOf('titulo')}
-          <div class="mt-1 text-sm text-red-500">{errorOf('titulo')}</div>
+{#if exibeFormEpisodio}
+  <div class="mt-auto mb-auto" id="containerForm">
+    <!-- Card do formulário -->
+    <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
+      <!-- Formulário principal -->
+      <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={criaEpisodio}>
+        <!-- Título -->
+        <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
+          Crie um episódio
+        </Heading>
+        <!-- Mensagem de erro -->
+        {#if error}
+          <div class="text-red-500 text-center">{error}</div>
         {/if}
-      </div>
-  
-      <!-- Botões de ação -->
-      
-      <div class="text-lg flex gap-4 justify-end mt-4">
-        <!-- Botão cancelar/voltar -->
-        <Button color="light" type="button" onclick={handleCancel} disabled={loading}>
-          <ArrowLeftOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
-            Voltar
-        </Button>
-        <!-- Botão salvar -->
-        <Button type="submit" color="primary" disabled={loading}>
-          <FloppyDiskAltOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
-            Criar
-        </Button> 
-      </div>
-    </form>
+        <!-- Campo Título -->
+        <div>
+          <Label for="titulo" class="text-lg text-primary-500">Título</Label>
+          <Input id="titulo" bind:value={titulo_episodio} placeholder="Digite o titulo do episodio" required class="mt-1" />
+          {#if errorOf('titulo')}
+            <div class="mt-1 text-sm text-red-500">{errorOf('titulo')}</div>
+          {/if}
+        </div>
     
-  </Card>
-</div>
+        <!-- Botões de ação -->
+        
+        <div class="text-lg flex gap-4 justify-end mt-4">
+          <!-- Botão cancelar/voltar -->
+          <Button color="light" type="button" onclick={handleCancel} disabled={loading}>
+            <ArrowLeftOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+              Voltar
+          </Button>
+          <!-- Botão salvar -->
+          <Button type="submit" color="primary" disabled={loading}>
+            <FloppyDiskAltOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+              Criar
+          </Button> 
+        </div>
+      </form>
+      
+    </Card>
+  </div>
+{/if}
+
 {#if exibeFormCena}
-<div class="mt-auto mb-auto" style="display:none" id="containerFormCena">
-  <!-- Card do formulário -->
-  <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
-    <!-- Formulário principal -->
-    <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={criaCena(idEpisodio)}>
-      <!-- Título -->
-      <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
-        Crie um episódio
-      </Heading>
-      <!-- Mensagem de erro -->
-      {#if error}
-        <div class="text-red-500 text-center">{error}</div>
-      {/if}
-      <!-- Campo Título -->
-      <div>
-        <Label for="titulo" class="text-lg text-primary-500">Título</Label>
-        <Input id="titulo" bind:value={titulo_episodio} placeholder="Digite o titulo do episodio" required class="mt-1" />
-        {#if errorOf('titulo')}
-          <div class="mt-1 text-sm text-red-500">{errorOf('titulo')}</div>
+  <div class="mt-auto mb-auto" id="containerFormCena">
+    <!-- Card do formulário -->
+    <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
+      <!-- Formulário principal -->
+      <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={criaCena(idEpisodio)}>
+        <!-- Título -->
+        <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
+          Crie uma cena
+        </Heading>
+        <!-- Mensagem de erro -->
+        {#if error}
+          <div class="text-red-500 text-center">{error}</div>
         {/if}
-      </div>
-  
-      <!-- Botões de ação -->
-      
-      <div class="text-lg flex gap-4 justify-end mt-4">
-        <!-- Botão cancelar/voltar -->
-        <Button color="light" type="button" onclick={handleCancel} disabled={loading}>
-          <ArrowLeftOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
-            Voltar
-        </Button>
-        <!-- Botão salvar -->
-        <Button type="submit" color="primary" disabled={loading}>
-          <FloppyDiskAltOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
-            Criar
-        </Button> 
-      </div>
-    </form>
+        <!-- Campo Título -->
+        <div>
+          <Label for="titulo" class="text-lg text-primary-500">Título</Label>
+          <Input id="titulo" bind:value={titulo_episodio} placeholder="Digite o titulo do episodio" required class="mt-1" />
+          {#if errorOf('titulo')}
+            <div class="mt-1 text-sm text-red-500">{errorOf('titulo')}</div>
+          {/if}
+        </div>
     
-  </Card>
-</div>
+        <!-- Botões de ação -->
+        
+        <div class="text-lg flex gap-4 justify-end mt-4">
+          <!-- Botão cancelar/voltar -->
+          <Button color="light" type="button" onclick={handleCancel} disabled={loading}>
+            <ArrowLeftOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+              Voltar
+          </Button>
+          <!-- Botão salvar -->
+          <Button type="submit" color="primary" disabled={loading}>
+            <FloppyDiskAltOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+              Criar
+          </Button> 
+        </div>
+      </form>
+      
+    </Card>
+  </div>
 {/if}
 
 {#if exibeSelect}
@@ -344,11 +345,10 @@
       {/if}
 
       <button class="px-4 py-2 rounded border-none transition bg-transparent text-primary-50 inline" on:click={() => {
-      document.getElementById('divCards') && (document.getElementById('divCards').style.display = "none");
-      divSelect = document.getElementById('divSelect');
-      divSelect.style.display = "none";
-      formEpisodio = document.getElementById('containerForm');
-      formEpisodio.style.display = "block";}}>
+      exibeCards = false;
+      exibeSelect = false;
+      exibeFormEpisodio = true
+      }}>
         <CirclePlusSolid class="shrink-0 h-6 w-6" />
       </button>
     </div>
@@ -356,9 +356,10 @@
 </div>
 {/if}
 
-<!--Div container card cenas-->
-{#if selectedEpisodio && cenas.length > 0}
-  {#if exibeCards}
+<!--Div container card cenas--> 
+{#if exibeCards}
+  {#if selectedEpisodio && cenas.length > 0}
+ 
 <div class="block">
   <div class="flex flex-col items-center gap-4 my-8 max-w-3xl mx-auto md:grid md:grid-cols-2" id="divCards">
     {#each cenas as cena}
@@ -375,6 +376,9 @@
           </div>
           <div class="flex gap-2">
             <!-- Botão editar -->
+            
+            <!--inserir botão editar aqui-->
+
             <!-- Botão remover -->
             <button
               title="Remover"
@@ -390,11 +394,12 @@
     {/each}
   </div>
 </div>  
-  {/if}
+ 
 {:else if selectedEpisodio && cenas.length == 0}
   <div class="px-4 pt-4 pb-2 bg-primary-900 text-left flex items-center justify-between">
       <div class="text-lg font-semibold text-primary-500 text-left text-center w-full inline">Não há cenas para esse episódio!</div>
   </div>
+  {/if}
 {/if}
 <div class="flex justify-between">
   <!-- Botão adicionar -->
@@ -404,9 +409,8 @@
   class="px-4 py-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent text-primary-500"
   on:click={() => {
     exibeFormCena = true;
-    divSelect = document.getElementById('divSelect');
-    divSelect.style.display = "none";
-    document.getElementById('divCards') && (document.getElementById('divCards').style.display = "none");
+    exibeSelect = false;
+    exibeCards = false;
   }}>
   Adicionar
 </button>
