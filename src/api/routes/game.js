@@ -450,7 +450,55 @@ router.get('/inimigo', verifyToken, async function(req, res) {
   }
 });
 
-// Unificar CRUD de episodio com cena e for para dar insert em cenas
+// *POST criar cena
+router.post('/cena/:id', verifyToken, async function(req, res) {
+  try {
+    const idEpisodio = req.params;
+    const { tipo, NPC, dialogo, id_comerciante, id_episodio, id_inimigo } = req.body;
+    const errors = [];
+
+    // Validação do tipo da cena
+    if (!tipo){
+      errors.push({ field: 'tipo', message: 'Tipo é obrigatório', code: 'REQUIRED' });
+    }
+    else if (tipo == "combate" && !id_inimigo){
+      errors.push({ field: 'inimigo', message: 'Inimigo é obrigatório em cena de combate', code: 'REQUIRED' });
+    }
+    else if (tipo == "dialogo" && !NPC || !dialogo){
+      if (!NPC) {errors.push({ field: 'npc', message: 'NPC é obrigatório', code: 'REQUIRED' })};
+      if (!dialogo) {errors.push({ field: 'dialogo', message: 'Diálogo é obrigatório', code: 'REQUIRED' })};
+    }
+    else if (tipo == "comercio" && !id_comerciante || !dialogo){
+      if (!id_comerciante) {errors.push({ field: 'comerciante', message: 'Comerciante é obrigatório', code: 'REQUIRED' })};
+      if (!dialogo) {errors.push({ field: 'dialogo', message: 'Diálogo é obrigatório', code: 'REQUIRED' })};
+    }
+    
+    if (tipo == "dialogo"){
+      const result = await pool.query(
+        'INSERT INTO cena (tipo, NPC, dialogo, id_episodio) VALUES ($1, $2, $3, $4) RETURNING tipo, NPC, dialogo, id_episodio',
+        [tipo, NPC, dialogo, id_episodio]
+      );
+      return sendSuccess(res, 201, 'Item criado com sucesso', result.rows[0]);
+    }
+    else if (tipo == "combate"){
+      const result = await pool.query(
+        'INSERT INTO cena (tipo, id_inimigo, id_episodio) VALUES ($1, $2, $3) RETURNING tipo, id_inimigo, id_episodio',
+        [tipo, id_inimigo, id_episodio]
+      );
+      return sendSuccess(res, 201, 'Item criado com sucesso', result.rows[0]);
+    }
+    else if (tipo == "comercio"){
+      const result = await pool.query(
+        'INSERT INTO cena (tipo, dialogo, id_comeciante, id_episodio) VALUES ($1, $2, $3, $4) RETURNING tipo, dialogo, id_comeciante, id_episodio',
+        [tipo, dialogo, id_comeciante, id_episodio]
+      );
+      return sendSuccess(res, 201, 'Item criado com sucesso', result.rows[0]);
+    }
+  } catch (error) {
+    console.error('Erro ao criar item:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
 // Unificar CRUD de comerciante e catálogo na mesma tela com select
 
 

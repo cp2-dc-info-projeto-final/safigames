@@ -172,7 +172,36 @@
   }
 
   async function criaCena(idEpisodio: number){
-
+    loading = true;
+    error = '';
+    fieldErrors = [];
+    console.log("ta funcionando")
+    try {
+      const res = await api.post(`/game/cena/${idEpisodio}`, { cena });
+      const body = res.data as ApiResponse<Cena>;
+      if (body.success && body.data) {
+        cenas.push(body.data);
+        for (let cena of cenas){
+          cena.tipo = '',
+          cena.NPC = '',
+          cena.dialogo = '',
+          cena.id_comerciante = 0,
+          cena.id_episodio = 0,
+          cena.id_inimigo = 0
+        }
+        handleCancel();
+      } else {
+        error = body.message;
+        fieldErrors = body.fieldErrors ?? [];
+      }
+    } catch (e: any) {
+      console.error('Erro ao criar cena:', e);
+      const body = e.response?.data as ApiResponse<Cena> | undefined;
+      error = body?.message || 'Erro ao criar cena.';
+    } finally {
+      buscaCena(idEpisodio);
+      loading = false;
+    }
   }
 
   $effect(() => {
@@ -350,7 +379,7 @@
     <!-- Card do formulário -->
     <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
       <!-- Formulário principal -->
-      <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={criaCena(idEpisodio)}>
+      <form class="flex flex-col gap-6 p-6">
         <!-- Título -->
         <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
           Crie uma cena
@@ -435,7 +464,7 @@
               Voltar
           </Button>
           <!-- Botão salvar -->
-          <Button type="submit" color="primary" disabled={loading}>
+          <Button type="submit" onclick={() => {criaCena(selectedEpisodio)}} color="primary" disabled={loading}>
             <FloppyDiskAltOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
               Criar
           </Button> 
@@ -532,7 +561,7 @@
     exibeSelect = false;
     exibeCards = false;
   }}>
-  Adicionar
+  Adicionar Cena
 </button>
 {/if}
   <!-- Botão voltar -->
