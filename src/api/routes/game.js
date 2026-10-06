@@ -427,6 +427,17 @@ router.put('/item/:id', verifyToken, async function(req, res) {
   }
 });
 
+// GET inimigo
+router.get('/inimigo', verifyToken, async function(req, res) {
+  try {
+    const result = await pool.query('SELECT * FROM inimigo');
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar inimigo:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
 // *GET busca cenas com filtro por id do episodio
 router.get('/cena/:idEpisodio', verifyToken, async function(req, res) {
   const { idEpisodio } = req.params;
@@ -439,16 +450,6 @@ router.get('/cena/:idEpisodio', verifyToken, async function(req, res) {
   }
 });
 
-// GET inimigo
-router.get('/inimigo', verifyToken, async function(req, res) {
-  try {
-    const result = await pool.query('SELECT * FROM inimigo');
-    return sendSuccess(res, 200, null, result.rows);
-  } catch (error) {
-    console.error('Erro ao buscar inimigo:', error);
-    return sendError(res, 500, 'Erro interno do servidor');
-  }
-});
 
 // *POST criar cena
 router.post('/cena/:id', verifyToken, async function(req, res) {
@@ -503,7 +504,30 @@ router.post('/cena/:id', verifyToken, async function(req, res) {
     return sendError(res, 500, 'Erro interno do servidor');
   }
 });
-// Unificar CRUD de comerciante e catálogo na mesma tela com select
+
+/* DELETE - Remover cena */
+router.delete('/cena/:id', verifyToken, async function(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (id == 1){
+      return sendError(res, 400, 'Não é possível deletar a cena inicial');
+    }
+
+    // Verificar se o episódio existe
+    const cenaExists = await pool.query('SELECT id FROM cena WHERE id = $1', [id]);
+    if (cenaExists.rows.length === 0) {
+      return sendError(res, 404, 'Episódio não encontrado');
+    }
+    
+    await pool.query('DELETE FROM cena WHERE id = $1', [id]);
+    
+    return sendSuccess(res, 200, 'Episódio deletado com sucesso');
+  } catch (error) {
+    console.error('Erro ao deletar cena:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
 
 
 module.exports = router;

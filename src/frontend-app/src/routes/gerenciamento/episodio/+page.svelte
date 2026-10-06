@@ -22,7 +22,8 @@
     let exibeCards = $state(true);
     let selectedEpisodio: number | null = $state(null);
     let confirmOpen = $state(false); // modal aberto?
-    let exibeFormEpisodio = $state(false); 
+    let exibeFormEpisodio = $state(false);
+    let confirmType: 'episodio' | 'cena' | null = $state(null); 
 
     // Arrays
     let episodios: Episodio[] = $state([]);
@@ -232,24 +233,29 @@
   }
 
   // Abre modal de confirmação
-  function openConfirm(id: number) {
-    console.log("entrou no openconfirm")
-    confirmTargetId = id;
-    confirmOpen = true;
-  }
+  function openConfirm(id: number, type: 'episodio' | 'cena') {
+  confirmTargetId = id;
+  confirmType = type;
+  confirmOpen = true;
+}
   // Fecha modal
   function closeConfirm() {
     confirmOpen = false;
     confirmTargetId = null;
+    confirmType = null;
   }
 
     // Confirma remoção
     function handleConfirm() {
-    if (confirmTargetId !== null) {
-      handleDelete(confirmTargetId);
-    }
+      if (confirmTargetId !== null) {
+        if (confirmType === 'episodio') {
+          handleDelete(confirmTargetId);
+        } else if (confirmType === 'cena') {
+          deletaCena(confirmTargetId);
+        }
+      }
     closeConfirm();
-  }
+  } 
 
   // Cancela remoção
   function cancelarDelecao() {
@@ -274,6 +280,26 @@
     } finally {
       buscaEpisodio();
       deletingId = null;
+    }
+  }
+
+  async function deletaCena(id: number){
+    error = '';
+    try {
+      const res = await api.delete(`/game/cena/${id}`);
+      const body = res.data as ApiResponse<null>;
+      if (!body.success) {
+        error = body.message;
+        return;
+      }
+      // Remove a cena da lista localmente
+      cenas = cenas.filter(cena => cena.id !== id);
+    } catch (e: any) {
+      console.error('Erro ao deletar cena:', e);
+      const body = e.response?.data as ApiResponse<null> | undefined;
+      error = body?.message || 'Erro ao remover cena.';
+    } finally {   
+      buscaCena(selectedEpisodio);
     }
   }
 
@@ -491,11 +517,11 @@
         <button
               title="Remover"
               class="p-2 rounded transition bg-transparent"
-              on:click={() => openConfirm(selectedEpisodio)}
+              on:click={() => openConfirm(selectedEpisodio, 'episodio')}
               disabled={selectedEpisodio === deletingId || loading}
             >
               <TrashBinOutline class="w-5 h-5 text-red-400" />
-            </button>
+        </button>
         {/if}
       {/if}
 
@@ -533,6 +559,16 @@
             <!-- Botão editar -->
 
             <!--inserir botão editar aqui-->
+
+            <!--Botão remover-->
+            <button
+              title="Remover"
+              class="p-2 rounded transition border border-red-400 hover:border-primary-50 bg-transparent"
+              on:click={() => openConfirm(cena.id, 'cena')}
+              disabled={cena.id === deletingId || loading}
+            >
+              <TrashBinOutline class="w-5 h-5 text-red-400" />
+        </button>
           </div>
         </div>
       </Card>
@@ -573,7 +609,7 @@
 
 <ConfirmModal
     open={confirmOpen}
-    message="Tem certeza que deseja remover este episodio?"
+    message={confirmType === 'episodio' ? "Tem certeza que deseja remover este episódio?" : "Tem certeza que deseja remover esta cena?"}
     confirmText="Remover"
     cancelText="Cancelar"
     onConfirm={handleConfirm}
