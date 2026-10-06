@@ -57,7 +57,7 @@ DROP TABLE IF EXISTS cena CASCADE;
 CREATE TABLE cena (
     id bigint GENERATED ALWAYS AS IDENTITY,
     npc TEXT,
-    dialogo TEXT NOT NULL,
+    dialogo TEXT,
     tipo TEXT NOT NULL,
     id_inimigo INTEGER,
     FOREIGN KEY (id_inimigo)

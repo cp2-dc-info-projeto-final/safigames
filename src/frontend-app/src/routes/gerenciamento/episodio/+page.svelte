@@ -43,7 +43,7 @@
     let fieldErrors: ApiFieldError[] = [];
 
 
-    let cena: CenaFormData = { id: 0, NPC: '', dialogo: '', tipo: '', id_inimigo: 0, id_comerciante: 0, id_episodio: 0}
+    let cena: CenaFormData = $state({ id: 0, NPC: '', dialogo: '', tipo: '', id_inimigo: 0, id_comerciante: 0, id_episodio: 0});
     let user: User;
     let error = '';
     let loading: boolean;
@@ -175,20 +175,18 @@
     loading = true;
     error = '';
     fieldErrors = [];
-    console.log("ta funcionando")
+    console.log("id do episodio: " + idEpisodio)
     try {
-      const res = await api.post(`/game/cena/${idEpisodio}`, { cena });
+      const res = await api.post(`/game/cena/${idEpisodio}`, cena );
       const body = res.data as ApiResponse<Cena>;
       if (body.success && body.data) {
         cenas.push(body.data);
-        for (let cena of cenas){
-          cena.tipo = '',
-          cena.NPC = '',
-          cena.dialogo = '',
-          cena.id_comerciante = 0,
-          cena.id_episodio = 0,
-          cena.id_inimigo = 0
-        }
+        cena.tipo = '';
+        cena.NPC = '';
+        cena.dialogo = '';
+        cena.id_comerciante = 0;
+        cena.id_episodio = 0;
+        cena.id_inimigo = 0;
         handleCancel();
       } else {
         error = body.message;
@@ -395,11 +393,11 @@
             id="tipo"
             class="w-80"
             items={itensSelectTipo}
-            bind:value={selectedTipo}
+            bind:value={cena.tipo}
             clearable
           ></Select>
       </div>
-      {#if selectedTipo == 'dialogo'}
+      {#if cena.tipo == 'dialogo'}
         <!-- Campo NPC -->
         <div>
           <Label for="npc" class="text-lg text-primary-500">NPC</Label>
@@ -418,7 +416,7 @@
           {/if}
         </div>
       {/if}
-      {#if selectedTipo == 'combate'}
+      {#if cena.tipo == 'combate'}
        <!-- Campo inimigo -->
       <div>
         <Label for="inimigo" class="text-lg text-primary-500">Inimigo</Label>
@@ -426,12 +424,12 @@
           id="inimigo"
           class="w-80"
           items={itensSelectInimigo}
-          bind:value={selectedInimigo}
+          bind:value={cena.id_inimigo}
           clearable
         ></Select>
       </div>
       {/if}
-      {#if selectedTipo == 'comercio'}
+      {#if cena.tipo == 'comercio'}
        <!-- Campo comerciante -->
       <div>
         <Label for="comerciante" class="text-lg text-primary-500">Comerciante</Label>
@@ -439,7 +437,7 @@
           id="comerciante"
           class="w-80"
           items={itensSelectComerciante}
-          bind:value={selectedComerciante}
+          bind:value={cena.id_comerciante}
           clearable
         ></Select>
       </div>
@@ -519,7 +517,7 @@
             <div class="text-lg font-semibold text-primary-500 text-left inline">ID:</div>
             <div class="text-lg text-gray-400 text-left inline">{cena.id}</div> <br>
             <div class="text-lg font-semibold text-primary-500 text-left inline">NPC:</div>
-            <div class="text-lg font-semibold text-primary-500 text-left inline">{cena.NPC}</div> <br>
+            <div class="text-lg font-semibold text-gray-400 text-left inline">{cena.npc}</div> <br>
             <div class="text-lg font-semibold text-primary-500 text-left inline">Diálogo:</div>
             <div class="text-lg text-gray-400 text-left inline"> {cena.dialogo}</div>
           </div>

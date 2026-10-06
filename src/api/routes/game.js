@@ -453,44 +453,48 @@ router.get('/inimigo', verifyToken, async function(req, res) {
 // *POST criar cena
 router.post('/cena/:id', verifyToken, async function(req, res) {
   try {
-    const idEpisodio = req.params;
-    const { tipo, NPC, dialogo, id_comerciante, id_episodio, id_inimigo } = req.body;
+    const idEpisodio = req.params.id;
+    const { NPC, dialogo, tipo, id_inimigo, id_comerciante } = req.body;
     const errors = [];
 
     // Validação do tipo da cena
     if (!tipo){
       errors.push({ field: 'tipo', message: 'Tipo é obrigatório', code: 'REQUIRED' });
+      return sendError(res, 400, 'Tipo é obrigatório', errors);
     }
     else if (tipo == "combate" && !id_inimigo){
       errors.push({ field: 'inimigo', message: 'Inimigo é obrigatório em cena de combate', code: 'REQUIRED' });
+      return sendError(res, 400, 'Inimigo é obrigatório', errors);
     }
-    else if (tipo == "dialogo" && !NPC || !dialogo){
+    else if (tipo == "dialogo" && (!NPC || !dialogo)){
       if (!NPC) {errors.push({ field: 'npc', message: 'NPC é obrigatório', code: 'REQUIRED' })};
       if (!dialogo) {errors.push({ field: 'dialogo', message: 'Diálogo é obrigatório', code: 'REQUIRED' })};
+      return sendError(res, 400, 'NPC e diálogo são obrigatórios', errors);
     }
-    else if (tipo == "comercio" && !id_comerciante || !dialogo){
+    else if (tipo == "comercio" && (!id_comerciante || !dialogo)){
       if (!id_comerciante) {errors.push({ field: 'comerciante', message: 'Comerciante é obrigatório', code: 'REQUIRED' })};
       if (!dialogo) {errors.push({ field: 'dialogo', message: 'Diálogo é obrigatório', code: 'REQUIRED' })};
+      return sendError(res, 400, 'Comerciante e diálogo são obrigatórios', errors);
     }
     
     if (tipo == "dialogo"){
       const result = await pool.query(
         'INSERT INTO cena (tipo, NPC, dialogo, id_episodio) VALUES ($1, $2, $3, $4) RETURNING tipo, NPC, dialogo, id_episodio',
-        [tipo, NPC, dialogo, id_episodio]
+        [tipo, NPC, dialogo, idEpisodio]
       );
       return sendSuccess(res, 201, 'Item criado com sucesso', result.rows[0]);
     }
     else if (tipo == "combate"){
       const result = await pool.query(
         'INSERT INTO cena (tipo, id_inimigo, id_episodio) VALUES ($1, $2, $3) RETURNING tipo, id_inimigo, id_episodio',
-        [tipo, id_inimigo, id_episodio]
+        [tipo, id_inimigo, idEpisodio]
       );
       return sendSuccess(res, 201, 'Item criado com sucesso', result.rows[0]);
     }
     else if (tipo == "comercio"){
       const result = await pool.query(
-        'INSERT INTO cena (tipo, dialogo, id_comeciante, id_episodio) VALUES ($1, $2, $3, $4) RETURNING tipo, dialogo, id_comeciante, id_episodio',
-        [tipo, dialogo, id_comeciante, id_episodio]
+        'INSERT INTO cena (tipo, dialogo, id_comerciante, id_episodio) VALUES ($1, $2, $3, $4) RETURNING tipo, dialogo, id_comerciante, id_episodio',
+        [tipo, dialogo, id_comerciante, idEpisodio]
       );
       return sendSuccess(res, 201, 'Item criado com sucesso', result.rows[0]);
     }

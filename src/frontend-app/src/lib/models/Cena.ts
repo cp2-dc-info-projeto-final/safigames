@@ -1,6 +1,6 @@
 export interface Cena{
     id: number,
-    NPC: string,
+    npc: string,
     dialogo: string,
     tipo: string,
     id_inimigo: number,
@@ -10,7 +10,7 @@ export interface Cena{
 
 export interface CenaFormData{
     id: number,
-    NPC: string,
+    npc: string,
     dialogo: string,
     tipo: string,
     id_inimigo?: number,
