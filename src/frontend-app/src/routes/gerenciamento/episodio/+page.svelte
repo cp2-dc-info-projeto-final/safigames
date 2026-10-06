@@ -21,9 +21,6 @@
     let exibeSelect = $state(true);
     let exibeCards = $state(true);
     let selectedEpisodio: number | null = $state(null);
-    let selectedTipo: string | null = $state(null);
-    let selectedInimigo: Inimigo | null = $state(null);
-    let selectedComerciante: Comerciante | null = $state(null);
     let confirmOpen = $state(false); // modal aberto?
     let exibeFormEpisodio = $state(false); 
 
@@ -43,7 +40,7 @@
     let fieldErrors: ApiFieldError[] = [];
 
 
-    let cena: CenaFormData = $state({ id: 0, NPC: '', dialogo: '', tipo: '', id_inimigo: 0, id_comerciante: 0, id_episodio: 0});
+    let cena: CenaFormData = $state({ id: 0, npc: '', dialogo: '', tipo: '', id_inimigo: 0, id_comerciante: 0, id_episodio: 0});
     let user: User;
     let error = '';
     let loading: boolean;
@@ -275,6 +272,7 @@
       const body = e.response?.data as ApiResponse<null> | undefined;
       error = body?.message || 'Erro ao remover episódio.';
     } finally {
+      buscaEpisodio();
       deletingId = null;
     }
   }
@@ -489,6 +487,16 @@
           bind:value={selectedEpisodio}
           clearable
         ></Select>
+        {#if selectedEpisodio}
+        <button
+              title="Remover"
+              class="p-2 rounded transition bg-transparent"
+              on:click={() => openConfirm(selectedEpisodio)}
+              disabled={selectedEpisodio === deletingId || loading}
+            >
+              <TrashBinOutline class="w-5 h-5 text-red-400" />
+            </button>
+        {/if}
       {/if}
 
       <button class="px-4 py-2 rounded border-none transition bg-transparent text-primary-50 inline" on:click={() => {
@@ -525,16 +533,6 @@
             <!-- Botão editar -->
 
             <!--inserir botão editar aqui-->
-
-            <!-- Botão remover -->
-            <button
-              title="Remover"
-              class="p-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent"
-              on:click={() => openConfirm(cena.id)}
-              disabled={cena.id === cena.id || loading}
-            >
-              <TrashBinOutline class="w-5 h-5 text-red-400" />
-            </button>
           </div>
         </div>
       </Card>
@@ -575,7 +573,7 @@
 
 <ConfirmModal
     open={confirmOpen}
-    message="Tem certeza que deseja remover este episódio?"
+    message="Tem certeza que deseja remover este episodio?"
     confirmText="Remover"
     cancelText="Cancelar"
     onConfirm={handleConfirm}
