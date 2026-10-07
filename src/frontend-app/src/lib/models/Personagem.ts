@@ -8,7 +8,8 @@ export interface Personagem {
     classe : string;
     armadura : string;
     dinheiro : number;
+    id_usuario : number;
     id_arma : number;
     id_cena : number;
-    id_user : number;
+    id_episodio : number;
   }

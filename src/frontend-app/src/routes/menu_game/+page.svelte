@@ -6,8 +6,9 @@
     import type { User } from '$lib/models/User';
     import ConfirmModal from '../../components/ConfirmModal.svelte'; // modal de confirmação
     import api from '$lib/api'; // API backend
-    import { ArrowLeftOutline, FloppyDiskAltOutline, TrashBinOutline, UserEditOutline } from 'flowbite-svelte-icons'; // ícones
+    import { ArrowLeftOutline, FloppyDiskAltOutline, TrashBinOutline, UserEditOutline, PlaySolid } from 'flowbite-svelte-icons'; // ícones
 	  import InputModal from "../../components/InputModal.svelte";
+    import { goto } from '$app/navigation';
 
     let novoJ = $state("Novo jogo");
     let carregarS = $state("Carregar save");
@@ -62,10 +63,12 @@
         error = body?.message || 'Erro ao criar personagem.';
       } finally {
         loading = false;
+        await buscaPersonagem();
         formPersonagem = document.getElementById('containerForm');
         formPersonagem.style.display = "none";
         menu = document.getElementById('menu');
         menu.style.display = "block"
+        goto(`/game/${personagens[personagens.length - 1].id}`)
         }
     }
   
@@ -303,6 +306,7 @@
         <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Classe</TableHeadCell>
         <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Armadura</TableHeadCell>
         <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Dinheiro</TableHeadCell>
+        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Carregar</TableHeadCell>
         <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]" colspan="2">Gerenciar</TableHeadCell>
       </TableHead>
       <TableBody>
@@ -316,6 +320,14 @@
           <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.classe}</TableBodyCell>
           <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.armadura}</TableBodyCell>
           <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.dinheiro}</TableBodyCell>
+          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
+            <button
+            title="Carregar"
+            class="p-2 rounded border border-green-100 hover:border-green-300 transition bg-transparent"
+            on:click={() => goto(`/game/${personagem.id}`)}>
+            <PlaySolid class="w-5 h-5 text-primary-500" />
+          </button>
+          </TableBodyCell>
           <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
             <button
               title="Editar"

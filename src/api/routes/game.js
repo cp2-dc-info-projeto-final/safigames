@@ -450,6 +450,17 @@ router.get('/cena/:idEpisodio', verifyToken, async function(req, res) {
   }
 });
 
+// *GET busca progresso do personagem
+router.get(`/progresso/:id`, verifyToken, async function(req, res) {
+  try {
+    const { id } = req.params;
+    const result = await pool.query('SELECT e.id AS episodio_id, e.titulo AS episodio_titulo, c.id AS cena_id, c.npc, c.dialogo, c.tipo, c.id_inimigo, c.id_comerciante FROM episodio e INNER JOIN cena c ON e.id = c.id_episodio  WHERE e.id = $1;', [id]);
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar progresso:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
 
 // *POST criar cena
 router.post('/cena/:id', verifyToken, async function(req, res) {

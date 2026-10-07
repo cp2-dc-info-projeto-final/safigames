@@ -279,6 +279,7 @@
       error = body?.message || 'Erro ao remover episódio.';
     } finally {
       buscaEpisodio();
+      selectedEpisodio = null;
       deletingId = null;
     }
   }

@@ -107,6 +107,10 @@ CREATE TABLE personagem (
     FOREIGN KEY (id_cena)
         REFERENCES cena (id)
         ON DELETE SET DEFAULT,
+    id_episodio INTEGER NOT NULL DEFAULT 1,
+    FOREIGN KEY (id_episodio)
+        REFERENCES episodio (id)
+        ON DELETE SET DEFAULT,
 
     CONSTRAINT pk_personagem PRIMARY KEY (id)
 );
@@ -176,8 +180,8 @@ VALUES('Vini do soep', 'Vini: OI! Você: Oi! Como vai? Vini: Vou bem.', 'Diálog
 INSERT INTO arma(nome, dano, descricao, stamina)
 VALUES('Espada de esmeralda', 30, 'Os aldeões adoram', 2);
 
-INSERT INTO personagem(nome, vida, stamina, classe, id_usuario, id_cena, id_arma)
-VALUES('Jâo, o garoto de programa', 90, 3, 'Mago', 1, 2, 1);
+INSERT INTO personagem(nome, vida, stamina, classe, id_usuario, id_cena, id_episodio, id_arma)
+VALUES('Jâo, o garoto de programa', 90, 3, 'Mago', 1, 2, 1, 1);
 
 INSERT INTO item(nome, descricao, tipo, fator_vida, preco)
 VALUES('Empadinha safadinha de queijo', 'Deliciosa empadinha de queijo que te dá mais vontade de viver', 'Cura', 50, 5);
