@@ -13,9 +13,15 @@
     //Arrays
     let cenas: Cena[] = []
 
+    //Variáveis de controle
+    let exibeMenu: boolean = false;
+    let exibeCena: boolean = true;
+
     let user: User;
     let personagem: Personagem;
     let episodio: Episodio;
+    let progresso: any;
+    let episodioAtual: any;
     let error = '';
     let loading = false;
     let idPersonagem: number;
@@ -57,7 +63,7 @@
       const res = await api.get(`/game/personagem/${idPersonagem}`);
       const body = res.data as ApiResponse<Personagem>;
       if (body.success && body.data.length > 0) {
-        personagem = body.data[0];
+        personagem = { ...body.data[0] };
         idEpisodio = personagem.id_episodio;
       } else {
         error = body.message;
@@ -75,7 +81,11 @@
     try{
       const res = await api.get(`/game/progresso/${idEpisodio}`);
       const body = res.data as ApiResponse<Episodio>;
-      console.log(body)
+      if (body.success){
+        progresso = { ...body.data }
+        episodioAtual = progresso[personagem.id_episodio];
+        console.log(progresso)
+      }
       error = body.message;
     } catch (e: any) {
         console.error('Erro ao carregar progresso:', e);
@@ -85,8 +95,92 @@
           loading = false;
         }
   }
+
+  async function exibicaoMenu(){
+    exibeMenu = !exibeMenu;
+    console.log(`Estado do menu: ${exibeMenu} e Estado da cena: ${exibeCena}` )
+  }
 </script>
 
-<div class="text-xxl text-primary-500">
-    Entrou no game piá
+<div class="text-center fixed top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded">
+   <Heading tag="h1" class="text-primary-50 mt-2">{progresso ? episodioAtual.episodio_titulo : "Erro: Episódio indefinido"}</Heading>
 </div>
+
+{#if exibeMenu}
+  <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+    <!-- Caixa Retangular Centralizada -->
+    <div class="w-96 border-2 border-white bg-gray-900 p-6 flex flex-col items-center gap-4 shadow-2xl rounded-none">
+      <h2 class="text-3xl font-bold tracking-widest border-b-2 border-white text-primary-50 pb-2 w-full text-center">
+        PAUSA
+      </h2>
+
+      <!-- Opções do Menu -->
+      <div class="flex flex-col gap-3 w-full mt-2">
+        <button
+          type="button"
+          on:click={exibicaoMenu}
+          class="w-full py-2 border-2 border-white hover:bg-white hover:text-black text-primary-50 font-semibold transition"
+        >
+          Continuar
+        </button>
+
+        <button
+          type="button"
+          class="w-full py-2 border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white font-semibold transition"
+          on:click={() => goto('/menu_game')}
+        >
+          Sair para o Menu
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}
+
+<!-- Container cena de diálogo -->
+{#if exibeCena && progresso && episodioAtual.tipo == "Diálogo"}
+<div class="min-h-screen fixed inset-0 bg-gray-900 text-white p-4 flex flex-col gap-4">
+	<!-- Topo: Menu circular à esquerda -->
+	<div class="flex items-center">
+		<button
+			type="button"
+			class="w-16 h-16 rounded-full border-2 border-white flex items-center justify-center font-bold hover:bg-gray-800 transition"
+      on:click={exibicaoMenu}
+		>
+			menu
+		</button>
+	</div>
+
+	<!-- Corpo Principal: Grid/Flex de duas colunas -->
+	<div class="flex flex-1 gap-4">
+		<!-- Coluna da Esquerda: Status do Jogador -->
+		<div class="w-1/4 border-2 border-white p-4 rounded-none flex flex-col">
+			<h2 class="text-xl font-bold mb-2">*status do jogador</h2>
+			<!-- Conteúdo do status vai aqui -->
+			<div class="text-xg text-gray-300">
+				<p>Vida: {personagem.vida}</p>
+				<p>Defesa: {personagem.defesa}</p>
+				<p>Xp: {personagem.xp}</p>
+				<p>Classe: {personagem.classe}</p>
+				<p>Dinheiro: {personagem.dinheiro}</p>
+				
+			</div>
+		</div>
+
+		<!-- Coluna da Direita: Ilustração + Diálogo -->
+		<div class="w-3/4 flex flex-col gap-4">
+			<!-- Bloco Superior: Ilustração -->
+			<div class="h-40 border-2 border-white p-4 flex items-center justify-center">
+				<span class="text-2xl font-semibold">*ilustração</span>
+			</div>
+
+			<!-- Bloco Inferior: Diálogo (com cantos arredondados como no esboço) -->
+			<div class="flex-1 border-2 border-white rounded-3xl p-6 bg-gray-800/50">
+				<h3 class="text-2xl font-bold mb-4">Diálogo</h3>
+				<p class="text-gray-200">
+					{episodioAtual.dialogo}
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+{/if}

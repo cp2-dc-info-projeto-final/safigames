@@ -62,6 +62,7 @@
       const body = e.response?.data as ApiResponse<Personagem> | undefined;
         error = body?.message || 'Erro ao criar personagem.';
       } finally {
+        
         loading = false;
         await buscaPersonagem();
         formPersonagem = document.getElementById('containerForm');
