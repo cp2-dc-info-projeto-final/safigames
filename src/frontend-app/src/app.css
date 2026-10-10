@@ -21,16 +21,17 @@
   --color-primary-800: #031703;
   --color-primary-900: #000000;
 
-  --color-secondary-50: #B8008A;
-  --color-secondary-100: #1E82E6;
-  --color-secondary-200: #bae6fd;
-  --color-secondary-300: #7dd3fc;
-  --color-secondary-400: #38bdf8;
-  --color-secondary-500: #0ea5e9;
-  --color-secondary-600: #0284c7;
-  --color-secondary-700: #0369a1;
-  --color-secondary-800: #075985;
-  --color-secondary-900: #0c4a6e;
+  --color-secondary-50: #1E64E6;
+  --color-secondary-51: #387EFF;
+  --color-secondary-100: #D99AA5;
+  --color-secondary-200: #D98697;
+  --color-secondary-300: #AD51A7;
+  --color-secondary-400: #5D0061;
+  --color-secondary-500: #E61E82;
+  --color-secondary-600: #CF0067;
+  --color-secondary-700: #660033;
+  --color-secondary-800: #17030D;
+  --color-secondary-900: #000000;
 }
 
 @source "../node_modules/flowbite-svelte/dist";

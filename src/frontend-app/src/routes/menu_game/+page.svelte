@@ -1,129 +1,140 @@
 <script lang=ts>
-    import { P, A, Heading, Card, Label, Input, Select, Button,  Table, TableHead, TableHeadCell, TableBody, TableBodyRow, TableBodyCell, Badge} from "flowbite-svelte";
-    import type { ApiFieldError, ApiResponse } from '$lib/api';
-    import { onMount } from 'svelte'; // ciclo de vida
-    import type { Personagem } from '$lib/models/Personagem';
-    import type { User } from '$lib/models/User';
-    import ConfirmModal from '../../components/ConfirmModal.svelte'; // modal de confirmação
-    import api from '$lib/api'; // API backend
-    import { ArrowLeftOutline, FloppyDiskAltOutline, TrashBinOutline, UserEditOutline, PlaySolid } from 'flowbite-svelte-icons'; // ícones
-	  import InputModal from "../../components/InputModal.svelte";
-    import { goto } from '$app/navigation';
+  import { P, A, Heading, Card, Label, Input, Select, Button, Table, TableHead, TableHeadCell, TableBody, TableBodyRow, TableBodyCell } from "flowbite-svelte";
+  import type { ApiFieldError, ApiResponse } from '$lib/api';
+  import { onMount } from 'svelte';
+  import type { Personagem } from '$lib/models/Personagem';
+  import type { User } from '$lib/models/User';
+  import ConfirmModal from '../../components/ConfirmModal.svelte';
+  import api from '$lib/api';
+  import { ArrowLeftOutline, FloppyDiskAltOutline, TrashBinOutline, UserEditOutline, PlaySolid } from 'flowbite-svelte-icons';
+  import InputModal from "../../components/InputModal.svelte";
+  import { goto } from '$app/navigation';
 
-    let novoJ = $state("Novo jogo");
-    let carregarS = $state("Carregar save");
-    let sair = $state("Sair");
-    let error = '';
-    let fieldErrors: ApiFieldError[] = [];
-    let nome_personagem = $state('');
-    let classe_personagem = $state('');
-    let loading: boolean;
-    let user: User;
-    let personagens: Personagem[] = $state([]);
-    let formPersonagem: any;
-    let menu: any;
-    let deletingId: number | null = $state(null); // id em deleção
-    let confirmOpen = $state(false); // modal aberto?
-    let confirmTargetId: number | null = null; // id alvo do modal
-    let inputOpen = $state(false);
-    let editingId: number | null = $state(null); // id em edição
-    let editingName: string = $state('');
-    let novoName: string = $state('');
-    let personagemEditado = {
-      id: 0,
-      nome: ""
+  let novoJ = $state("Novo jogo");
+  let showTitle = $state(true);
+  let carregarS = $state("Carregar save");
+  let sair = $state("Sair");
+  let error = $state('');
+  let fieldErrors: ApiFieldError[] = $state([]);
+  let nome_personagem = $state('');
+  let classe_personagem = $state('');
+  let loading = $state(false);
+  let user: User | null = null;
+  let personagens: Personagem[] = $state([]);
+  let showEmptyCharacters = $state(false);
+  let showBackButton = $state(false);
+  let selectedPersonagem: Personagem | null = $state(null);
+  let deletingId: number | null = $state(null);
+  let confirmOpen = $state(false);
+  let confirmTargetId: number | null = null;
+  let inputOpen = $state(false);
+  let editingId: number | null = $state(null);
+  let editingName = $state('');
+  let novoName = $state('');
+
+  function getFieldErrors<T>(body?: ApiResponse<T>): ApiFieldError[] {
+    const errors = (body as { errors?: ApiFieldError[] } | undefined)?.errors;
+    return Array.isArray(errors) ? errors : [];
+  }
+
+  function errorOf(field: string): string | null {
+    return fieldErrors.find((item) => item.field === field)?.message ?? null;
+  }
+
+  async function criaPersonagem() {
+    fieldErrors = [];
+    if (!nome_personagem || !classe_personagem) {
+      fieldErrors = [{ field: 'nome', message: 'Nome e classe do personagem não podem ser vazios!' }];
+      error = 'Nome e classe do personagem não podem ser vazios!';
+      return;
     }
 
+    if (!user) {
+      error = 'Usuário não carregado.';
+      return;
+    }
 
-    async function criaPersonagem() {
-      fieldErrors = [];
-      if (!nome_personagem || !classe_personagem){
-        fieldErrors = [{ field: 'nome', message: 'Nome e classe do personagem não podem ser vazios!' }];
-        error = 'Nome e classe do personagem não podem ser vazios!';
+    loading = true;
+    error = '';
+    try {
+      const dadosPersonagem = {
+        nome: nome_personagem,
+        classe: classe_personagem,
+        id: user.id
+      };
+      const res = await api.post('/game/personagem', dadosPersonagem);
+      const body = res.data as ApiResponse<Personagem>;
+      if (!body.success) {
+        error = body.message ?? 'Erro ao criar personagem.';
+        fieldErrors = getFieldErrors(body);
         return;
       }
-
-      loading = true;
-      error = '';
-      try{
-        const dadosPersonagem = {
-          nome: nome_personagem, 
-          classe: classe_personagem, 
-          id: user.id
-        };
-        const res = await api.post('/game/personagem', dadosPersonagem);
-        const body = res.data as ApiResponse<Personagem>;
-        if (!body.success) {
-          error = body.message;
-          fieldErrors = body.errors;
-          return;
-        } 
-      } catch (e: any){
+    } catch (e: any) {
       const body = e.response?.data as ApiResponse<Personagem> | undefined;
-        error = body?.message || 'Erro ao criar personagem.';
-      } finally {
-        
-        loading = false;
-        await buscaPersonagem();
-        formPersonagem = document.getElementById('containerForm');
-        formPersonagem.style.display = "none";
-        menu = document.getElementById('menu');
-        menu.style.display = "block"
-        goto(`/game/${personagens[personagens.length - 1].id}`)
-        }
+      error = body?.message || 'Erro ao criar personagem.';
+      fieldErrors = getFieldErrors(body);
+    } finally {
+      loading = false;
+      await buscaPersonagem();
+      const formPersonagem = document.getElementById('containerForm');
+      if (formPersonagem) formPersonagem.style.display = 'none';
+      const menu = document.getElementById('menu');
+      if (menu) menu.style.display = 'block';
+      const ultimoPersonagem = personagens[personagens.length - 1];
+      if (ultimoPersonagem?.id) {
+        goto(`/game/${ultimoPersonagem.id}`);
+      }
     }
-  
-  
+  }
+
   async function buscaPersonagem() {
-    try{
+    try {
       const res = await api.get('/game/personagem');
       const body = res.data as ApiResponse<Personagem[]>;
       if (body.success) {
         personagens = body.data ?? [];
       } else {
-        error = body.message;
+        error = body.message ?? 'Erro ao carregar personagens';
       }
     } catch (e: any) {
-        console.error('Erro ao carregar personagens:', e);
-        const body = e.response?.data as ApiResponse<Personagem[]> | undefined;
-        error = body?.message || 'Erro ao carregar personagens';
-      } finally {
-          loading = false;
-        }
+      console.error('Erro ao carregar personagens:', e);
+      const body = e.response?.data as ApiResponse<Personagem[]> | undefined;
+      error = body?.message || 'Erro ao carregar personagens';
+    } finally {
+      loading = false;
+    }
   }
 
-    function errorOf(field: string): string | null {
-    return fieldErrors.find((item) => item.field === field)?.message ?? null;
+  function setElementDisplay(id: string, display: 'block' | 'none' | 'flex') {
+    const element = document.getElementById(id);
+    if (element) {
+      element.style.display = display;
+    }
   }
 
   function handleCancel() {
-    menu = document.getElementById('menu');
-    menu.style.display = "block";
-    formPersonagem = document.getElementById('containerForm');
-    formPersonagem.style.display = "none";
+    showTitle = true;
+    setElementDisplay('menu', 'block');
+    setElementDisplay('containerForm', 'none');
   }
 
-  // Abre modal de confirmação
   function openConfirm(id: number) {
     confirmTargetId = id;
     confirmOpen = true;
   }
-  // Fecha modal
+
   function closeConfirm() {
-    console.log("Ta entrando")
     confirmOpen = false;
     confirmTargetId = null;
   }
 
-    // Confirma remoção
-    function handleConfirm() {
+  function handleConfirm() {
     if (confirmTargetId !== null) {
-      handleDelete(confirmTargetId);
+      void handleDelete(confirmTargetId);
     }
     closeConfirm();
   }
 
-  // Cancela remoção
   function cancelarDelecao() {
     closeConfirm();
   }
@@ -135,7 +146,7 @@
       const res = await api.delete(`/game/personagem/${id}`);
       const body = res.data as ApiResponse<null>;
       if (!body.success) {
-        error = body.message;
+        error = body.message ?? 'Erro ao remover usuário.';
         return;
       }
       personagens = personagens.filter(personagem => personagem.id !== id);
@@ -148,19 +159,19 @@
     }
   }
 
-  function mostraFormPersonagem(){
-    menu = document.getElementById('menu');
-    menu.style.display = "none"
-    formPersonagem = document.getElementById('containerForm');
-    formPersonagem.style.display = "block";
+  function mostraFormPersonagem() {
+    showTitle = false;
+    showEmptyCharacters = false;
+    setElementDisplay('menu', 'none');
+    setElementDisplay('containerForm', 'flex');
   }
 
-  async function listaPersonagem(){
+  async function listaPersonagem() {
+    showBackButton = true;
     await buscaPersonagem();
-    const tablePersonagem = document.getElementById('personagemContainer');
-    const menu = document.getElementById('menu');
-    menu.style.display = "none"
-    tablePersonagem.style.display = "block";
+    showEmptyCharacters = personagens.length === 0;
+    setElementDisplay('menu', 'none');
+    setElementDisplay('personagemContainer', 'block');
   }
 
   function abrirModalEdit(personagem_id: number, personagem_nome: string) {
@@ -169,35 +180,40 @@
     inputOpen = true;
   }
 
-  function cancelEdit(){
+  function cancelEdit() {
     inputOpen = false;
   }
 
-  async function confirmEdit(){
-    novoName = editingName;
-    console.log("editingId:", editingId, "editingName:", novoName);
+  async function confirmEdit() {
+    if (editingId === null) {
+      return;
+    }
+
+    novoName = editingName.trim();
+    if (!novoName) {
+      error = 'Nome do personagem não pode ser vazio.';
+      fieldErrors = [{ field: 'nome', message: 'Nome do personagem não pode ser vazio.' }];
+      return;
+    }
+
     inputOpen = false;
-    try{
+    try {
       const res = await api.put(`/game/personagem/${editingId}`, { nome: novoName });
-        const body = res.data as ApiResponse<Personagem>;
-        if (!body.success) {
-          error = body.message;
-          fieldErrors = body.errors;
-          return;
-        }
+      const body = res.data as ApiResponse<Personagem>;
+      if (!body.success) {
+        error = body.message ?? 'Erro ao editar nome.';
+        fieldErrors = getFieldErrors(body);
+        return;
+      }
     } catch (e: any) {
       const body = e.response?.data as ApiResponse<Personagem> | undefined;
       error = body?.message || 'Erro ao editar nome.';
-      fieldErrors = body?.errors || [];
-    }
-    finally {
-      buscaPersonagem();
+      fieldErrors = getFieldErrors(body);
+    } finally {
+      await buscaPersonagem();
     }
   }
 
-
-
-  // Opções de roles
   const classeOptions = [
     { value: 'Guerreiro', name: 'Guerreiro' },
     { value: 'Assassino', name: 'Assassino' }
@@ -205,50 +221,67 @@
 
   onMount(async () => {
     try {
-        const res = await api.get(`/users/me`);
-        const body = res.data as ApiResponse<User>;
-        if (body.success && body.data) {
-          user = { ...body.data };
-        } else {
-          error = body.message;
-        }
-      } catch (e: any) {
-        const body = e.response?.data as ApiResponse<User> | undefined;
-        error = body?.message || 'Erro ao carregar usuário.';
-      } finally {
-    } 
-  }) 
-
+      const res = await api.get(`/users/me`);
+      const body = res.data as ApiResponse<User>;
+      if (body.success && body.data) {
+        user = { ...body.data };
+      } else {
+        error = body.message ?? 'Erro ao carregar usuário.';
+      }
+    } catch (e: any) {
+      const body = e.response?.data as ApiResponse<User> | undefined;
+      error = body?.message || 'Erro ao carregar usuário.';
+    }
+  });
 </script>
 
 <style>
-    :global(body) {
-  font-family: 'fonte-topiy';
-}
+  :global(body) {
+    font-family: 'fonte-topiy';
+  }
 </style>
 
 <svelte:head>
   <title>Esgotamento</title>
 </svelte:head>
 
+{#if showTitle}
 <div class="text-center fixed top-4 left-1/2 -translate-x-1/2 z-50 text-white px-4 py-2 rounded">
     <img src="/images/titulo_grafite_sem_fundo_pixelado.png" alt="ESGOTAMENTO">
 </div>
+{/if}
 <div class="text-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 text-white p-6 rounded-lg" id="menu">
-    <A class="text-primary-600 hover:text-secondary-50 text-4xl" onclick={mostraFormPersonagem} onmouseenter={() => novoJ = "> Novo jogo <"} onmouseleave={() => novoJ = "Novo jogo"}>{novoJ}</A><br>
-    <A class="text-primary-600 mt-6 mb-6 text-4xl hover:text-secondary-50" onclick={listaPersonagem} onmouseenter={() => carregarS = "> Carregar save <"} onmouseleave={() => carregarS = "Carregar Save"} >{carregarS}</A><br>
-    <A class="text-primary-600 text-4xl hover:text-secondary-50" href="/" onmouseenter={() => sair= "> Sair <"} onmouseleave={() => sair = "Sair"}>{sair}</A>
+    <A 
+      class="text-primary-600 hover:text-secondary-500 text-4xl" 
+      onclick={mostraFormPersonagem} onmouseenter={() => novoJ = "> Novo jogo <"} 
+      onmouseleave={() => novoJ = "Novo jogo"}>
+        {novoJ}
+    </A><br>
+    <A 
+      class="text-primary-600 mt-6 mb-6 text-4xl hover:text-secondary-500" 
+      onclick={listaPersonagem} 
+      onmouseenter={() => carregarS = "> Carregar save <"} 
+      onmouseleave={() => carregarS = "Carregar Save"}>
+        {carregarS}
+    </A><br>
+    <A 
+      class="text-primary-600 text-4xl hover:text-secondary-500" 
+      href="/" 
+      onmouseenter={() => sair= "> Sair <"} 
+      onmouseleave={() => sair = "Sair"}>
+        {sair}
+    </A>
 </div>
 
 <div class=" text-center fixed bottom-6 right-6 z-50 text-white p-4 rounded-full">
     <P class="text-primary-500">Por: Safigames</P>
 </div>
 
-<div class="mt-auto mb-auto" style="display:none" id="containerForm">
-<!-- Card do formulário -->
-<Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
+<div class="fixed inset-0 items-center justify-center overflow-hidden" style="display:none" id="containerForm">
+  <!-- Card do formulário -->
+  <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
     <!-- Formulário principal -->
-    <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={criaPersonagem}>
+    <form class="flex flex-col gap-6 p-6" onsubmit={(event) => { event.preventDefault(); void criaPersonagem(); }}>
       <!-- Título -->
       <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
         Crie seu personagem
@@ -289,90 +322,102 @@
         </Button> 
       </div>
     </form>
-    
   </Card>
 </div>
 
 <!-- Container de tabela personagem -->
-<div id="personagemContainer" class="flex flex-col gap-4 w-full max-w-full" style="display:none">
-  <!-- Wrapper da Tabela -->
-  <div class="w-full overflow-hidden shadow-lg border border-primary-500 rounded-lg">
-    <Table id="personagemTable" class="w-full table-fixed border-collapse">
-      <TableHead class="text-sm md:text-base bg-primary-900 text-primary-500">
-        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Nome</TableHeadCell>
-        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Vida</TableHeadCell>
-        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Defesa</TableHeadCell>
-        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">XP</TableHeadCell>
-        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Stamina</TableHeadCell>
-        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Classe</TableHeadCell>
-        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Armadura</TableHeadCell>
-        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Dinheiro</TableHeadCell>
-        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">Carregar</TableHeadCell>
-        <TableHeadCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]" colspan="2">Gerenciar</TableHeadCell>
-      </TableHead>
-      <TableBody>
-      {#each personagens as personagem} 
-        <TableBodyRow class="text-sm md:text-base bg-primary-900 text-primary-500">
-          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]" id="nomeP">{personagem.nome}</TableBodyCell>
-          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.vida}</TableBodyCell>
-          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.defesa}</TableBodyCell>
-          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.xp}</TableBodyCell>
-          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.stamina}</TableBodyCell>
-          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.classe}</TableBodyCell>
-          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.armadura}</TableBodyCell>
-          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">{personagem.dinheiro}</TableBodyCell>
-          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
-            <button
-            title="Carregar"
-            class="p-2 rounded border border-green-100 hover:border-green-300 transition bg-transparent"
-            on:click={() => goto(`/game/${personagem.id}`)}>
-            <PlaySolid class="w-5 h-5 text-primary-500" />
-          </button>
-          </TableBodyCell>
-          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
-            <button
-              title="Editar"
-              class="p-2 rounded border border-green-100 hover:border-green-300 transition bg-transparent"
-              on:click={() =>abrirModalEdit(personagemEditado.id = (personagem.id), personagemEditado.nome = (personagem.nome))}>
-              <UserEditOutline class="w-5 h-5 text-primary-500" />
-            </button>
-          </TableBodyCell>
-          <TableBodyCell class="p-2 text-center whitespace-normal break-words [word-break:break-word]">
-            <button
-              title="Remover"
-              class="p-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent"
-              on:click={() => openConfirm(personagem.id)}
-              disabled={deletingId === personagem.id || loading}
-            >
-              <TrashBinOutline class="w-5 h-5 text-red-400" />
-            </button>
-        </TableBodyCell>
+<div id="personagemContainer" class="mx-auto flex h-80 min-h-0 w-full max-w-4xl flex-col items-center gap-4 overflow-y-auto px-4">
+  {#if selectedPersonagem}
+    <section class="w-full max-w-2xl mx-auto p-6 rounded-lg border border-secondary-500 bg-primary-900 text-secondary-500 shadow-lg" aria-labelledby="personagem-title">
+      <div class="mb-6">
+        <h2 id="personagem-title" class="text-xl font-bold break-words">{selectedPersonagem.nome}</h2>
+      </div>
+      <dl class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div><dt class="font-semibold">Vida</dt><dd class="text-white">{selectedPersonagem.vida}</dd></div>
+        <div><dt class="font-semibold">Defesa</dt><dd class="text-white">{selectedPersonagem.defesa}</dd></div>
+        <div><dt class="font-semibold">XP</dt><dd class="text-white">{selectedPersonagem.xp}</dd></div>
+        <div><dt class="font-semibold">Stamina</dt><dd class="text-white">{selectedPersonagem.stamina}</dd></div>
+        <div><dt class="font-semibold">Classe</dt><dd class="text-white">{selectedPersonagem.classe}</dd></div>
+        <div><dt class="font-semibold">Armadura</dt><dd class="text-white">{selectedPersonagem.armadura}</dd></div>
+        <div><dt class="font-semibold">Dinheiro</dt><dd class="text-white">{selectedPersonagem.dinheiro}</dd></div>
+        <div><dt class="font-semibold">Usuário</dt><dd class="text-white">{((selectedPersonagem as any).id_user ?? '—')}</dd></div>
+        <div><dt class="font-semibold">ID</dt><dd class="text-white">{selectedPersonagem.id}</dd></div>
+      </dl>
 
-        </TableBodyRow>
-      {/each}
-      {#if personagens.length === 0}
-        <TableBodyRow class="text-sm md:text-base bg-primary-900 text-primary-500">
-          <TableBodyCell class="p-2 text-center break-words" colspan="8">Nenhum personagem encontrado!</TableBodyCell>
-        </TableBodyRow>
-      {/if}
-      </TableBody>
-    </Table>
-  </div>
-
-  <!-- Botão voltar (Fora da tabela, embaixo e à direita) -->
-  <div class="flex justify-end w-full">
-    <button
-      title="voltar"
-      class="px-4 py-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent text-primary-500"
-      on:click={() => {
-        const tablePersonagem = document.getElementById('personagemContainer');
-        const menu = document.getElementById('menu');
-        menu.style.display = "block";
-        tablePersonagem.style.display = "none";
-      }}>
-      Voltar
-    </button>
-  </div>
+      <div class="mt-6 flex items-center justify-center">
+        <button
+          type="button"
+          class="px-4 py-2 rounded border border-secondary-500 hover:border-secondary-300 transition"
+          onclick={() => selectedPersonagem = null}>
+            Fechar
+        </button>
+      </div>
+    </section>
+  {:else}
+    {#if personagens.length > 0}
+      <div class="mx-auto grid h-fit w-full max-w-3xl grid-cols-1 gap-3 overflow-y-auto p-1 sm:grid-cols-2 lg:grid-cols-2">
+        {#each personagens as personagem (personagem.id)}
+          <article class="relative min-h-[100px] rounded-lg border border-secondary-500 bg-primary-900 text-secondary-500 shadow-lg">
+            <button
+              type="button"
+              class="flex h-full w-full flex-col justify-between rounded-lg p-3 pr-16 pb-2 text-left transition hover:bg-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary-500"
+              aria-label={`Ver detalhes de ${personagem.nome}`}
+              onclick={() => selectedPersonagem = personagem}>
+              <div>
+                <h2 class="text-lg font-bold break-words">{personagem.nome}</h2>
+                <br />
+              </div>
+              <div class="mt-auto flex flex-col gap-1">
+                <h2 class="text-lm font-bold">User ID: 
+                  <p class="text-white">{((personagem as any).id_user ?? '—')}</p>
+                </h2>
+                <h2 class="text-lm font-bold">ID: 
+                  <p class="text-white">{personagem.id}</p>
+                </h2>
+              </div>
+            </button>
+            <div class="absolute top-3 right-3 flex flex-col gap-2">
+              <button
+                title="Carregar"
+                class="p-2 rounded border border-green-100 hover:border-green-300 transition bg-transparent"
+                onclick={() => goto(`/game/${personagem.id}`)}>
+                  <PlaySolid class="w-5 h-5 text-primary-500" />
+              </button>
+              <button
+                title="Editar"
+                class="p-2 rounded border border-green-100 hover:border-green-300 transition bg-transparent"
+                onclick={() => abrirModalEdit(personagem.id, personagem.nome)}>
+                  <UserEditOutline class="w-5 h-5 text-primary-500" />
+              </button>
+              <button
+                type="button"
+                title="Remover"
+                aria-label={`Remover ${personagem.nome}`}
+                class="p-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent"
+                onclick={() => openConfirm(personagem.id)}
+                disabled={deletingId === personagem.id || loading}>
+                  <TrashBinOutline class="w-5 h-5 text-red-400" />
+              </button>
+            </div>
+          </article>
+        {/each}
+      </div>
+    {:else if showEmptyCharacters}
+      <p class="mt-4 p-6 text-center rounded-lg border border-secondary-500 bg-primary-900 text-secondary-500">Nenhum personagem encontrado!</p>
+    {/if}
+  {/if}
+  
+    <!-- Botão voltar (Fora da tabela, embaixo e à direita) -->
+  {#if showBackButton}
+    <div class="mt-auto flex w-full justify-end">
+      <button
+        title="voltar"
+        class="mt-4 px-4 py-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent text-secondary-500"
+        onclick={() => window.location.reload()}>
+          Voltar
+      </button>
+    </div>
+  {/if}
 </div>
 
 <ConfirmModal
@@ -383,13 +428,3 @@
   onConfirm={handleConfirm}
   onCancel={cancelarDelecao}
 />
-
-<form on:submit|preventDefault={confirmEdit}>
-  <InputModal
-    open={inputOpen}
-    bind:nome={editingName}
-    onConfirm={confirmEdit}
-    onEnter={confirmEdit}
-    onCancel={cancelEdit}
-  />
-</form>

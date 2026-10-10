@@ -9,7 +9,6 @@
   import type { User, UserFormData } from '$lib/models/User';
   import { getToken, getCurrentUser } from "$lib/auth";
   import { login as authLogin } from "$lib/auth";
-  
 
   export let id: number | null = null; // id do usuário
 
@@ -29,6 +28,7 @@
   let confirmarSenha = '';
   let senhaVisivel = false;
   let componenteAtivo = EyeSlashSolid;
+  let isAdmin = false;
 
   function olhoeSenha(){
     mudaOlho();
@@ -57,6 +57,7 @@
   onMount(async () => {
     if (hasToken){
       user_me = await getCurrentUser();
+      isAdmin = user_me?.role === 'admin';
     }
     if (id !== null) {
       loading = true;
@@ -92,7 +93,7 @@
       const result = await authLogin({ login, password });
       
       if (result.success) {
-        await goto('/');
+        window.location.assign('/')
       } else {
         error = result.message || 'Credenciais inválidas';
       }
@@ -103,8 +104,6 @@
       loading = false;
     }
   }
-
-  
 
   // Submissão do formulário
   async function handleSubmit() {
@@ -171,11 +170,11 @@
 </script>
 
 <!-- Card do formulário -->
-<Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
+<Card class={['max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border rounded-lg', !isAdmin ? 'border-primary-600' : 'border-secondary-600'].join(' ')}>
   <!-- Formulário principal -->
   <form class="flex flex-col gap-6 p-6" on:submit|preventDefault={handleSubmit}>
     <!-- Título -->
-    <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
+    <Heading tag="h3" class={['text-4xl mb-2 text-center', !isAdmin ? 'text-primary-100' : 'text-secondary-100'].join(' ')}>
       {id === null ? 'Cadastrar Usuário' : 'Editar Usuário'}
     </Heading>
     <!-- Mensagem de erro -->
@@ -184,7 +183,9 @@
     {/if}
     <!-- Campo login -->
     <div>
-      <Label for="login" class="text-lg text-primary-500">Login</Label>
+      <Label for="login" class={['text-lg', !isAdmin ? 'text-primary-500' : 'text-secondary-500'].join(' ')}>
+        Login
+      </Label>
       <Input id="login" bind:value={user.login} placeholder="Digite o login" required class="mt-1" />
       {#if errorOf('login')}
         <div class="mt-1 text-sm text-red-500">{errorOf('login')}</div>
@@ -192,7 +193,9 @@
     </div>
     <!-- Campo email -->
     <div>
-      <Label for="email" class="text-lg text-primary-500">Email</Label>
+      <Label for="email" class={['text-lg', !isAdmin ? 'text-primary-500' : 'text-secondary-500'].join(' ')}>
+        Email
+      </Label>
       <Input id="email" type="email" bind:value={user.email} placeholder="Digite o e-mail" required class="mt-1" />
       {#if errorOf('email')}
         <div class="mt-1 text-sm text-red-500">{errorOf('email')}</div>
@@ -200,7 +203,9 @@
     </div>
     <!-- Campo senha -->
     <div>
-      <Label for="senha" class="text-lg text-primary-500">Senha {id !== null ? '(deixe vazio para manter atual)' : ''}</Label>
+      <Label for="senha" class={['text-lg', !isAdmin ? 'text-primary-500' : 'text-secondary-500'].join(' ')}>
+        Senha {id !== null ? '(deixe vazio para manter atual)' : ''}
+      </Label>
       <Input 
         id="senha" 
         type={senhaVisivel ? "text" : "password"}
@@ -210,15 +215,15 @@
         minlength={6}
         class="mt-1" 
       />
-      
-        
       {#if errorOf('senha')}
         <div class="mt-1 text-sm text-red-500">{errorOf('senha')}</div>
       {/if}
     </div>
 
     <div>
-      <Label for="confirmarSenha" class="text-lg text-primary-500">Confirme a Senha</Label>
+      <Label for="confirmarSenha" class={['text-lg', !isAdmin ? 'text-primary-500' : 'text-secondary-500'].join(' ')}>
+        Confirme a Senha
+      </Label>
       <Input 
         id ="confirmarSenha"
         type={senhaVisivel ? "text" : "password"}
@@ -226,25 +231,22 @@
         placeholder={id === null ? 'Confirme sua senha' : 'Confirme sua senha (opcional)'}
         required={id === null}
         minlength={6}
-        class="mt-1" 
-        
-      />
+        class="mt-1"/>
       <A type="button" onclick={olhoeSenha} class="text-primary-50 bg-primary-900 transition-colors rounded-lg ml-92 mt-1">
-        <svelte:component this={componenteAtivo} class="shrink-0 h-6 w-6"/></A>
+        <svelte:component this={componenteAtivo} class="shrink-0 h-6 w-6"/>
+      </A>
     </div>
 
     <!-- Campo role -->
     <div>
         {#if hasToken && user_me && user_me.role === 'admin'}
-          <Label for="role" class="text-lg text-primary-500">Perfil</Label>
+          <Label for="role" class={['text-lg', !isAdmin ? 'text-primary-500' : 'text-secondary-500'].join(' ')}>
+            Perfil
+          </Label>
           <Select id="role" bind:value={user.role} items={roleOptions} class="mt-1" />
-
         {:else}
-          
           <Select id="role" bind:value={user.role} items={roleOptions} class="mt-1" hidden />
         {/if}
-        
-
       {#if errorOf('role')}
         <div class="mt-1 text-sm text-red-500">{errorOf('role')}</div>
       {/if}
@@ -264,5 +266,4 @@
       </Button> 
     </div>
   </form>
-  
 </Card>

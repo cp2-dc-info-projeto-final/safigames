@@ -1,65 +1,40 @@
 <script lang="ts">
-
-    import { Table, TableHead, TableHeadCell, TableBody, TableBodyRow, TableBodyCell } from "flowbite-svelte";
-    import Menu from '../../components/Menu.svelte';
-    import { onMount } from 'svelte'; // ciclo de vida
-    import api from '$lib/api'; // API backend
-    import type { ApiResponse } from '$lib/api';
-    import type { User } from '$lib/models/User';
-    import type { Personagem } from '$lib/models/Personagem';
-    import { TrashBinOutline } from 'flowbite-svelte-icons'; // ícones
-    import ConfirmModal from '../../components/ConfirmModal.svelte'; // modal de confirmação
-    import { goto } from '$app/navigation';
-
-    let user: User;
-    let error = '';
-    let personagens: Personagem[] = $state([]);
-
-    onMount(async () => {
-    try {
-        const res = await api.get(`/users/me`);
-        const body = res.data as ApiResponse<User>;
-        if (body.success && body.data) {
-          user = { ...body.data };
-        } else {
-          error = body.message;
-        }
-      } catch (e: any) {
-        const body = e.response?.data as ApiResponse<User> | undefined;
-        error = body?.message || 'Erro ao carregar usuário.';
-      } finally {
-    } 
-  })
-
+  import Menu from '../../components/Menu.svelte';
+  import { FolderOpenSolid } from 'flowbite-svelte-icons';
+  import { goto } from '$app/navigation';
 </script>
+
 <Menu />
 
 <svelte:head>
   <title>Gerenciamento</title>
 </svelte:head>
-
-<div>
-  <button
-      class="ml-2 px-3 py-1 bg-secondary-100 hover:bg-primary-200 text-white rounded text-lg flex items-center gap-1"
-      on:click={goto('/gerenciamento/personagem')}>
-      Personagem
-  </button>
-
-  <button 
-      class="ml-2 px-3 py-1 bg-secondary-100 hover:bg-primary-200 text-white rounded text-lg flex items-center gap-1"
-      on:click={goto('/gerenciamento/episodio')}>
-      Episódio
-  </button>
-
-  <button 
-      class="ml-2 px-3 py-1 bg-secondary-100 hover:bg-primary-200 text-white rounded text-lg flex items-center gap-1"
-      on:click={goto('/gerenciamento/comerciante')}>
-      Comerciante
-  </button>
-
-  <button 
-      class="ml-2 px-3 py-1 bg-secondary-100 hover:bg-primary-200 text-white rounded text-lg flex items-center gap-1"
-      on:click={goto('/gerenciamento/item')}>
-      Item
-  </button>
+<h1 class="text-6xl font-medium text-center text-secondary-200 mb-10">
+  Gerenciamento
+</h1>
+<div class="grid grid-cols-4 gap-20">
+  <div class="flex flex-col items-center">
+    <button class="px-3 py-1 rounded" on:click={() => goto('/gerenciamento/personagem')}>
+      <FolderOpenSolid class="h-25 w-25 text-secondary-50 hover:text-secondary-200'" />
+    </button>
+    <p class="text-lg font-medium text-center text-primary-50">Personagem</p>
+  </div>
+  <div class="flex flex-col items-center">
+    <button class="px-3 py-1 rounded" on:click={() => goto('/gerenciamento/episodio')}>
+      <FolderOpenSolid class="h-25 w-25 text-secondary-50 hover:text-secondary-51" />
+    </button>
+    <p class="text-lg font-medium text-center text-primary-50">Episódio</p>
+  </div>
+  <div class="flex flex-col items-center">
+    <button class="px-3 py-1 rounded" on:click={() => goto('/gerenciamento/comerciante')}>
+      <FolderOpenSolid class="h-25 w-25 text-secondary-50 hover:text-secondary-51" />
+    </button>
+    <p class="text-lg font-medium text-center text-primary-50">Comerciante</p>
+  </div>
+  <div class="flex flex-col items-center">
+    <button class="px-3 py-1 rounded" on:click={() => goto('/gerenciamento/item')}>
+      <FolderOpenSolid class="h-25 w-25 text-secondary-50 hover:text-secondary-51" />
+    </button>
+    <p class="text-lg font-medium text-center text-primary-50">Item</p>
+  </div>
 </div>

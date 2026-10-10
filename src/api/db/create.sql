@@ -178,7 +178,8 @@ VALUES('Vini do soep', 'Vini: OI! Você: Oi! Como vai? Vini: Vou bem.', 'Diálog
 ('Clécio', 'Clécio: 4 tempos! Você: Di guÊ? Clécio: Di bandi dadus.', 'Diálogo', 1);
 
 INSERT INTO arma(nome, dano, descricao, stamina)
-VALUES('Espada de esmeralda', 30, 'Os aldeões adoram', 2);
+VALUES('Espada de esmeralda', 30, 'Os aldeões adoram', 2),
+('Adaga de obsidiana', 15, 'Corta até átomos', 1);
 
 INSERT INTO personagem(nome, vida, stamina, classe, id_usuario, id_cena, id_episodio, id_arma)
 VALUES('Jâo, o garoto de programa', 90, 3, 'Mago', 1, 2, 1, 1);
@@ -191,4 +192,3 @@ VALUES(1, 1);
 
 INSERT INTO catalogo(id_item, id_comerciante)
 VALUES(1, 1);
-

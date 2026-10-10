@@ -64,7 +64,7 @@
   }
 
   onMount(async () => {
-   buscarTodosUsuarios()
+    buscarTodosUsuarios()
   })
   
   async function buscarTodosUsuarios(){
@@ -121,10 +121,10 @@ $:if (filtro) {
   <!-- Tabela para telas médias/grandes -->
   <div class="hidden xl:block">
     <Pesquisa 
-     bind:filtro={filtro} />
+      bind:filtro={filtro} />
     <!-- Tabela de usuários -->
-    <Table class="w-full max-w-5xl mx-auto my-8 shadow-lg border border-primary-500 rounded-lg ">
-      <TableHead class="text-lg bg-primary-900 text-primary-500">
+    <Table class="w-full max-w-5xl mx-auto my-8 shadow-lg border border-secondary-500 rounded-lg ">
+      <TableHead class="text-lg bg-primary-900 text-secondary-500">
         <TableHeadCell class="w-16">ID</TableHeadCell>
         <TableHeadCell class="w-32">Login</TableHeadCell>
         <TableHeadCell class="min-w-0">Email</TableHeadCell>
@@ -133,23 +133,23 @@ $:if (filtro) {
       </TableHead>
       <TableBody >
         {#each users as user}
-          <TableBodyRow class="text-lg bg-primary-900 text-primary-500" >
+          <TableBodyRow class="text-lg bg-primary-900 text-secondary-500" >
             <TableBodyCell>{user.id}</TableBodyCell>
             <TableBodyCell>{user.login}</TableBodyCell>
             <TableBodyCell class="truncate max-w-0">{user.email}</TableBodyCell>
             <TableBodyCell>
-              <Badge class={user.role === 'admin' ? 'bg-primary-600 text-sm mt-1' : 'text-sm mt-1 bg-primary-200 text-primary-900'}>
+              <Badge class={user.role === 'admin' ? 'bg-secondary-600 text-sm mt-1' : 'text-sm mt-1 bg-secondary-200 text-primary-900'}>
                 {user.role}
               </Badge>
             </TableBodyCell>
             <TableBodyCell>
               <!-- Botão editar -->
               <button
-                class="p-2 rounded border border-primary-200 hover:border-primary-400 transition bg-transparent"
+                class="p-2 rounded border border-secondary-200 hover:border-secondary-400 transition bg-transparent"
                 title="Editar"
                 on:click={() => goto(`/users/edit/${user.id}`)}
               >
-                <UserEditOutline class="w-5 h-5 text-primary-500" />
+                <UserEditOutline class="w-5 h-5 text-secondary-500" />
               </button>
               <!-- Botão remover -->
               <button
@@ -164,7 +164,7 @@ $:if (filtro) {
           </TableBodyRow>
         {/each}
         {#if users.length === 0}
-            <TableBodyCell class="text-primary-500">Nenhum usuário encontrado!</TableBodyCell>
+            <TableBodyCell class="text-secondary-500">Nenhum usuário encontrado!</TableBodyCell>
         {/if}
       </TableBody>
     </Table>
@@ -176,12 +176,12 @@ $:if (filtro) {
       bind:filtro={filtro} />
       {#each users as user}
         <!-- Card de usuário -->
-        <Card class="max-w-sm w-full p-0 overflow-hidden shadow-lg border border-primary-500">
+        <Card class="max-w-sm w-full p-0 overflow-hidden shadow-lg border border-secondary-500">
           <div class="px-4 pt-4 pb-2 bg-primary-900 text-left flex items-center justify-between">
             <div>
-              <div class="text-lg font-semibold text-primary-500 text-left">{user.login}</div>
-              <div class="text-xs text-gray-400 text-left">ID: {user.id}</div>
-              <Badge class="{user.role === 'admin' ? 'bg-primary-500 text-xs mt-1' : 'text-xs mt-1 bg-primary-900 text-primary-500'}">
+              <div class="text-lg font-semibold text-secondary-500 text-left">{user.login}</div>
+              <div class="text-xm text-gray-400 text-left">ID: {user.id}</div>
+              <Badge class="{user.role === 'admin' ? 'bg-secondary-500 text-xs mt-1' : 'text-xm mt-1 bg-primary-900 text-secondary-500'}">
                 {user.role}
               </Badge>
             </div>
@@ -190,9 +190,8 @@ $:if (filtro) {
               <button
                 class="p-2 rounded border border-primary-200 hover:border-primary-400 transition bg-transparent"
                 title="Editar"
-                on:click={() => goto(`/users/edit/${user.id}`)}
-              >
-                <UserEditOutline class="w-5 h-5 text-primary-500" />
+                on:click={() => goto(`/users/edit/${user.id}`)}>
+                  <UserEditOutline class="w-5 h-5 text-primary-500" />
               </button>
               <!-- Botão remover -->
               <button
@@ -208,8 +207,11 @@ $:if (filtro) {
           <div class="px-4 pb-4 pt-2 flex flex-col gap-2 text-left bg-primary-900">
             <div class="flex items-center gap-2 text-left">
               <!-- Ícone de email -->
-              <svg class="w-4 h-4 text-primary-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 12A4 4 0 1 0 8 12a4 4 0 0 0 8 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14v7m-7-7v7m14-7v7"/></svg>
-              <span class="text-primary-600 text-sm">{user.email}</span>
+              <svg class="w-4 h-4 text-secondary-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 12A4 4 0 1 0 8 12a4 4 0 0 0 8 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 14v7m-7-7v7m14-7v7"/>
+              </svg>
+              <span class="text-secondary-600 text-sl">{user.email}</span>
             </div>
           </div>
         </Card>
