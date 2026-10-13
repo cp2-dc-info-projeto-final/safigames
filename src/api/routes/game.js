@@ -31,7 +31,7 @@ router.get('/personagem', verifyToken, async function(req, res) {
 });
 
 // Busca personagens por id
-router.get('/personagem/:id', verifyToken, async function(req, res) {
+router.get('/personagem/:id', verifyToken, isAdmin, async function(req, res) {
   try {
     const { id } = req.params;
     const result = await pool.query('SELECT * FROM personagem WHERE id = $1 ORDER BY id', [id]);
@@ -43,7 +43,7 @@ router.get('/personagem/:id', verifyToken, async function(req, res) {
 });
 
 // Busca todos os personagens
-router.get('/personagemsemid', verifyToken, async function(req, res) {
+router.get('/personagemsemid', verifyToken, isAdmin, async function(req, res) {
   try {
     const result = await pool.query('SELECT * FROM personagem');
     return sendSuccess(res, 200, null, result.rows);
@@ -69,7 +69,7 @@ router.post('/personagem', verifyToken, async function(req, res) {
     };
 
     if (classe == 'Guerreiro'){
-     personagem = { nome, vida : 80, defesa : 20, xp : 0, stamina : 3, classe, armadura : 'Armadura de Netherite', dinheiro : 1, id_arma : 1, id_cena : 1, id_user}
+      personagem = { nome, vida : 80, defesa : 20, xp : 0, stamina : 3, classe, armadura : 'Armadura de Netherite', dinheiro : 1, id_arma : 1, id_cena : 1, id_user}
     }
     else if (classe == 'Assassino'){
       personagem = { nome, vida : 70, defesa : 0, xp : 0, stamina : 5, classe, armadura : 'Sem armadura', dinheiro : 42, id_arma : 2, id_cena : 1, id_user}
@@ -142,7 +142,7 @@ router.put('/personagem/:id', verifyToken, async function(req, res) {
   }
 });
 
-router.post('/episodio', verifyToken, async function(req, res) {
+router.post('/episodio', verifyToken, isAdmin, async function(req, res) {
   try {
     const { titulo } = req.body;
 
@@ -166,7 +166,7 @@ router.post('/episodio', verifyToken, async function(req, res) {
 });
 
 /* Busca todos os episodios */
-router.get('/episodio', verifyToken, async function(req, res) {
+router.get('/episodio', verifyToken, isAdmin, async function(req, res) {
   try {
     const result = await pool.query('SELECT * FROM episodio');
     return sendSuccess(res, 200, null, result.rows);
@@ -177,7 +177,7 @@ router.get('/episodio', verifyToken, async function(req, res) {
 });
 
 /* DELETE - Remover episodio */
-router.delete('/episodio/:id', verifyToken, async function(req, res) {
+router.delete('/episodio/:id', verifyToken, isAdmin, async function(req, res) {
   try {
     const { id } = req.params;
 
@@ -202,7 +202,7 @@ router.delete('/episodio/:id', verifyToken, async function(req, res) {
 });
 
 /* PUT - Editar título do episódio*/
-router.put('/episodio/:id', verifyToken, async function(req, res) {
+router.put('/episodio/:id', verifyToken, isAdmin, async function(req, res) {
   try {
     const { id }  = req.params;
     const { titulo }  = req.body;
@@ -239,7 +239,7 @@ router.put('/episodio/:id', verifyToken, async function(req, res) {
 });
 
 // *GET busca todos os comerciantes
-router.get('/comerciante', verifyToken, async function(req, res) {
+router.get('/comerciante', verifyToken, isAdmin, async function(req, res) {
   try {
     const result = await pool.query('SELECT * FROM comerciante');
     return sendSuccess(res, 200, null, result.rows);
@@ -250,7 +250,7 @@ router.get('/comerciante', verifyToken, async function(req, res) {
 });
 
 // *POST criar comerciante
-router.post('/comerciante', verifyToken, async function(req, res) {
+router.post('/comerciante', verifyToken, isAdmin, async function(req, res) {
   try {
     const { nome, descricao } = req.body;
 
@@ -275,7 +275,7 @@ router.post('/comerciante', verifyToken, async function(req, res) {
 });
 
 // *DELETE excluir comerciante
-router.delete('/comerciante/:id', verifyToken, async function(req, res) {
+router.delete('/comerciante/:id', verifyToken, isAdmin, async function(req, res) {
   try {
     const { id } = req.params;
 
@@ -295,7 +295,7 @@ router.delete('/comerciante/:id', verifyToken, async function(req, res) {
 });
 
 // *PUT editar comerciante
-router.put('/comerciante/:id', verifyToken, async function(req, res) {
+router.put('/comerciante/:id', verifyToken, isAdmin, async function(req, res) {
   try {
     const { id }  = req.params;
     const { nome, descricao }  = req.body;
@@ -332,7 +332,7 @@ router.put('/comerciante/:id', verifyToken, async function(req, res) {
 });
 
 // *GET busca todos os itens
-router.get('/item', verifyToken, async function(req, res) {
+router.get('/item', verifyToken, isAdmin, async function(req, res) {
   try {
     const result = await pool.query('SELECT * FROM item');
     return sendSuccess(res, 200, null, result.rows);
@@ -343,7 +343,7 @@ router.get('/item', verifyToken, async function(req, res) {
 });
 
 // *POST criar item
-router.post('/item', verifyToken, async function(req, res) {
+router.post('/item', verifyToken, isAdmin, async function(req, res) {
   try {
     const { nome, descricao, tipo, fator_vida, fator_dano, fator_defesa, preco } = req.body;
 
@@ -372,7 +372,7 @@ router.post('/item', verifyToken, async function(req, res) {
 });
 
 // *DELETE excluir item
-router.delete('/item/:id', verifyToken, async function(req, res) {
+router.delete('/item/:id', verifyToken, isAdmin, async function(req, res) {
   try {
     const { id } = req.params;
 
@@ -392,7 +392,7 @@ router.delete('/item/:id', verifyToken, async function(req, res) {
 });
 
 // *PUT editar item
-router.put('/item/:id', verifyToken, async function(req, res) {
+router.put('/item/:id', verifyToken, isAdmin, async function(req, res) {
   try {
     const { id }  = req.params;
     const { nome, descricao, tipo, fator_vida, fator_dano, fator_defesa, preco } = req.body;
@@ -429,6 +429,5 @@ router.put('/item/:id', verifyToken, async function(req, res) {
 
 // Unificar CRUD de episodio com cena e for para dar insert em cenas
 // Unificar CRUD de comerciante e catálogo na mesma tela com select
-
 
 module.exports = router;
