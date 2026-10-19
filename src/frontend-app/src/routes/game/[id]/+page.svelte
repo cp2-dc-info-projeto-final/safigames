@@ -18,6 +18,12 @@
   let exibeCena: boolean = true;
 
   let user: User;
+
+  // let logCombate: string[] = [
+  //   `Você causou ${dano} de dano no inimigo.`,
+  //   `O inimigo causou ${dano} de dano em você.`,
+  // ];  
+
   let personagem: Personagem;
   let episodio: Episodio;
   let progresso: any;
@@ -89,7 +95,7 @@
       const body = res.data as ApiResponse<Episodio>;
       if (body.success){
         progresso = { ...body.data }
-        episodioAtual = progresso[personagem.id_episodio];
+        episodioAtual = progresso[personagem.id_episodio - 1];
         console.log(progresso)
       } else {
         error = body.message ?? 'Erro ao carregar progresso.';
@@ -177,13 +183,20 @@
         </div>
 
         <!-- Bloco Inferior: Diálogo (com cantos arredondados como no esboço) -->
-        <div class="flex-5x1 border-2 border-primary-500 rounded-3xl p-6 bg-primary-800/50">
+        <div class="flex-5x1 border-2 border-primary-500 p-6 bg-primary-800/50">
           <h3 class="text-3xl font-bold mb-4">Diálogo</h3>
           <p class="text-primary-500">
             {episodioAtual.dialogo}
-          </p>
+          </p>   
         </div>
       </div>
     </div>
   </div>
 {/if}
+
+<!-- Aqui vai ficar o container de cena de combate, vai ter uma variável para armazenar o log do combate, que vai ser exibido conforme clicar nos botões "atacar", "finalizar turno" e "usar item"-->
+
+<!-- <audio autoplay loop>
+  <source src="/assets/audio/tema.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio> -->
