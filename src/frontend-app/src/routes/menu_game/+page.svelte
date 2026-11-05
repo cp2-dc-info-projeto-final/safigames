@@ -328,7 +328,7 @@
 <!-- Container de tabela personagem -->
 <div id="personagemContainer" class="mx-auto flex h-80 min-h-0 w-full max-w-4xl flex-col items-center gap-4 overflow-y-auto px-4">
   {#if selectedPersonagem}
-    <section class="w-full max-w-2xl mx-auto p-6 rounded-lg border border-secondary-500 bg-primary-900 text-secondary-500 shadow-lg" aria-labelledby="personagem-title">
+    <section class="w-full max-w-2xl mx-auto p-6 rounded-lg border border-primary-500 bg-primary-900 text-primary-500 shadow-lg" aria-labelledby="personagem-title">
       <div class="mb-6">
         <h2 id="personagem-title" class="text-xl font-bold break-words">{selectedPersonagem.nome}</h2>
       </div>
@@ -347,7 +347,7 @@
       <div class="mt-6 flex items-center justify-center">
         <button
           type="button"
-          class="px-4 py-2 rounded border border-secondary-500 hover:border-secondary-300 transition"
+          class="px-4 py-2 rounded border border-primary-500 hover:border-primary-300 transition"
           onclick={() => selectedPersonagem = null}>
             Fechar
         </button>
@@ -357,10 +357,10 @@
     {#if personagens.length > 0}
       <div class="mx-auto grid h-fit w-full max-w-3xl grid-cols-1 gap-3 overflow-y-auto p-1 sm:grid-cols-2 lg:grid-cols-2">
         {#each personagens as personagem (personagem.id)}
-          <article class="relative min-h-[100px] rounded-lg border border-secondary-500 bg-primary-900 text-secondary-500 shadow-lg">
+          <article class="relative min-h-[100px] rounded-lg border border-primary-500 bg-primary-900 text-primary-500 shadow-lg">
             <button
               type="button"
-              class="flex h-full w-full flex-col justify-between rounded-lg p-3 pr-16 pb-2 text-left transition hover:bg-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary-500"
+              class="flex h-full w-full flex-col justify-between rounded-lg p-3 pr-16 pb-2 text-left transition hover:bg-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
               aria-label={`Ver detalhes de ${personagem.nome}`}
               onclick={() => selectedPersonagem = personagem}>
               <div>
@@ -403,7 +403,7 @@
         {/each}
       </div>
     {:else if showEmptyCharacters}
-      <p class="mt-4 p-6 text-center rounded-lg border border-secondary-500 bg-primary-900 text-secondary-500">Nenhum personagem encontrado!</p>
+      <p class="mt-4 p-6 text-center rounded-lg border border-primary-500 bg-primary-900 text-primary-500">Nenhum personagem encontrado!</p>
     {/if}
   {/if}
   
@@ -412,7 +412,7 @@
     <div class="mt-auto flex w-full justify-end">
       <button
         title="voltar"
-        class="mt-4 px-4 py-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent text-secondary-500"
+        class="mt-4 px-4 py-2 rounded border border-red-100 hover:border-red-300 transition bg-transparent text-primary-500"
         onclick={() => window.location.reload()}>
           Voltar
       </button>

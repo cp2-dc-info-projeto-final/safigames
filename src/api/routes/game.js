@@ -428,9 +428,10 @@ router.put('/item/:id', verifyToken, async function(req, res) {
 });
 
 // GET inimigo
-router.get('/inimigo', verifyToken, async function(req, res) {
+router.get('/inimigo/:idCena', verifyToken, async function(req, res) {
+  const { idCena } = req.params;
   try {
-    const result = await pool.query('SELECT * FROM inimigo');
+    const result = await pool.query('SELECT * FROM inimigo i INNER JOIN cena c ON i.id = c.id_inimigo WHERE c.id = $1', [idCena]);
     return sendSuccess(res, 200, null, result.rows);
   } catch (error) {
     console.error('Erro ao buscar inimigo:', error);
@@ -466,7 +467,7 @@ router.get(`/progresso/:id`, verifyToken, async function(req, res) {
 router.post('/cena/:id', verifyToken, async function(req, res) {
   try {
     const idEpisodio = req.params.id;
-    const { NPC, dialogo, tipo, id_inimigo, id_comerciante } = req.body;
+    const { npc, dialogo, tipo, id_inimigo, id_comerciante } = req.body;
     const errors = [];
 
     // Validação do tipo da cena
@@ -478,8 +479,8 @@ router.post('/cena/:id', verifyToken, async function(req, res) {
       errors.push({ field: 'inimigo', message: 'Inimigo é obrigatório em cena de combate', code: 'REQUIRED' });
       return sendError(res, 400, 'Inimigo é obrigatório', errors);
     }
-    else if (tipo == "dialogo" && (!NPC || !dialogo)){
-      if (!NPC) {errors.push({ field: 'npc', message: 'NPC é obrigatório', code: 'REQUIRED' })};
+    else if (tipo == "dialogo" && (!npc || !dialogo)){
+      if (!npc) {errors.push({ field: 'npc', message: 'NPC é obrigatório', code: 'REQUIRED' })};
       if (!dialogo) {errors.push({ field: 'dialogo', message: 'Diálogo é obrigatório', code: 'REQUIRED' })};
       return sendError(res, 400, 'NPC e diálogo são obrigatórios', errors);
     }
@@ -491,8 +492,8 @@ router.post('/cena/:id', verifyToken, async function(req, res) {
     
     if (tipo == "dialogo"){
       const result = await pool.query(
-        'INSERT INTO cena (tipo, NPC, dialogo, id_episodio) VALUES ($1, $2, $3, $4) RETURNING tipo, NPC, dialogo, id_episodio',
-        [tipo, NPC, dialogo, idEpisodio]
+        'INSERT INTO cena (tipo, npc, dialogo, id_episodio) VALUES ($1, $2, $3, $4) RETURNING tipo, npc, dialogo, id_episodio',
+        [tipo, npc, dialogo, idEpisodio]
       );
       return sendSuccess(res, 201, 'Item criado com sucesso', result.rows[0]);
     }

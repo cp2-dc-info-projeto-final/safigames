@@ -6,6 +6,7 @@
   import type { User } from '$lib/models/User';
   import type { Cena } from '$lib/models/Cena';
   import type { Episodio } from '$lib/models/Episodio';
+  import type { Inimigo } from '$lib/models/Inimigo';
   import api from '$lib/api'; // API backend
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
@@ -16,6 +17,7 @@
   //Variáveis de controle
   let exibeMenu: boolean = false;
   let exibeCena: boolean = true;
+  let indiceCena: number = 0;
 
   let user: User;
 
@@ -26,8 +28,9 @@
 
   let personagem: Personagem;
   let episodio: Episodio;
-  let progresso: any;
-  let episodioAtual: any;
+  export let progresso: any[] = [];
+  let cenaAtual: any;
+  let inimigoAtual: Inimigo;
   let error = '';
   let loading = false;
   let idPersonagem: number;
@@ -94,20 +97,57 @@
       const res = await api.get(`/game/progresso/${idEpisodio}`);
       const body = res.data as ApiResponse<Episodio>;
       if (body.success){
-        progresso = { ...body.data }
-        episodioAtual = progresso[personagem.id_episodio - 1];
+        progresso = body.data
+        if (progresso.length > 0) {
+          cenaAtual = progresso[indiceCena];
+        }
         console.log(progresso)
       } else {
         error = body.message ?? 'Erro ao carregar progresso.';
       }
     } catch (e: any) {
       console.error('Erro ao carregar progresso:', e);
-      const body = e.response?.data as ApiResponse<Personagem> | undefined;
+      const body = e.response?.data as ApiResponse<Episodio> | undefined;
       error = body?.message || 'Erro ao carregar progresso';
     } finally {
       loading = false;
     }
   }
+  
+  async function buscaInimigo(idCena: number) {
+    try{
+      const res = await api.get(`/game/inimigo/${idCena}`);
+      const body = res.data as ApiResponse<Inimigo>;
+      if (body.success){
+        inimigoAtual = body.data
+        console.log(inimigoAtual)
+      } else {
+        error = body.message ?? 'Erro ao buscar inimigo.';
+      }
+    } catch (e: any) {
+      console.error('Erro ao buscar inimigo:', e);
+      const body = e.response?.data as ApiResponse<Inimigo> | undefined;
+      error = body?.message || 'Erro ao buscar inimigo';
+    } finally {
+      loading = false;
+    }
+  }
+
+  $: if (cenaAtual && cenaAtual.tipo == 'Combate'){
+    buscaInimigo(cenaAtual.cena_id)
+  }
+
+  function proximaCena() {
+        if (indiceCena < progresso.length - 1) {
+            indiceCena++;
+            console.log(indiceCena)
+        } else {
+            console.log("Você chegou ao fim das cenas!");
+        }
+        if (progresso.length > 0) {
+          cenaAtual = progresso[indiceCena];
+        }
+    }
 
   async function exibicaoMenu(){
     exibeMenu = !exibeMenu;
@@ -115,8 +155,15 @@
   }
 </script>
 
+<!-- Evento global de teclado para escutar o Enter -->
+<svelte:window on:keydown={(e) => {
+  if (e.key === 'Enter') {
+      proximaCena();
+  }
+}} />
+
 <div class="text-center fixed w-[85%] top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded">
-  <Heading tag="h1" class="text-primary-500 mt-1">{progresso ? episodioAtual.episodio_titulo : "Erro: Episódio indefinido"}</Heading>
+  <Heading tag="h1" class="text-primary-500 mt-1">{cenaAtual ? cenaAtual.episodio_titulo : "Erro: Episódio indefinido"}</Heading>
 </div>
 
 {#if exibeMenu}
@@ -148,13 +195,13 @@
 {/if}
 
 <!-- Container cena de diálogo -->
-{#if exibeCena && progresso && episodioAtual.tipo == "Diálogo"}
+{#if exibeCena && cenaAtual && cenaAtual.tipo == "Diálogo"}
   <div class="min-h-screen fixed inset-0 bg-primary-900 text-primary-500 p-4 flex flex-col gap-4">
     <!-- Topo: Menu circular à esquerda -->
     <div class="flex items-center">
       <button
         type="button"
-        class="w-16 h-16 rounded-full border-2 border-primary-500 flex items-center justify-center font-bold hover:bg-primary-800 transition"
+        class="w-16 h-16 rounded-full border-2 border-primary-300 flex items-center justify-center font-bold hover:bg-primary-800 transition"
         on:click={exibicaoMenu}>
           menu
       </button>
@@ -163,10 +210,10 @@
     <!-- Corpo Principal: Grid/Flex de duas colunas -->
     <div class="flex flex-1 gap-4">
       <!-- Coluna da Esquerda: Status do Jogador -->
-      <div class="w-1/4 border-2 border-primary-500 p-4 rounded-none flex flex-col">
+      <div class="w-1/4 border-2 border-primary-300 p-4 rounded-none flex flex-col">
         <h2 class="text-5xl font-bold mb-2 text-primary-500">status:</h2>
         <!-- Conteúdo do status vai aqui -->
-        <div class="text-xg text-primary-500">
+        <div class="text-xg text-primary-50">
           <p>Vida: {personagem.vida}</p>
           <p>Defesa: {personagem.defesa}</p>
           <p>Xp: {personagem.xp}</p>
@@ -178,25 +225,76 @@
       <!-- Coluna da Direita: Ilustração + Diálogo -->
       <div class="w-3/4 flex flex-col gap-4">
         <!-- Bloco Superior: Ilustração -->
-        <div class="h-40 border-2 border-primary-500 p-4 flex items-center justify-center">
+        <div class="h-40 border-2 border-primary-300 p-4 flex items-center justify-center">
           <span class="text-2xl font-semibold">*ilustração*</span>
         </div>
 
-        <!-- Bloco Inferior: Diálogo (com cantos arredondados como no esboço) -->
-        <div class="flex-5x1 border-2 border-primary-500 p-6 bg-primary-800/50">
+        <!-- Bloco Inferior: Diálogo -->
+        <div class="flex-5x1 border-2 border-primary-300 p-6 bg-primary-800/50">
           <h3 class="text-3xl font-bold mb-4">Diálogo</h3>
-          <p class="text-primary-500">
-            {episodioAtual.dialogo}
-          </p>   
+          <p class="text-primary-50 whitespace-pre-line">
+            {cenaAtual.dialogo}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Container cena de diálogo -->
+{:else if exibeCena && cenaAtual && cenaAtual.tipo == "Combate"}
+  <div class="min-h-screen fixed inset-0 bg-primary-900 text-primary-500 p-4 flex flex-col gap-4">
+    <!-- Topo: Menu circular à esquerda -->
+    <div class="flex items-center">
+      <button
+        type="button"
+        class="w-16 h-16 rounded-full border-2 border-primary-300 flex items-center justify-center font-bold hover:bg-primary-800 transition"
+        on:click={exibicaoMenu}>
+          menu
+      </button>
+    </div>
+
+    <!-- Corpo Principal: Grid/Flex de duas colunas -->
+    <div class="flex flex-1 gap-4">
+      <!-- Coluna da Esquerda: Status do Jogador -->
+      <div class="w-1/4 border-2 border-primary-300 p-4 rounded-none flex flex-col">
+        <h2 class="text-5xl font-bold mb-2 text-primary-500">status:</h2>
+        <!-- Conteúdo do status vai aqui -->
+        <div class="text-xg text-primary-50">
+          <p>Vida: {personagem.vida}</p>
+          <p>Defesa: {personagem.defesa}</p>
+          <p>Xp: {personagem.xp}</p>
+          <p>Classe: {personagem.classe}</p>
+          <p>Dinheiro: {personagem.dinheiro}</p>
+        </div>
+      </div>
+
+      <!-- Coluna do Meio: Ilustração + Diálogo -->
+      <div class="w-3/4 flex flex-col gap-4">
+        <!-- Bloco Superior: Ilustração -->
+        <div class="h-40 border-2 border-primary-300 p-4 flex items-center justify-center">
+          <span class="text-2xl font-semibold">*ilustração*</span>
+        </div>
+
+        <!-- Bloco Inferior: Diálogo -->
+        <div class="flex-5x1 border-2 border-primary-300 p-6 bg-primary-800/50">
+          <h3 class="text-3xl font-bold mb-4">Diálogo</h3>
+          <p class="text-primary-50 whitespace-pre-line">
+            {cenaAtual.dialogo}
+          </p>
+        </div>
+      </div>
+
+      <!-- Coluna da Direita: Status do inimigo -->
+      <div class="w-1/4 border-2 border-primary-300 p-4 rounded-none flex flex-col">
+        <h2 class="text-5xl font-bold mb-2 text-primary-500">status do inimigo:</h2>
+        <!-- Conteúdo do status vai aqui -->
+        <div class="text-xg text-primary-50">
+          <p>Nome: {inimigoAtual ? inimigoAtual[0].nome : 'Inimigo Indefinido'}</p>
+          <p>Descrição: {inimigoAtual ? inimigoAtual[0].descricao : 'Inimigo Indefinido'}</p>
+          <p>Vida: {inimigoAtual ? inimigoAtual[0].vida : 'Inimigo Indefinido'}</p>
+          <p>Defesa: {inimigoAtual ? inimigoAtual[0].defesa : 'Inimigo Indefinido'}</p>
         </div>
       </div>
     </div>
   </div>
 {/if}
-
-<!-- Aqui vai ficar o container de cena de combate, vai ter uma variável para armazenar o log do combate, que vai ser exibido conforme clicar nos botões "atacar", "finalizar turno" e "usar item"-->
-
-<!-- <audio autoplay loop>
-  <source src="/assets/audio/tema.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
-</audio> -->

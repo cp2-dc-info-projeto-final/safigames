@@ -164,7 +164,7 @@ INSERT INTO usuario (login, email, senha, role) VALUES
 ('vit_dev', 'vit@gmail.com', '$2a$12$f2c.uHGHS4drfaz6HR870OLamkarD57kI.gkr4//Vbbp0vN9IrFfG', 'admin');
 
 INSERT INTO inimigo(nome, vida, dano, descricao, fator_xp, fator_dinheiro)
-VALUES('Carlinhos de LP', 670, 180, 'Gordinho bem pedofilo bem bizarro bem nooooojento', 200, 12);
+VALUES('Rato de Óculos e Barbicha', 30, 6, 'Esse rato fala, diferente de todos os outros. Além disso ele tem uma aparência um tanto quanto familiar...', 6, 12);
 
 INSERT INTO comerciante(nome, descricao)
 VALUES('Stefany da empadinha bem safadinha', 'Ela vende empadas que regeneram sua vida (e é bem safadinha)');
@@ -173,9 +173,30 @@ INSERT INTO episodio(titulo)
 VALUES('Episódio 1: A RATIFICAÇÃO'),
 ('Episódio 2: O DESPERTAR DO GORDINHO');
 
-INSERT INTO cena(npc, dialogo, tipo, id_episodio)
-VALUES('Vini do soep', 'Vini: OI! Você: Oi! Como vai? Vini: Vou bem.', 'Diálogo', 1),
-('Clécio', 'Clécio: 4 tempos! Você: Di guÊ? Clécio: Di bandi dadus.', 'Diálogo', 1);
+INSERT INTO cena(npc, dialogo, tipo, id_episodio, id_inimigo, id_comerciante)
+VALUES('Narrador', 'Narrador: Você é a amizade mais confiável de Daniel, ele está desaparecido e sua missão é encontrá-lo. Há boatos que ele foi visto pela última vez entrando em um bueiro na frente do Colégio Pedro II - Campus Duque de Caxias. Você inicia sua jornada numa rede de esgotos, desconfiando se ele está lá mesmo. 
+
+Você: (Cara... Que fedor. Não é possível que ele se enfiou aqui, mas vamo lá, eu só tenho essa pista mesmo.)
+
+Narrador: Você vê um túnel escuro, com as paredes de tijolos caindo aos pedaços, sujos e fétidos, e um córrego onde corre um fluído de cor suspeita e odor insuportável. Você reúne toda sua coragem e amor pelo Daniel, tampa o nariz e segue em frente, até que encontra...
+', 'Diálogo', 1, NULL, NULL),
+
+('Rato de óculos e barbicha', 'Rato de óculos e barbicha: Entrosa não mano!
+
+Você: O RATO TA FALANDO?!!?!?!
+Narrador: O rato se prepara e pula em você.', 'Diálogo', 1, NULL, NULL),
+
+('', '', 'Combate', 1, 1, NULL),
+
+('Rato de óculos e barbicha, Narrador', 'Você: (É a primeira vez que eu luto contra um rato falante... Eu sou a primeira pessoa da minha árvore genealógica a fazer isso)
+
+Rato de óculos e barbicha: Mano, a pessoa invade o meu espaço pessoal e ainda me bate!
+
+Você: Foi você que avançou em mim doidão! Mas ai, na moral agora, você por acaso viu um menino branco, loiro, com cara de nerd por aí?
+
+Rato de óculos e barbicha: Menino? Nem tem gente aqui. Eu vou é meter minha pata, tu é um doido falando com um rato.
+
+Narrador: O rato entra em um dos buracos na parede, perto do chão e você segue em frente pelos dutos escuros, fedidos e ecoantes.', 'Diálogo', 1, NULL, NULL);
 
 INSERT INTO arma(nome, dano, descricao, stamina)
 VALUES('Espada de esmeralda', 30, 'Os aldeões adoram', 2),
