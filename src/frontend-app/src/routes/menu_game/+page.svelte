@@ -261,7 +261,7 @@
       class="text-primary-600 mt-6 mb-6 text-4xl hover:text-secondary-500" 
       onclick={listaPersonagem} 
       onmouseenter={() => carregarS = "> Carregar save <"} 
-      onmouseleave={() => carregarS = "Carregar Save"}>
+      onmouseleave={() => carregarS = "Carregar save"}>
         {carregarS}
     </A><br>
     <A 
