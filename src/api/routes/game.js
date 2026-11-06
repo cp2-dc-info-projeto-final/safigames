@@ -34,7 +34,7 @@ router.get('/personagem', verifyToken, async function(req, res) {
 router.get('/personagem/:id', verifyToken, async function(req, res) {
   try {
     const { id } = req.params;
-    const result = await pool.query('SELECT * FROM personagem p INNER JOIN arma a ON p.id_arma = a.id WHERE p.id = $1 ORDER BY p.id', [id]);
+    const result = await pool.query('SELECT p.id AS id_personagem, p.nome AS nome_personagem, p.vida, p.defesa, p.xp, p.stamina AS stamina, p.classe, p.armadura, p.dinheiro, p.id_usuario, p.id_arma, p.id_cena, p.id_episodio, a.nome AS nome_arma, a.dano AS dano_arma, a.descricao, a.stamina AS stamina_arma FROM personagem p INNER JOIN arma a ON p.id_arma = a.id WHERE p.id = $1 ORDER BY p.id', [id]);
     return sendSuccess(res, 200, null, result.rows);
   } catch (error) {
     console.error('Erro ao buscar usuários:', error);

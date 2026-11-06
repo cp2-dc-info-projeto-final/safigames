@@ -12,6 +12,10 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
 
+
+  // Função de espera para atrasar o turno do inimigo
+  const esperar = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
   //Arrays
   let cenas: Cena[] = []
 
@@ -19,6 +23,15 @@
   let exibeMenu: boolean = false;
   let exibeCena: boolean = true;
   let indiceCena: number = 0;
+  let turnoJogador: boolean = true;
+  let jogadorMorto: boolean = false;
+
+  // variavel de controle para verificar se é a primeira vez que o jogador tá atacando
+  let verificaPrimeiroAtaque: boolean = true;
+
+  // "backup" da stamina para restaurar depois do inimigo atacar
+  let staminaBackup: number = 0;
+
 
   let user: User;
 
@@ -140,7 +153,7 @@
   }
 
   function proximaCena() {
-        if (indiceCena < progresso.length - 1 && cenaAtual.tipo == "Diálogo") {
+        if (indiceCena < progresso.length - 1 && cenaAtual.tipo == "Diálogo" || (inimigoAtual && inimigoAtual.vida == 0)) {
             indiceCena++;
             console.log(indiceCena)
         } else {
@@ -158,17 +171,42 @@
     }
 
     console.log("Valor bruto da vida:", inimigoAtual.vida, typeof inimigoAtual.vida);
-    console.log("Valor bruto do dano:", personagem?.dano, typeof personagem?.dano);
+    console.log("Valor bruto do dano:", personagem?.dano_arma, typeof personagem?.dano_arma);
 
     const vidaAtual = Number(inimigoAtual.vida)
-    const dano = Number(personagem.dano) || 0;
+    const dano = Number(personagem.dano_arma) || 0;
+    const staminaPersonagem = Number(personagem.stamina);
+    const staminaArma = Number(personagem.stamina_arma);
 
-    inimigoAtual.vida = vidaAtual - dano;
-    console.log(`Você deu ${personagem.dano} pontos de dano e a vida do inimigo é ${inimigoAtual.vida}`)
+    
+
+    if (verificaPrimeiroAtaque){
+      staminaBackup = staminaPersonagem;
+      verificaPrimeiroAtaque = false;
+    }
+
+    if (staminaPersonagem >= staminaArma){
+      if (inimigoAtual.vida == 0) return;
+      personagem.stamina = staminaPersonagem - staminaArma;
+      inimigoAtual.vida = vidaAtual - dano;
+      console.log(`Você deu ${personagem.dano_arma} pontos de dano e a vida do inimigo agora é ${inimigoAtual.vida}. Sua stamina agora é ${personagem.stamina}`)
+    }
   }
   
-  function InimigoAtaque(inimigo: any, personagem: any){
-    personagem.vida = personagem.vida - inimigo.dano
+  function InimigoAtaque(){
+
+    const vidaAtual = Number(personagem.vida)
+    const dano = Number(inimigoAtual.dano) || 0;
+
+    personagem.vida = vidaAtual - dano;
+    personagem.stamina = staminaBackup;
+    
+    if (personagem.vida <= 0){
+      jogadorMorto = true;
+    }
+
+    console.log(`Você levou ${inimigoAtual.dano} pontos de dano e sua vida agora é ${personagem.vida}`)
+    turnoJogador = true;
   }
 
   function MostrarInventário(){
@@ -183,8 +221,14 @@
 
   }
 
-  function EncerrarTurno(){
+  async function EncerrarTurno(){
+    if (personagem){
+      turnoJogador = false;
 
+      await esperar(3000)
+
+      InimigoAtaque()
+    }
   }
 
 
@@ -259,6 +303,7 @@
         <div class="text-xg text-primary-50">
           <p>Vida: {personagem.vida}</p>
           <p>Defesa: {personagem.defesa}</p>
+          <p>Stamina: {personagem.stamina}</p>
           <p>Xp: {personagem.xp}</p>
           <p>Classe: {personagem.classe}</p>
           <p>Dinheiro: {personagem.dinheiro}</p>
@@ -312,6 +357,7 @@
         <div class="text-xg text-primary-50">
           <p>Vida: {personagem.vida}</p>
           <p>Defesa: {personagem.defesa}</p>
+          <p>Stamina: {personagem.stamina}</p>
           <p>Xp: {personagem.xp}</p>
           <p>Classe: {personagem.classe}</p>
           <p>Dinheiro: {personagem.dinheiro}</p>
@@ -334,18 +380,26 @@
           {/if}
         </div>
 
+        {#if turnoJogador && inimigoAtual && inimigoAtual.vida > 0}
         <!-- Botões de Ação do Combate -->
         <div class="py-2 absolute bottom-25 left-0 right-0 flex justify-center gap-4">
-          <button type="button" on:click={PersonagemAtaque(personagem)} class="px-12 py-6 text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition">
+          <button type="button" on:click={() => {PersonagemAtaque(personagem)}} class="px-12 py-6 text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition">
             Atacar
           </button>
           <button type="button" class="px-6 py-2 text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition">
             Inventário
           </button>
-          <button type="button" class="px-6 py-2 text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition">
+          <button type="button" on:click={() => {EncerrarTurno()}} class="px-6 py-2 text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition">
             Encerrar turno
           </button>
         </div>
+        {:else if inimigoAtual && inimigoAtual.vida <= 0}
+        <div class="py-2 absolute bottom-25 left-0 right-0 flex justify-center gap-4">
+          <button type="button" on:click={() => {proximaCena()}} class="px-12 py-6 text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition">
+            Próxima Cena 
+          </button>
+        </div>
+        {/if}
         
       </div>
 
@@ -360,6 +414,24 @@
           <p>Defesa: {inimigoAtual ? inimigoAtual.defesa : 'Inimigo Indefinido'}</p>
         </div>
       </div>
+    </div>
+  </div>
+{/if}
+
+{#if jogadorMorto}
+<div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+  <!-- Caixa Retangular Centralizada -->
+  <div class="w-96 border-2 border-primary-500 bg-primary-900 p-6 flex flex-col items-center gap-4 shadow-2xl rounded-none">
+    <h2 class="text-3xl font-bold tracking-widest border-b-2 border-primary-500 text-primary-500 pb-2 w-full text-center">
+      VOCÊ MORREU!!
+    </h2>
+    <!-- Opções do Menu -->
+      <button
+        type="button"
+        class="w-full py-2 border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white font-semibold transition"
+        on:click={() => goto('/menu_game')}>
+          Sair para o Menu
+      </button>
     </div>
   </div>
 {/if}
