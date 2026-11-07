@@ -31,6 +31,7 @@
 
   // "backup" da stamina para restaurar depois do inimigo atacar
   let staminaBackup: number = 0;
+  let staminaPersonagem: number = 0;
 
 
   let user: User;
@@ -90,6 +91,7 @@
 
         if (Array.isArray(personagens) && personagens.length > 0) {
           personagem = { ...personagens[0] };
+          staminaPersonagem = Number(personagem.stamina);
           idEpisodio = personagem.id_episodio;
           console.log(personagem);
         } else {
@@ -175,7 +177,7 @@
 
     const vidaAtual = Number(inimigoAtual.vida)
     const dano = Number(personagem.dano_arma) || 0;
-    const staminaPersonagem = Number(personagem.stamina);
+    
     const staminaArma = Number(personagem.stamina_arma);
 
     
@@ -225,7 +227,12 @@
     if (personagem){
       turnoJogador = false;
 
-      await esperar(3000)
+      if (verificaPrimeiroAtaque){
+      staminaBackup = staminaPersonagem;
+      verificaPrimeiroAtaque = false;
+    }
+
+      await esperar(2500)
 
       InimigoAtaque()
     }
