@@ -256,14 +256,15 @@
   <title>{cenaAtual?.episodio_titulo}</title>
 </svelte:head>
 
-<div class="text-center fixed w-[85%] top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded">
-  <Heading tag="h1" class="text-primary-500 mt-1">{cenaAtual ? cenaAtual.episodio_titulo : "Erro: Episódio indefinido"}</Heading>
+<div class="text-center fixed w-11/12 max-w-[85%] top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded">
+  <Heading tag="h1" class="text-primary-500 mb-2 md:mt-1 text-2xl sm:text-3xl md:text-5xl">{cenaAtual ? cenaAtual.episodio_titulo : "Erro: Episódio indefinido"}</Heading>
 </div>
 
 {#if exibeMenu}
-  <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+  <!-- Menu de pause para telas médias/grandes e pequenas -->
+  <div class="flex fixed inset-0 bg-black/70 backdrop-blur-sm items-center justify-center z-50">
     <!-- Caixa Retangular Centralizada -->
-    <div class="w-96 border-2 border-primary-500 bg-primary-900 p-6 flex flex-col items-center gap-4 shadow-2xl rounded-none">
+    <div class="w-11/12 max-w-sm md:w-96 border-2 border-primary-500 bg-primary-900 p-6 flex flex-col items-center gap-4 shadow-2xl rounded-none">
       <h2 class="text-3xl font-bold tracking-widest border-b-2 border-primary-500 text-primary-500 pb-2 w-full text-center">
         PAUSA
       </h2>
@@ -286,27 +287,95 @@
       </div>
     </div>
   </div>
+
 {/if}
 
 <!-- Container cena de diálogo -->
 {#if exibeCena && cenaAtual && cenaAtual.tipo == "Diálogo"}
-  <div class="min-h-screen fixed inset-0 bg-primary-900 text-primary-500 p-4 flex flex-col gap-4">
+  <div class="min-h-screen fixed inset-0 bg-primary-900 text-primary-500 pt-10 md:pt-4 flex flex-col gap-4">
     <!-- Topo: Menu circular à esquerda -->
-    <div class="flex items-center">
+    <div class="flex items-center relative z-50">
       <button
         type="button"
-        class="w-16 h-16 rounded-full cursor-pointer border-2 border-primary-300 flex items-center justify-center font-bold hover:bg-primary-800 transition"
+        class="w-12 h-12 md:w-16 md:h-16 rounded-full cursor-pointer border-2 border-primary-300 flex items-center justify-center font-bold bg-primary-900 hover:bg-primary-800 transition shadow-lg"
         on:click={exibicaoMenu}>
-          <PauseSolid class="shrink-0 h-9 w-9 text-primary-50" />
+          <PauseSolid class="shrink-0 w-8 h-8 md:w-12 md:h-12 text-primary-50" />
       </button>
     </div>
 
     <!-- Corpo Principal: Grid/Flex de duas colunas -->
-    <div class="flex flex-1 gap-4">
+    <div class="flex flex-col md:flex-row flex-1 gap-4 pb-28 md:pb-0">
       <!-- Coluna da Esquerda: Status do Jogador -->
-      <div class="w-1/4 border-2 border-primary-300 p-4 rounded-none flex flex-col">
-        <h2 class="text-5xl font-bold mb-2 text-primary-500">status:</h2>
-        <!-- Conteúdo do status vai aqui -->
+      <div class="hidden md:flex w-1/4 border-2 border-primary-300 p-4 rounded-none flex-col">
+        <h2 class="text-3xl lg:text-5xl font-bold mb-2 text-primary-500">Status:</h2>
+        <!-- Conteúdo do status -->
+        <div class="text-sm lg:text-base text-primary-50 flex flex-col gap-1">
+          <p>Vida: {personagem.vida}</p>
+          <p>Defesa: {personagem.defesa}</p>
+          <p>Stamina: {personagem.stamina}</p>
+          <p>Xp: {personagem.xp}</p>
+          <p>Classe: {personagem.classe}</p>
+          <p>Dinheiro: {personagem.dinheiro}</p>
+        </div>
+      </div>
+
+      <!-- Status do Jogador EXCLUSIVO para telas pequenas (Canto inferior esquerdo) -->
+      <div class="flex md:hidden fixed bottom-4 left-4 z-40 w-36 backdrop-blur-sm border-2 border-primary-300 p-2 shadow-xl flex-col">
+        <h2 class="text-sm font-bold text-primary-500 pb-1 mb-1">Status</h2>
+        <div class="text-xs text-primary-50 flex flex-col gap-0.5">
+          <p>Vida: {personagem.vida}</p>
+          <p>Defesa: {personagem.defesa}</p>
+          <p>Stamina: {personagem.stamina}</p>
+          <p>Xp: {personagem.xp}</p>
+          <p>Classe: {personagem.classe}</p>
+          <p>Dinheiro: {personagem.dinheiro}</p>
+        </div>
+      </div>
+
+      <!-- Coluna do meio: Ilustração + Diálogo -->
+      <div class="w-full md:w-3/4 flex flex-col gap-4">
+        <!-- Bloco Superior: Ilustração -->
+        <div class="h-24 md:h-40 border-2 border-primary-300 p-4 flex items-center justify-center">
+          <span class="text-xl md:text-2xl font-semibold">*ilustração*</span>
+        </div>
+
+        <!-- Bloco Inferior: Diálogo -->
+        <div class="border-2 border-primary-300 p-4 md:p-6 flex-1">
+          <h3 class="text-2xl md:text-3xl font-bold mb-4">Diálogo</h3>
+          <p class="text-xs md:text-base text-primary-50 whitespace-pre-line">
+            {cenaAtual.dialogo}
+          </p>
+        </div>
+
+        <!-- Indicador para pressionar Enter -->
+        <div class="mb-2 text-right">
+          <span class="text-lg md:text-2xl text-primary-500 animate-pulse italic ">
+            Pressione enter para continuar...
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Container cena de combate -->
+{:else if exibeCena && cenaAtual && cenaAtual.tipo == "Combate"}
+  <div class="min-h-screen fixed inset-0 bg-primary-900 text-primary-500 pt-10 md:pt-4 flex flex-col gap-4 overflow-y-auto">
+    <!-- Topo: Menu circular à esquerda -->
+    <div class="flex items-center">
+      <button
+        type="button"
+        class="w-12 h-12 md:w-16 md:h-16 rounded-full cursor-pointer border-2 border-primary-300 flex items-center justify-center font-bold bg-primary-900 hover:bg-primary-800 transition shadow-lg"
+        on:click={exibicaoMenu}>
+          <PauseSolid class="shrink-0 w-8 h-8 md:w-12 md:h-12 text-primary-50" />
+      </button>
+    </div>
+
+    <!-- Corpo Principal: Grid/Flex de duas colunas -->
+    <div class="flex flex-col md:flex-row flex-1 gap-4 pb-28 md:pb-0">
+      <!-- Coluna da Esquerda: Status do Jogador -->
+      <div class="hidden md:flex w-1/4 border-2 border-primary-300 p-4 rounded-none flex-col">
+        <h2 class="text-5xl font-bold mb-2 text-primary-500">Status:</h2>
+        <!-- Conteúdo do status -->
         <div class="text-xg text-primary-50">
           <p>Vida: {personagem.vida}</p>
           <p>Defesa: {personagem.defesa}</p>
@@ -317,51 +386,10 @@
         </div>
       </div>
 
-      <!-- Coluna da Direita: Ilustração + Diálogo -->
-      <div class="w-3/4 flex flex-col gap-4">
-        <!-- Bloco Superior: Ilustração -->
-        <div class="h-40 border-2 border-primary-300 p-4 flex items-center justify-center">
-          <span class="text-2xl font-semibold">*ilustração*</span>
-        </div>
-
-        <!-- Bloco Inferior: Diálogo -->
-        <div class="flex-5x1 border-2 border-primary-300 p-6 bg-primary-800/50">
-          <h3 class="text-3xl font-bold mb-4">Diálogo</h3>
-          <p class="text-primary-50 whitespace-pre-line">
-            {cenaAtual.dialogo}
-          </p>
-        </div>
-
-        <!-- Indicador para pressionar Enter -->
-        <div class="mt-6 text-right">
-          <span class="text-lg text-primary-500 animate-pulse italic">
-            Pressione enter para continuar...
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-<!-- Container cena de combate -->
-{:else if exibeCena && cenaAtual && cenaAtual.tipo == "Combate"}
-  <div class="min-h-screen fixed inset-0 bg-primary-900 text-primary-500 p-4 flex flex-col gap-4">
-    <!-- Topo: Menu circular à esquerda -->
-    <div class="flex items-center">
-      <button
-        type="button"
-        class="w-16 h-16 rounded-full border-2 border-primary-300 flex items-center justify-center font-bold hover:bg-primary-800 transition"
-        on:click={exibicaoMenu}>
-          <PauseSolid class="shrink-0 h-9 w-9 text-primary-50" />
-      </button>
-    </div>
-
-    <!-- Corpo Principal: Grid/Flex de duas colunas -->
-    <div class="flex flex-1 gap-4">
-      <!-- Coluna da Esquerda: Status do Jogador -->
-      <div class="w-1/4 border-2 border-primary-300 p-4 rounded-none flex flex-col">
-        <h2 class="text-5xl font-bold mb-2 text-primary-500">status:</h2>
-        <!-- Conteúdo do status vai aqui -->
-        <div class="text-xg text-primary-50">
+      <!-- Status do Jogador EXCLUSIVO para telas pequenas (Canto inferior esquerdo) -->
+      <div class="flex md:hidden fixed bottom-4 left-4 z-40 w-36 backdrop-blur-sm border-2 border-primary-300 p-2 shadow-xl flex-col">
+        <h2 class="text-sm font-bold text-primary-500 pb-1 mb-1">Status</h2>
+        <div class="text-xs text-primary-50 flex flex-col gap-0.5">
           <p>Vida: {personagem.vida}</p>
           <p>Defesa: {personagem.defesa}</p>
           <p>Stamina: {personagem.stamina}</p>
@@ -372,16 +400,16 @@
       </div>
 
       <!-- Coluna do Meio: Ilustração + Log de Combate -->
-      <div class="w-3/4 flex flex-col gap-4 relative pb-16">
+      <div class="w-full md:w-3/4 flex flex-col gap-4 relative pb-24 md:pb-28">
         <!-- Bloco Superior: Ilustração -->
-        <div class="h-40 border-2 border-primary-300 p-4 flex items-center justify-center">
-          <span class="text-2xl font-semibold">*ilustração*</span>
+        <div class="h-24 md:h-40 border-2 border-primary-300 p-4 flex items-center justify-center">
+          <span class="text-xl md:text-2xl font-semibold">*ilustração*</span>
         </div>
 
         <!-- Bloco Inferior: Log de combate -->
-        <div class="flex-5x1 border-2 border-primary-300 p-6 bg-primary-800/50">
+        <div class="border-2 border-primary-300 p-4 md:p-6 flex-1">
           {#if inimigoAtual?.vida == 0}
-          <p class="text-primary-50 whitespace-pre-line">
+          <p class="text-primary-50 whitespace-pre-line text-xs md:text-base">
             Você derrotou {inimigoAtual.nome}!
           </p>
           {/if}
@@ -389,20 +417,20 @@
 
         {#if turnoJogador && inimigoAtual && inimigoAtual.vida > 0}
         <!-- Botões de Ação do Combate -->
-        <div class="py-2 absolute bottom-25 left-0 right-0 flex justify-center gap-4">
-          <button type="button" on:click={() => {PersonagemAtaque(personagem)}} class="px-12 py-6 text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition">
+        <div class="absolute bottom-1 md:bottom-5 left-0 right-0 flex flex-wrap justify-center gap-2 md:gap-4 px-2">
+          <button type="button" on:click={() => {PersonagemAtaque(personagem)}} class="px-4 md:px-12 py-2 md:py-4 text-sm md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 shadow-md">
             Atacar
           </button>
-          <button type="button" class="px-6 py-2 text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition">
+          <button type="button" class="px-4 md:px-12 py-2 md:py-4 text-sm md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 shadow-md">
             Inventário
           </button>
-          <button type="button" on:click={() => {EncerrarTurno()}} class="px-6 py-2 text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition">
+          <button type="button" on:click={() => {EncerrarTurno()}} class="px-4 md:px-12 py-2 md:py-4 text-sm md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 shadow-md">
             Encerrar turno
           </button>
         </div>
         {:else if inimigoAtual && inimigoAtual.vida <= 0}
-        <div class="py-2 absolute bottom-25 left-0 right-0 flex justify-center gap-4">
-          <button type="button" on:click={() => {proximaCena()}} class="px-12 py-6 text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition">
+        <div class="absolute bottom-2 left-0 right-0 flex justify-center px-2">
+          <button type="button" on:click={() => {proximaCena()}} class="px-8 py-3 md:px-12 md:py-5 text-base md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 shadow-md">
             Próxima Cena 
           </button>
         </div>
@@ -411,18 +439,31 @@
       </div>
 
       <!-- Coluna da Direita: Status do inimigo -->
-      <div class="w-1/4 border-2 border-primary-300 p-4 rounded-none flex flex-col">
-        <h2 class="text-5xl font-bold mb-2 text-primary-500">status do inimigo:</h2>
+      <div class="hidden md:flex w-1/4 border-2 border-primary-300 p-4 rounded-none flex-col">
+        <h2 class="text-3xl lg:text-5xl font-bold mb-2 text-primary-500">Status do inimigo:</h2>
         <!-- Conteúdo do status vai aqui -->
-        <div class="text-xg text-primary-50">
+        <div class="text-base text-primary-50">
           <p>Nome: {inimigoAtual ? inimigoAtual.nome : 'Inimigo Indefinido'}</p>
           <p>Descrição: {inimigoAtual ? inimigoAtual.descricao : 'Inimigo Indefinido'}</p>
           <p>Vida: {inimigoAtual ? inimigoAtual.vida : 'Inimigo Indefinido'}</p>
           <p>Defesa: {inimigoAtual ? inimigoAtual.defesa : 'Inimigo Indefinido'}</p>
         </div>
       </div>
+
+      <!-- Status do Inimigo EXCLUSIVO para telas oequenas (Canto Inferior Direito) -->
+      <div class="flex md:hidden fixed bottom-4 right-4 z-40 w-50 bg-primary-900/90 backdrop-blur-sm border-2 border-primary-300 p-2 shadow-xl flex-col">
+        <h2 class="text-xs font-bold text-primary-500 border-b border-primary-500/50 pb-1 mb-1">Inimigo</h2>
+        <div class="text-[10px] text-primary-50 flex flex-col gap-0.5">
+          <p>Nome: {inimigoAtual ? inimigoAtual.nome : '?'}</p>
+          <p>Descrição: {inimigoAtual ? inimigoAtual.descricao : 'Inimigo Indefinido'}</p>
+          <p>Vida: {inimigoAtual ? inimigoAtual.vida : '?'}</p>
+          <p>Defesa: {inimigoAtual ? inimigoAtual.defesa : '?'}</p>
+        </div>
+      </div>
+
     </div>
   </div>
+
 {/if}
 
 {#if jogadorMorto}

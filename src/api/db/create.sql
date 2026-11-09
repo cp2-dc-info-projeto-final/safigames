@@ -184,6 +184,7 @@ Narrador: Você vê um túnel escuro, com as paredes de tijolos caindo aos peda�
 ('Rato de óculos e barbicha', 'Rato de óculos e barbicha: Entrosa não mano!
 
 Você: O RATO TA FALANDO?!!?!?!
+
 Narrador: O rato se prepara e pula em você.', 'Diálogo', 1, NULL, NULL),
 
 ('', '', 'Combate', 1, 1, NULL),
