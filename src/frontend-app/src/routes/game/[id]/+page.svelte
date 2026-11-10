@@ -249,7 +249,9 @@
 <svelte:window on:keydown={(e) => {
   if (e.key === 'Enter') {
       proximaCena();
-  }
+  }}} 
+  on:click={() => {
+  proximaCena();
 }} />
 
 <svelte:head>
@@ -292,74 +294,7 @@
 
 <!-- Container cena de diálogo -->
 {#if exibeCena && cenaAtual && cenaAtual.tipo == "Diálogo"}
-  <div class="min-h-screen fixed inset-0 bg-primary-900 text-primary-500 pt-10 md:pt-4 flex flex-col gap-4">
-    <!-- Topo: Menu circular à esquerda -->
-    <div class="flex items-center relative z-50">
-      <button
-        type="button"
-        class="w-12 h-12 md:w-16 md:h-16 rounded-full cursor-pointer border-2 border-primary-300 flex items-center justify-center font-bold bg-primary-900 hover:bg-primary-800 transition shadow-lg"
-        on:click={exibicaoMenu}>
-          <PauseSolid class="shrink-0 w-8 h-8 md:w-12 md:h-12 text-primary-50" />
-      </button>
-    </div>
-
-    <!-- Corpo Principal: Grid/Flex de duas colunas -->
-    <div class="flex flex-col md:flex-row flex-1 gap-4 pb-28 md:pb-0">
-      <!-- Coluna da Esquerda: Status do Jogador -->
-      <div class="hidden md:flex w-1/4 border-2 border-primary-300 p-4 rounded-none flex-col">
-        <h2 class="text-3xl lg:text-5xl font-bold mb-2 text-primary-500">Status:</h2>
-        <!-- Conteúdo do status -->
-        <div class="text-sm lg:text-base text-primary-50 flex flex-col gap-1">
-          <p>Vida: {personagem.vida}</p>
-          <p>Defesa: {personagem.defesa}</p>
-          <p>Stamina: {personagem.stamina}</p>
-          <p>Xp: {personagem.xp}</p>
-          <p>Classe: {personagem.classe}</p>
-          <p>Dinheiro: {personagem.dinheiro}</p>
-        </div>
-      </div>
-
-      <!-- Status do Jogador EXCLUSIVO para telas pequenas (Canto inferior esquerdo) -->
-      <div class="flex md:hidden fixed bottom-4 left-4 z-40 w-36 backdrop-blur-sm border-2 border-primary-300 p-2 shadow-xl flex-col">
-        <h2 class="text-sm font-bold text-primary-500 pb-1 mb-1">Status</h2>
-        <div class="text-xs text-primary-50 flex flex-col gap-0.5">
-          <p>Vida: {personagem.vida}</p>
-          <p>Defesa: {personagem.defesa}</p>
-          <p>Stamina: {personagem.stamina}</p>
-          <p>Xp: {personagem.xp}</p>
-          <p>Classe: {personagem.classe}</p>
-          <p>Dinheiro: {personagem.dinheiro}</p>
-        </div>
-      </div>
-
-      <!-- Coluna do meio: Ilustração + Diálogo -->
-      <div class="w-full md:w-3/4 flex flex-col gap-4">
-        <!-- Bloco Superior: Ilustração -->
-        <div class="h-24 md:h-40 border-2 border-primary-300 p-4 flex items-center justify-center">
-          <span class="text-xl md:text-2xl font-semibold">*ilustração*</span>
-        </div>
-
-        <!-- Bloco Inferior: Diálogo -->
-        <div class="border-2 border-primary-300 p-4 md:p-6 flex-1">
-          <h3 class="text-2xl md:text-3xl font-bold mb-4">Diálogo</h3>
-          <p class="text-xs md:text-base text-primary-50 whitespace-pre-line">
-            {cenaAtual.dialogo}
-          </p>
-        </div>
-
-        <!-- Indicador para pressionar Enter -->
-        <div class="mb-2 text-right">
-          <span class="text-lg md:text-2xl text-primary-500 animate-pulse italic ">
-            Pressione enter para continuar...
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-<!-- Container cena de combate -->
-{:else if exibeCena && cenaAtual && cenaAtual.tipo == "Combate"}
-  <div class="min-h-screen fixed inset-0 bg-primary-900 text-primary-500 pt-10 md:pt-4 flex flex-col gap-4 overflow-y-auto">
+  <div class="min-h-screen fixed inset-0 bg-primary-900 text-primary-500 px-2 md:px-4 py-3 pt-10 md:pt-4 flex flex-col gap-4">
     <!-- Topo: Menu circular à esquerda -->
     <div class="flex items-center">
       <button
@@ -386,10 +321,71 @@
         </div>
       </div>
 
-      <!-- Status do Jogador EXCLUSIVO para telas pequenas (Canto inferior esquerdo) -->
-      <div class="flex md:hidden fixed bottom-4 left-4 z-40 w-36 backdrop-blur-sm border-2 border-primary-300 p-2 shadow-xl flex-col">
-        <h2 class="text-sm font-bold text-primary-500 pb-1 mb-1">Status</h2>
-        <div class="text-xs text-primary-50 flex flex-col gap-0.5">
+      <!-- Coluna do Meio: Ilustração + Diálogo -->
+      <div class="w-full md:w-3/4 flex flex-col gap-4 relative pb-24 md:pb-28">
+        <!-- Bloco Superior: Ilustração -->
+        <div class="h-24 md:h-40 border-2 border-primary-300 p-4 flex items-center justify-center">
+          <span class="text-xl md:text-2xl font-semibold">*ilustração*</span>
+        </div>
+
+      <!-- Status do Jogador EXCLUSIVO para telas pequenas (Logo abaixo da ilustração) -->
+      <div class="flex md:hidden w-full border-2 border-primary-300 bg-primary-900 p-3 flex-col shadow-md">
+        <h2 class="text-2xl font-bold text-primary-500 pb-1 mb-1">Status</h2>
+        <div class="text-xs text-primary-50 flex-col grid grid-cols-2 gap-x-2 gap-y-0.5">
+          <p>Vida: {personagem.vida}</p>
+          <p>Defesa: {personagem.defesa}</p>
+          <p>Stamina: {personagem.stamina}</p>
+          <p>Xp: {personagem.xp}</p>
+          <p>Classe: {personagem.classe}</p>
+          <p>Dinheiro: {personagem.dinheiro}</p>
+        </div>
+      </div>
+
+        <!-- Bloco Inferior: Diálogo -->
+        <div class="border-2 border-primary-300 p-4 md:p-6 flex-1">
+          <h3 class="text-2xl md:text-5xl font-bold mb-2 md:mb-4">Diálogo</h3>
+          <p class="text-xs md:text-base text-primary-50 whitespace-pre-line leading-relaxed">
+            {cenaAtual.dialogo}
+          </p>
+        </div>
+
+        <!-- Indicador para pressionar Enter (Telas Médias/Grandes) -->
+        <div class="mb-2 text-right">
+          <span class="hidden md:block text-2xl text-primary-500 animate-pulse italic ">
+            Pressione enter para continuar...
+          </span>
+        </div>
+
+        <!-- Indicador para pressionar na tela (Telas pequenas) -->
+        <div class="-mt-7 mb-2 text-right">
+          <span class="block md:hidden text-xl text-primary-500 animate-pulse italic ">
+            Clique na tela para continuar...
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Container cena de combate -->
+{:else if exibeCena && cenaAtual && cenaAtual.tipo == "Combate"}
+  <div class="min-h-screen fixed inset-0 bg-primary-900 text-primary-500 px-2 md:px-4 py-3 pt-10 md:pt-4 flex flex-col gap-4">
+    <!-- Topo: Menu circular à esquerda -->
+    <div class="flex items-center">
+      <button
+        type="button"
+        class="w-12 h-12 md:w-16 md:h-16 rounded-full cursor-pointer border-2 border-primary-300 flex items-center justify-center font-bold bg-primary-900 hover:bg-primary-800 transition shadow-lg"
+        on:click={exibicaoMenu}>
+          <PauseSolid class="shrink-0 w-8 h-8 md:w-12 md:h-12 text-primary-50" />
+      </button>
+    </div>
+
+    <!-- Corpo Principal: Grid/Flex de duas colunas -->
+    <div class="flex flex-col md:flex-row flex-1 gap-4 pb-28 md:pb-0">
+      <!-- Coluna da Esquerda: Status do Jogador -->
+      <div class="hidden md:flex w-1/4 border-2 border-primary-300 p-4 rounded-none flex-col">
+        <h2 class="text-5xl font-bold mb-2 text-primary-500">Status:</h2>
+        <!-- Conteúdo do status -->
+        <div class="text-xg text-primary-50">
           <p>Vida: {personagem.vida}</p>
           <p>Defesa: {personagem.defesa}</p>
           <p>Stamina: {personagem.stamina}</p>
@@ -405,6 +401,30 @@
         <div class="h-24 md:h-40 border-2 border-primary-300 p-4 flex items-center justify-center">
           <span class="text-xl md:text-2xl font-semibold">*ilustração*</span>
         </div>
+
+      <!-- Status do Jogador EXCLUSIVO para telas pequenas (Logo abaixo da ilustração) -->
+      <div class="flex md:hidden w-full border-2 border-primary-300 bg-primary-900 p-3 flex-col shadow-md">
+        <h2 class="text-2xl font-bold text-primary-500 pb-1 mb-1">Status</h2>
+        <div class="text-xs text-primary-50 flex-col grid grid-cols-2 gap-x-2 gap-y-0.5">
+          <p>Vida: {personagem.vida}</p>
+          <p>Defesa: {personagem.defesa}</p>
+          <p>Stamina: {personagem.stamina}</p>
+          <p>Xp: {personagem.xp}</p>
+          <p>Classe: {personagem.classe}</p>
+          <p>Dinheiro: {personagem.dinheiro}</p>
+        </div>
+      </div>
+
+            <!-- Status do Inimigo EXCLUSIVO para telas oequenas (Canto Inferior Direito) -->
+      <div class="flex md:hidden w-full border-2 border-primary-300 bg-primary-900 p-3 flex-col shadow-md">
+        <h2 class="text-2xl font-bold text-primary-500 pb-1 mb-1">Inimigo</h2>
+        <div class="text-xs text-primary-50 flex-col grid gap-x-2 gap-y-0.5">
+          <p>Nome: {inimigoAtual ? inimigoAtual.nome : '?'}</p>
+          <p>Descrição: {inimigoAtual ? inimigoAtual.descricao : 'Inimigo Indefinido'}</p>
+          <p>Vida: {inimigoAtual ? inimigoAtual.vida : '?'}</p>
+          <p>Defesa: {inimigoAtual ? inimigoAtual.defesa : '?'}</p>
+        </div>
+      </div>
 
         <!-- Bloco Inferior: Log de combate -->
         <div class="border-2 border-primary-300 p-4 md:p-6 flex-1">
@@ -449,18 +469,6 @@
           <p>Defesa: {inimigoAtual ? inimigoAtual.defesa : 'Inimigo Indefinido'}</p>
         </div>
       </div>
-
-      <!-- Status do Inimigo EXCLUSIVO para telas oequenas (Canto Inferior Direito) -->
-      <div class="flex md:hidden fixed bottom-4 right-4 z-40 w-50 bg-primary-900/90 backdrop-blur-sm border-2 border-primary-300 p-2 shadow-xl flex-col">
-        <h2 class="text-xs font-bold text-primary-500 border-b border-primary-500/50 pb-1 mb-1">Inimigo</h2>
-        <div class="text-[10px] text-primary-50 flex flex-col gap-0.5">
-          <p>Nome: {inimigoAtual ? inimigoAtual.nome : '?'}</p>
-          <p>Descrição: {inimigoAtual ? inimigoAtual.descricao : 'Inimigo Indefinido'}</p>
-          <p>Vida: {inimigoAtual ? inimigoAtual.vida : '?'}</p>
-          <p>Defesa: {inimigoAtual ? inimigoAtual.defesa : '?'}</p>
-        </div>
-      </div>
-
     </div>
   </div>
 
