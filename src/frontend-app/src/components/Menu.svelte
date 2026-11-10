@@ -83,20 +83,35 @@
 
 </script>
 
+<style>
+
+  /* Força qualquer ul gerado dentro da navbar a assumir o fundo escuro do seu tema */
+  :global(nav ul) {
+    background-color: rgb(var(--color-primary-900, 15 23 42)) !important; /* Se a variável falhar, substitua pela cor exata do seu bg-primary-900, ex: #0b0f19 */
+  }
+</style>
+
 <div class="relative px-8">
   <Navbar class="fixed start-0 top-0 z-20 w-full bg-primary-900 px-2 py-2.5 sm:px-4">
-    <NavBrand href="/">
-      <img src="/images/rato-sem-fundo.png" class="me-6 h-9 sm:h-12" alt="Logo aleatória" />
-      <Heading 
-        class={
-          ['self-center text-2xl font-semibold whitespace-nowrap', !isAdmin ? 'text-primary-500' : 'text-secondary-500']
-          .join(' ')
-        }>
-        Projeto Safigames
-      </Heading>
-    </NavBrand>
-    <NavHamburger class={[!isAdmin ? 'bg-primary-600' : 'bg-secondary-600'].join(' ')}/>
-    <NavUl>
+    <div class="flex items-center justify-between w-full md:w-auto">
+      <!-- Esquerda no Mobile: Hambúrguer + Logo lado a lado -->
+      <div class="flex items-center gap-2">
+        <NavHamburger class={[!isAdmin ? 'bg-primary-600' : 'bg-secondary-600'].join(' ')}/>
+
+        <NavBrand href="/">
+          <img src="/images/rato-sem-fundo.png" class="me-2 h-9 sm:h-12" alt="Logo aleatória" />
+          <Heading 
+            class={
+              ['self-center text-xl md:text-2xl font-semibold whitespace-nowrap', !isAdmin ? 'text-primary-500' : 'text-secondary-500']
+              .join(' ')
+            }>
+            Projeto Safigames
+          </Heading>
+        </NavBrand>
+      </div>
+    </div>
+    
+    <NavUl class="bg-primary-900">
       <NavLi 
         href="/" 
         nonActiveClass={
