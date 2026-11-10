@@ -11,7 +11,8 @@
   import api from '$lib/api'; // API backend
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-
+  import Typewriter from '../../../components/TypeWriter.svelte';
+	import TypeWriter from "../../../components/TypeWriter.svelte";
 
   // Função de espera para atrasar o turno do inimigo
   const esperar = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -349,8 +350,7 @@
           <p class="text-xs md:text-base text-primary-50 whitespace-pre-line leading-relaxed">
             {cenaAtual.dialogo}
           </p>
-        </div>
-
+        </div>  
         <!-- Indicador para pressionar Enter (Telas Médias/Grandes) -->
         <div class="mb-2 text-right">
           <span class="hidden md:block text-2xl text-primary-500 animate-pulse italic ">
@@ -457,7 +457,6 @@
           </button>
         </div>
         {/if}
-        
       </div>
 
       <!-- Coluna da Direita: Status do inimigo -->
