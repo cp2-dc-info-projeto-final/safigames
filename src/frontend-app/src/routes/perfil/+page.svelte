@@ -105,22 +105,22 @@
 </script>
 <Menu />
 <div class="text-center">
-    <Heading tag="h1" class={[!isAdmin ? 'text-primary-200' : 'text-secondary-200']}>
+    <Heading tag="h1" class={['text-4xl md:text-5xl', !isAdmin ? 'text-primary-200' : 'text-secondary-200 ']}>
       Seu Perfil
     </Heading>
 </div>
 <Card 
   class={
-    ['max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border rounded-lg', 
+    ['w-[92%] sm:w-full max-w-xs md:max-w-md mx-auto mt-6 md:mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border rounded-lg', 
     !isAdmin 
       ? 'border-primary-600' 
       : 'border-secondary-600']
     .join(' ')
   }>
-  <P class={['text-primary-50 text-2xl border px-3', !isAdmin ? 'border-primary-500' : 'border-secondary-500']}>
+  <P class={['text-primary-50 text-xl md:text-2xl border px-3', !isAdmin ? 'border-primary-500' : 'border-secondary-500']}>
     Nome: {user ? user.login : "Carregando usuário..."}
   </P>
-  <P class={['text-primary-50 text-2xl border px-3', !isAdmin ? 'border-primary-500' : 'border-secondary-500']}>
+  <P class={['text-primary-50 text-xl md:text-2xl border px-3', !isAdmin ? 'border-primary-500' : 'border-secondary-500']}>
     Email: {user ? user.email : "Carregando email..."}
   </P>
   <div class="flex gap-1 justify-center">
