@@ -246,26 +246,26 @@
 </svelte:head>
 
 {#if showTitle}
-<div class="text-center fixed top-4 left-1/2 -translate-x-1/2 z-50 text-white px-4 py-2 rounded">
+<div class="text-center fixed top-4 left-1/2 -translate-x-1/2 z-50 text-white px-4 py-2 rounded w-100 mt-5 md:mt-auto md:w-auto max-w-none">
     <img src="/images/titulo_grafite_sem_fundo_pixelado.png" alt="ESGOTAMENTO">
 </div>
 {/if}
 <div class="text-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 text-white p-6 rounded-lg" id="menu">
     <A 
-      class="text-primary-600 hover:text-secondary-500 text-4xl" 
+      class="text-primary-600 hover:text-secondary-500 text-3xl md:text-4xl" 
       onclick={mostraFormPersonagem} onmouseenter={() => novoJ = "> Novo jogo <"} 
       onmouseleave={() => novoJ = "Novo jogo"}>
         {novoJ}
     </A><br>
     <A 
-      class="text-primary-600 mt-6 mb-6 text-4xl hover:text-secondary-500" 
+      class="text-primary-600 mt-6 mb-6 text-3xl md:text-4xl hover:text-secondary-500" 
       onclick={listaPersonagem} 
       onmouseenter={() => carregarS = "> Carregar save <"} 
       onmouseleave={() => carregarS = "Carregar save"}>
         {carregarS}
     </A><br>
     <A 
-      class="text-primary-600 text-4xl hover:text-secondary-500" 
+      class="text-primary-600 text-3xl md:text-4xl hover:text-secondary-500" 
       href="/" 
       onmouseenter={() => sair= "> Sair <"} 
       onmouseleave={() => sair = "Sair"}>
@@ -277,47 +277,47 @@
     <P class="text-primary-500">Por: Safigames</P>
 </div>
 
-<div class="fixed inset-0 items-center justify-center overflow-hidden" style="display:none" id="containerForm">
+<div class="fixed inset-0 items-center justify-center overflow-hidden p-4" style="display:none" id="containerForm">
   <!-- Card do formulário -->
-  <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg">
+  <Card class="w-full max-w-sm md:max-w-md mx-auto mt-4 md:mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg max-h-[90vh] overflow-y-auto">
     <!-- Formulário principal -->
-    <form class="flex flex-col gap-6 p-6" onsubmit={(event) => { event.preventDefault(); void criaPersonagem(); }}>
+    <form class="flex flex-col gap-4 md:gap-6 p-4 md:p-6" onsubmit={(event) => { event.preventDefault(); void criaPersonagem(); }}>
       <!-- Título -->
-      <Heading tag="h3" class="text-4xl mb-2 text-center text-primary-100">
+      <Heading tag="h3" class="text-2xl md:text-4xl mb-1 md:mb-2 text-center text-primary-100">
         Crie seu personagem
       </Heading>
       <!-- Mensagem de erro -->
       {#if error}
-        <div class="text-red-500 text-center">{error}</div>
+        <div class="text-red-500 text-center text-xs md:text-sm">{error}</div>
       {/if}
       <!-- Campo Nome -->
       <div>
-        <Label for="nome" class="text-lg text-primary-500">Nome</Label>
+        <Label for="nome" class="text-sm md:text-lg text-primary-500">Nome</Label>
         <Input id="nome" bind:value={nome_personagem} placeholder="Digite o nome do personagem" required class="mt-1" />
         {#if errorOf('nome')}
-          <div class="mt-1 text-sm text-red-500">{errorOf('nome')}</div>
+          <div class="mt-1 text-xs md:text-sm text-red-500">{errorOf('nome')}</div>
         {/if}
       </div>
   
       <!-- Campo classe -->
       <div>
-            <Label for="classe" class="text-lg text-primary-500">Escolha sua classe</Label>
+            <Label for="classe" class="text-sm md:text-lg text-primary-500">Escolha sua classe</Label>
             <Select id="classe" bind:value={classe_personagem}  items={classeOptions} class="mt-1" />
         {#if errorOf('role')}
-          <div class="mt-1 text-sm text-red-500">{errorOf('role')}</div>
+          <div class="mt-1 text-xs md:text-sm text-red-500">{errorOf('role')}</div>
         {/if}
       </div>
-      <!-- Botões de ação -->
       
-      <div class="text-lg flex gap-4 justify-end mt-4">
+      <!-- Botões de ação -->
+      <div class="text-sm md:text-lg flex gap-2 md:gap-4 justify-end mt-2 md:mt-4">
         <!-- Botão cancelar/voltar -->
         <Button color="light" type="button" onclick={handleCancel} disabled={loading}>
-          <ArrowLeftOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+          <ArrowLeftOutline class="inline w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2 align-text-bottom" />
             Voltar
         </Button>
         <!-- Botão salvar -->
         <Button type="submit" color="primary" disabled={loading}>
-          <FloppyDiskAltOutline class="inline w-5 h-5 mr-2 align-text-bottom" />
+          <FloppyDiskAltOutline class="inline w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2 align-text-bottom" />
             Criar
         </Button> 
       </div>

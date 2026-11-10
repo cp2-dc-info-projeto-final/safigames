@@ -247,11 +247,13 @@
 
 <!-- Evento global de teclado para escutar o Enter -->
 <svelte:window on:keydown={(e) => {
-  if (e.key === 'Enter') {
+  if (e.key === 'Enter' && !exibeMenu) {
       proximaCena();
   }}} 
   on:click={() => {
-  proximaCena();
+  if (!exibeMenu){
+    proximaCena();
+  }
 }} />
 
 <svelte:head>
@@ -272,10 +274,10 @@
       </h2>
 
       <!-- Opções do Menu -->
-      <div class="flex flex-col gap-3 w-full mt-2">
+      <div class="flex flex-col gap-3 w-full mt-2" >
         <button
           type="button"
-          on:click={exibicaoMenu}
+          on:click|stopPropagation={exibicaoMenu} 
           class="w-full py-2 border-2 border-primary-500 hover:bg-primary-500 hover:text-white text-primary-500 font-semibold transition">
             Continuar
         </button>
@@ -283,7 +285,7 @@
         <button
           type="button"
           class="w-full py-2 border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white font-semibold transition"
-          on:click={() => goto('/menu_game')}>
+          on:click|stopPropagation={() => goto('/menu_game')}>
             Sair para o Menu
         </button>
       </div>
