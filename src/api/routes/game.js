@@ -427,6 +427,18 @@ router.put('/item/:id', verifyToken, async function(req, res) {
   }
 });
 
+// *GET busca inventário do personagem
+router.get('/inventario/:id_personagem', verifyToken, async function(req, res) {
+  try {
+    const { id_personagem } =  req.params;
+    const result = await pool.query('SELECT i.nome AS nome_item, i.id, i.descricao, i.tipo, i.fator_vida, i.fator_dano, i.fator_defesa, i.stamina FROM inventario inv INNER JOIN item i ON inv.id_item = i.id WHERE inv.id_personagem = $1', [id_personagem]);
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar itens:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
 // GET inimigo
 router.get('/inimigo/:idCena', verifyToken, async function(req, res) {
   const { idCena } = req.params;

@@ -7,11 +7,11 @@
   import type { Cena } from '$lib/models/Cena';
   import type { Episodio } from '$lib/models/Episodio';
   import type { Inimigo } from '$lib/models/Inimigo';
-  import { PauseSolid } from 'flowbite-svelte-icons';
+  import type { Item } from '$lib/models/Item';
+  import { PauseSolid, CloseOutline } from 'flowbite-svelte-icons';
   import api from '$lib/api'; // API backend
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import Typewriter from '../../../components/TypeWriter.svelte';
 	import TypeWriter from "../../../components/TypeWriter.svelte";
 
   // Função de espera para atrasar o turno do inimigo
@@ -19,6 +19,7 @@
 
   //Arrays
   let cenas: Cena[] = []
+  let itens: Item[] = [];
 
   //Variáveis de controle
   let exibeMenu: boolean = false;
@@ -26,6 +27,9 @@
   let indiceCena: number = 0;
   let turnoJogador: boolean = true;
   let jogadorMorto: boolean = false;
+  let mostrandoInventario: boolean = false;
+  let mostrandoLog: boolean = false;
+  let statusItem: boolean = false;
 
   let logCombate: string = '';
 
@@ -45,6 +49,7 @@
   // ];  
 
   let personagem: Personagem;
+  let personagemCopia: Personagem;
   let episodio: Episodio;
   export let progresso: any[] = [];
   let cenaAtual: any;
@@ -53,17 +58,15 @@
   let loading = false;
   let idPersonagem: number;
   let idEpisodio: number;
+  // item selecionado no inventário
+  let item_selecionado: Item;
+
   $: idPersonagem = Number($page.params.id);
   
   /**
     - PASSAR CENAS
-    Combate: ao inimigo ter a vida zerada
-    Diálogo: quando apertar enter
     Comércio: botão sair
-
-    - MORTE 
-    A vida do inimigo fica numa variável. 
-    Se a vida do inimigo zera, passa para a próxima cena. Se a vida do jogador zera, volta para os stats do início da cena (o inimigo e o jogador).
+   
   */
 
   onMount(async () => {
@@ -94,6 +97,7 @@
 
         if (Array.isArray(personagens) && personagens.length > 0) {
           personagem = { ...personagens[0] };
+          personagemCopia = { ...personagens[0] };
           staminaPersonagem = Number(personagem.stamina);
           idEpisodio = personagem.id_episodio;
           console.log(personagem);
@@ -152,6 +156,26 @@
       loading = false;
     }
   }
+  
+  async function buscaInventario(id_personagem: number) {
+    try{
+      console.log(id_personagem)
+      const res = await api.get(`/game/inventario/${id_personagem}`);
+      const body = res.data as ApiResponse<Item>;
+      if (body.success){
+        itens = body.data
+        console.log(itens);
+      } else {
+        error = body.message ?? 'Erro ao buscar inventario.';
+      }
+    } catch (e: any) {
+      console.error('Erro ao buscar inventario:', e);
+      const body = e.response?.data as ApiResponse<Item> | undefined;
+      error = body?.message || 'Erro ao buscar inventario';
+    } finally {
+      loading = false;
+    }
+  }
 
   $: if (cenaAtual && cenaAtual.tipo == 'Combate'){
     buscaInimigo(cenaAtual.cena_id)
@@ -160,7 +184,6 @@
   function proximaCena() {
         if (indiceCena < progresso.length - 1 && cenaAtual.tipo == "Diálogo" || (inimigoAtual && inimigoAtual.vida == 0)) {
             indiceCena++;
-            console.log(indiceCena)
         } else {
             console.log("Você chegou ao fim das cenas!");
         }
@@ -213,16 +236,52 @@
     turnoJogador = true;
   }
 
-  function MostrarInventário(){
-
+  async function MostrarInventario(){
+    turnoJogador = !turnoJogador;
+    mostrandoLog = !mostrandoLog;
+    mostrandoInventario = !mostrandoInventario;
+    if (personagem){
+    await buscaInventario(personagem.id_personagem)
+    }
   }
 
-  function OcultarInventário(){
-
+  function OcultarInventario(){
+    turnoJogador = !turnoJogador;
+    mostrandoLog = !mostrandoLog;
+    mostrandoInventario = !mostrandoInventario;
+    statusItem = false;
   }
 
-  function UsarItem(){
+  function MostrarStatus(item_selecionado_id: number){
+    statusItem = true;
+    item_selecionado = itens[item_selecionado_id - 1];
+  }
 
+  function UsarItem(item: Item){
+    if (!item) return;
+    const limite = personagemCopia?.vida;
+    let danoLevado: number = 0;
+    if (personagem && item.tipo == "Cura" && limite > personagem?.vida){
+      let cura: number = item.fator_vida
+      danoLevado = limite - personagem?.vida;
+      console.log("entrou no primeiro if")
+      if (danoLevado == cura){
+        personagem.vida = limite;
+        console.log("entrou no segundo if")
+      }
+      else if (danoLevado > cura){
+        console.log("entrou no terceiro if")
+        personagem.vida += cura;
+      }
+      else if (danoLevado < cura){
+        console.log("entrou no quarto if")
+        cura = limite - personagem.vida;
+        personagem.vida += cura;
+      }
+    }
+    else{
+      return "Sua vida está cheia"
+    }
   }
 
   async function EncerrarTurno(){
@@ -234,7 +293,7 @@
       verificaPrimeiroAtaque = false;
     }
 
-      await esperar(2500)
+      await esperar(1500)
 
       InimigoAtaque()
     }
@@ -396,6 +455,16 @@
           <p>Classe: {personagem.classe}</p>
           <p>Dinheiro: {personagem.dinheiro}</p>
         </div>
+        <!-- status do item -->
+        {#if statusItem}
+        <h2 class="text-5xl font-bold mt-10 mb-2 text-primary-500">Status do item:</h2>
+        <div class="text-xg text-primary-50">
+          <p>Descrição: {item_selecionado ? item_selecionado.descricao : 'Item Indefinido'}</p>
+          <p>{item_selecionado.tipo == "Cura" ? `Fator de cura: ${item_selecionado.fator_vida}` : ''}</p>
+          <p>{item_selecionado.tipo == "Dano" ? `Fator de dano: ${item_selecionado.fator_dano}` : ''}</p>
+          <p>Stamina necessária: {item_selecionado ? item_selecionado.stamina : 'Item Indefinido'}</p>
+        </div>
+        {/if}
       </div>
 
       <!-- Coluna do Meio: Ilustração + Log de Combate -->
@@ -430,17 +499,20 @@
       </div>
 
         <!-- Bloco Inferior: Log de combate -->
-        <div class="border-2 border-primary-300 p-4 md:p-6 flex-1">
-          {#if inimigoAtual?.vida == 0}
-          <p class="text-primary-50 whitespace-pre-line text-xs md:text-base">
-            Você derrotou {inimigoAtual.nome}!
-          </p>
-          {:else}
-          <p class="text-primary-50 whitespace-pre-line text-xs md:text-base">
-            {logCombate || "O combate começou. Escolha sua ação!"}
-          </p>
-          {/if}
-        </div>
+        {#if !mostrandoLog}
+          <div class="border-2 border-primary-300 p-4 md:p-6 flex-1">
+            <h3 class="text-2xl md:text-4xl font-bold mb-2 md:mb-4">O combate começou. Escolha sua ação!</h3>
+            {#if inimigoAtual?.vida == 0}
+            <p class="text-primary-50 whitespace-pre-line text-xs md:text-base">
+              Você derrotou {inimigoAtual.nome}!
+            </p>
+            {:else}
+            <p class="text-primary-50 whitespace-pre-line text-xs md:text-base">
+              {logCombate}
+            </p>
+            {/if}
+          </div>
+        {/if}
 
         {#if turnoJogador && inimigoAtual && inimigoAtual.vida > 0}
         <!-- Botões de Ação do Combate -->
@@ -448,7 +520,7 @@
           <button type="button" on:click|stopPropagation={() => {PersonagemAtaque(personagem)}} class="px-4 md:px-12 py-2 md:py-4 text-sm md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 shadow-md">
             Atacar
           </button>
-          <button type="button" class="px-4 md:px-12 py-2 md:py-4 text-sm md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 shadow-md">
+          <button type="button" on:click|stopPropagation={() => {MostrarInventario()}} class="px-4 md:px-12 py-2 md:py-4 text-sm md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 shadow-md">
             Inventário
           </button>
           <button type="button" on:click|stopPropagation={() => {EncerrarTurno()}} class="px-4 md:px-12 py-2 md:py-4 text-sm md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 shadow-md">
@@ -461,6 +533,26 @@
             Próxima Cena 
           </button>
         </div>
+        {:else if mostrandoInventario}
+          <!-- Inventário -->
+          <div class="border-2 border-primary-300 p-4 md:p-6 flex-1 relative">
+            <h3 class="text-2xl md:text-5xl font-bold mb-2 md:mb-4">Inventário</h3>
+            <button type="button" on:click|stopPropagation={() => {OcultarInventario()}} class="absolute top-4 right-4 text-primary-50 hover:text-primary-300 cursor-pointer">
+              <CloseOutline class="shrink-0 h-9 w-9" />
+          </button>
+            {#each itens as item}
+            <button type="button" on:click|stopPropagation={() => {MostrarStatus(item.id)}} class="px-4 md:px-12 py-2 md:py-4 text-sm md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 shadow-md">
+              {item.nome_item}
+            </button>
+            {/each}
+          </div>
+          {#if item_selecionado}
+          <div class="absolute bottom-1 md:bottom-5 left-0 right-0 flex flex-wrap justify-center gap-2 md:gap-4 px-2">
+            <button type="button" on:click|stopPropagation={() => {UsarItem(item_selecionado)}} class="px-4 md:px-12 py-2 md:py-4 text-sm md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 w-fit">
+              Usar Item
+            </button>
+          </div>
+          {/if}
         {/if}
       </div>
 

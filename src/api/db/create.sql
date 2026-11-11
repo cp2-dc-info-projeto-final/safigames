@@ -122,6 +122,7 @@ CREATE TABLE item(
     nome TEXT NOT NULL,
     descricao TEXT NOT NULL,
     tipo TEXT NOT NULL,
+    stamina INTEGER NOT NULL,
     fator_vida INTEGER,
     fator_dano INTEGER,
     fator_defesa INTEGER,
@@ -161,7 +162,8 @@ CREATE TABLE catalogo(
 
 INSERT INTO usuario (login, email, senha, role) VALUES
 -- senha efelantinho
-('vit_dev', 'vit@gmail.com', '$2a$12$f2c.uHGHS4drfaz6HR870OLamkarD57kI.gkr4//Vbbp0vN9IrFfG', 'admin');
+('vit_dev', 'vit@gmail.com', '$2a$12$f2c.uHGHS4drfaz6HR870OLamkarD57kI.gkr4//Vbbp0vN9IrFfG', 'admin'),
+('jao', 'jao@gmail.com', '$2a$12$AuHwdJEcFAggJX4Hi5DGquFShw2w7Z5a6TUqki12GprmU/9G/5ZWq', 'jogador');
 
 INSERT INTO inimigo(nome, vida, dano, descricao, fator_xp, fator_dinheiro)
 VALUES('Rato de Óculos e Barbicha', 30, 6, 'Esse rato fala, diferente de todos os outros. Além disso ele tem uma aparência um tanto quanto familiar...', 6, 12);
@@ -204,13 +206,15 @@ VALUES('Espada de esmeralda', 30, 'Os aldeões adoram', 2),
 ('Adaga de obsidiana', 15, 'Corta até átomos', 1);
 
 INSERT INTO personagem(nome, vida, stamina, classe, id_usuario, id_cena, id_episodio, id_arma)
-VALUES('Jâo, o garoto de programa', 90, 3, 'Mago', 1, 2, 1, 1);
+VALUES('Jâo, o garoto de programa', 70, 3, 'Guerreiro', 1, 2, 1, 1),
+('Safizigoto', 70, 3, 'Guerreiro', 2, 1, 1, 1);
 
-INSERT INTO item(nome, descricao, tipo, fator_vida, preco)
-VALUES('Empadinha safadinha de queijo', 'Deliciosa empadinha de queijo que te dá mais vontade de viver', 'Cura', 50, 5);
+INSERT INTO item(nome, descricao, tipo, fator_vida, preco, stamina)
+VALUES('Empadinha safadinha de queijo', 'Deliciosa empadinha de queijo que te dá mais vontade de viver', 'Cura', 24, 5, 2);
 
 INSERT INTO inventario(id_item, id_personagem)
-VALUES(1, 1);
+VALUES(1, 1),
+(1, 2);
 
 INSERT INTO catalogo(id_item, id_comerciante)
 VALUES(1, 1);
