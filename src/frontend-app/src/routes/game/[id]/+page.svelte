@@ -27,6 +27,8 @@
   let turnoJogador: boolean = true;
   let jogadorMorto: boolean = false;
 
+  let logCombate: string = '';
+
   // variavel de controle para verificar se é a primeira vez que o jogador tá atacando
   let verificaPrimeiroAtaque: boolean = true;
 
@@ -173,9 +175,6 @@
         return;
     }
 
-    console.log("Valor bruto da vida:", inimigoAtual.vida, typeof inimigoAtual.vida);
-    console.log("Valor bruto do dano:", personagem?.dano_arma, typeof personagem?.dano_arma);
-
     const vidaAtual = Number(inimigoAtual.vida)
     const dano = Number(personagem.dano_arma) || 0;
     
@@ -192,6 +191,7 @@
       if (inimigoAtual.vida == 0) return;
       personagem.stamina = staminaPersonagem - staminaArma;
       inimigoAtual.vida = vidaAtual - dano;
+      logCombate = `Você deu ${dano} pontos de dano e a vida do inimigo agora é ${inimigoAtual.vida}`;
       console.log(`Você deu ${personagem.dano_arma} pontos de dano e a vida do inimigo agora é ${inimigoAtual.vida}. Sua stamina agora é ${personagem.stamina}`)
     }
   }
@@ -208,6 +208,7 @@
       jogadorMorto = true;
     }
 
+    logCombate = `Você levou ${dano} pontos de dano e sua vida agora é ${personagem.vida}`;
     console.log(`Você levou ${inimigoAtual.dano} pontos de dano e sua vida agora é ${personagem.vida}`)
     turnoJogador = true;
   }
@@ -417,7 +418,7 @@
         </div>
       </div>
 
-            <!-- Status do Inimigo EXCLUSIVO para telas oequenas (Canto Inferior Direito) -->
+            <!-- Status do Inimigo EXCLUSIVO para telas pequenas (Canto Inferior Direito) -->
       <div class="flex md:hidden w-full border-2 border-primary-300 bg-primary-900 p-3 flex-col shadow-md">
         <h2 class="text-2xl font-bold text-primary-500 pb-1 mb-1">Inimigo</h2>
         <div class="text-xs text-primary-50 flex-col grid gap-x-2 gap-y-0.5">
@@ -434,25 +435,29 @@
           <p class="text-primary-50 whitespace-pre-line text-xs md:text-base">
             Você derrotou {inimigoAtual.nome}!
           </p>
+          {:else}
+          <p class="text-primary-50 whitespace-pre-line text-xs md:text-base">
+            {logCombate || "O combate começou. Escolha sua ação!"}
+          </p>
           {/if}
         </div>
 
         {#if turnoJogador && inimigoAtual && inimigoAtual.vida > 0}
         <!-- Botões de Ação do Combate -->
         <div class="absolute bottom-1 md:bottom-5 left-0 right-0 flex flex-wrap justify-center gap-2 md:gap-4 px-2">
-          <button type="button" on:click={() => {PersonagemAtaque(personagem)}} class="px-4 md:px-12 py-2 md:py-4 text-sm md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 shadow-md">
+          <button type="button" on:click|stopPropagation={() => {PersonagemAtaque(personagem)}} class="px-4 md:px-12 py-2 md:py-4 text-sm md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 shadow-md">
             Atacar
           </button>
           <button type="button" class="px-4 md:px-12 py-2 md:py-4 text-sm md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 shadow-md">
             Inventário
           </button>
-          <button type="button" on:click={() => {EncerrarTurno()}} class="px-4 md:px-12 py-2 md:py-4 text-sm md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 shadow-md">
+          <button type="button" on:click|stopPropagation={() => {EncerrarTurno()}} class="px-4 md:px-12 py-2 md:py-4 text-sm md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 shadow-md">
             Encerrar turno
           </button>
         </div>
         {:else if inimigoAtual && inimigoAtual.vida <= 0}
         <div class="absolute bottom-2 left-0 right-0 flex justify-center px-2">
-          <button type="button" on:click={() => {proximaCena()}} class="px-8 py-3 md:px-12 md:py-5 text-base md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 shadow-md">
+          <button type="button" on:click|stopPropagation={() => {proximaCena()}} class="px-8 py-3 md:px-12 md:py-5 text-base md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 shadow-md">
             Próxima Cena 
           </button>
         </div>
