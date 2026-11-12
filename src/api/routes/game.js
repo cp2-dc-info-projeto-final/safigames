@@ -439,11 +439,22 @@ router.get('/inventario/:id_personagem', verifyToken, async function(req, res) {
   }
 });
 
-// GET inimigo
+// GET inimigo com base na cena
 router.get('/inimigo/:idCena', verifyToken, async function(req, res) {
   const { idCena } = req.params;
   try {
     const result = await pool.query('SELECT * FROM inimigo i INNER JOIN cena c ON i.id = c.id_inimigo WHERE c.id = $1', [idCena]);
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar inimigo:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+// GET inimigo 
+router.get('/inimigo', verifyToken, async function(req, res) {
+  try {
+    const result = await pool.query('SELECT * FROM inimigo', []);
     return sendSuccess(res, 200, null, result.rows);
   } catch (error) {
     console.error('Erro ao buscar inimigo:', error);
