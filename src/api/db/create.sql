@@ -202,19 +202,21 @@ Rato de óculos e barbicha: Menino? Nem tem gente aqui. Eu vou é meter minha pa
 Narrador: O rato entra em um dos buracos na parede, perto do chão e você segue em frente pelos dutos escuros, fedidos e ecoantes.', 'Diálogo', 1, NULL, NULL);
 
 INSERT INTO arma(nome, dano, descricao, stamina)
-VALUES('Espada de esmeralda', 30, 'Os aldeões adoram', 2),
-('Adaga de obsidiana', 15, 'Corta até átomos', 1);
+VALUES('Espada de esmeralda', 10, 'Os aldeões adoram', 2),
+('Adaga de obsidiana', 5, 'Corta até átomos', 1);
 
 INSERT INTO personagem(nome, vida, stamina, classe, id_usuario, id_cena, id_episodio, id_arma)
 VALUES('Jâo, o garoto de programa', 70, 3, 'Guerreiro', 1, 2, 1, 1),
 ('Safizigoto', 70, 3, 'Guerreiro', 2, 1, 1, 1);
 
-INSERT INTO item(nome, descricao, tipo, fator_vida, preco, stamina)
-VALUES('Empadinha safadinha de queijo', 'Deliciosa empadinha de queijo que te dá mais vontade de viver', 'Cura', 24, 5, 2);
+INSERT INTO item(nome, descricao, tipo, fator_vida, preco, stamina, fator_dano)
+VALUES('Empadinha safadinha de queijo', 'Deliciosa empadinha de queijo que te dá mais vontade de viver', 'Cura', 24, 5, 2, 0),
+('Refresco de 1 real do panasco', 'Suco de sabor (???) com gosto de óleo velho. Ao tocar a arma, ela se torna fatal', 'Dano', 0, 1, 1, 5);
 
 INSERT INTO inventario(id_item, id_personagem)
 VALUES(1, 1),
-(1, 2);
+(1, 2),
+(2, 2);
 
 INSERT INTO catalogo(id_item, id_comerciante)
 VALUES(1, 1);

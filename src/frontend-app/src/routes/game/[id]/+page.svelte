@@ -19,7 +19,7 @@
 
   //Arrays
   let cenas: Cena[] = []
-  let itens: Item[] = [];
+  let itens: any[] = [];
 
   //Variáveis de controle
   let exibeMenu: boolean = false;
@@ -27,9 +27,11 @@
   let indiceCena: number = 0;
   let turnoJogador: boolean = true;
   let jogadorMorto: boolean = false;
+  let inimigoMorto: boolean = false;
   let mostrandoInventario: boolean = false;
   let mostrandoLog: boolean = false;
   let statusItem: boolean = false;
+  let usouItem: boolean = false;
 
   let logCombate: string = '';
 
@@ -39,6 +41,9 @@
   // "backup" da stamina para restaurar depois do inimigo atacar
   let staminaBackup: number = 0;
   let staminaPersonagem: number = 0;
+
+  let bonusDanoTemp: number = 0;
+  
 
 
   let user: User;
@@ -182,15 +187,16 @@
   }
 
   function proximaCena() {
-        if (indiceCena < progresso.length - 1 && cenaAtual.tipo == "Diálogo" || (inimigoAtual && inimigoAtual.vida == 0)) {
-            indiceCena++;
-        } else {
-            console.log("Você chegou ao fim das cenas!");
-        }
-        if (progresso.length > 0) {
-          cenaAtual = progresso[indiceCena];
-        }
+    if (cenaAtual && cenaAtual.tipo == "Combate" && !inimigoMorto) return
+    if (indiceCena < progresso.length - 1 && cenaAtual.tipo == "Diálogo" || (inimigoAtual && inimigoAtual.vida == 0)) {
+        indiceCena++;
+    } else {
+        console.log("Você chegou ao fim das cenas!");
     }
+    if (progresso.length > 0) {
+      cenaAtual = progresso[indiceCena];
+    }
+  }
 
   function PersonagemAtaque(personagem: any){
     if (!inimigoAtual) {
@@ -199,30 +205,31 @@
     }
 
     const vidaAtual = Number(inimigoAtual.vida)
-    const dano = Number(personagem.dano_arma) || 0;
-    
+    const danoBase = Number(personagem.dano_arma)
+    const danoTotal = danoBase + bonusDanoTemp;
     const staminaArma = Number(personagem.stamina_arma);
 
-    
-
     if (verificaPrimeiroAtaque){
-      staminaBackup = staminaPersonagem;
+      staminaBackup = personagem.stamina;
       verificaPrimeiroAtaque = false;
     }
 
-    if (staminaPersonagem >= staminaArma){
-      if (inimigoAtual.vida == 0) return;
-      personagem.stamina = staminaPersonagem - staminaArma;
-      inimigoAtual.vida = vidaAtual - dano;
-      logCombate = `Você deu ${dano} pontos de dano e a vida do inimigo agora é ${inimigoAtual.vida}`;
+    if (personagem && personagem.stamina >= staminaArma){
+      personagem.stamina -= staminaArma;
+      inimigoAtual.vida = vidaAtual - danoTotal;
+      logCombate = `Você deu ${danoTotal} pontos de dano e a vida do inimigo agora é ${inimigoAtual.vida}`;
+      if (inimigoAtual.vida == 0) {inimigoMorto = true};
       console.log(`Você deu ${personagem.dano_arma} pontos de dano e a vida do inimigo agora é ${inimigoAtual.vida}. Sua stamina agora é ${personagem.stamina}`)
+    }
+    else{
+      logCombate = "Você não tem stamina suficiente. Encerre o turno para recuperar."
     }
   }
   
   function InimigoAtaque(){
 
     const vidaAtual = Number(personagem.vida)
-    const dano = Number(inimigoAtual.dano) || 0;
+    const dano = Number(inimigoAtual.dano)
 
     personagem.vida = vidaAtual - dano;
     personagem.stamina = staminaBackup;
@@ -240,8 +247,8 @@
     turnoJogador = !turnoJogador;
     mostrandoLog = !mostrandoLog;
     mostrandoInventario = !mostrandoInventario;
-    if (personagem){
-    await buscaInventario(personagem.id_personagem)
+    if (personagem && !usouItem){
+      await buscaInventario(personagem.id_personagem);
     }
   }
 
@@ -249,35 +256,65 @@
     turnoJogador = !turnoJogador;
     mostrandoLog = !mostrandoLog;
     mostrandoInventario = !mostrandoInventario;
+    item_selecionado = null;
     statusItem = false;
   }
 
   function MostrarStatus(item_selecionado_id: number){
+    console.log("entrou no status")
     statusItem = true;
-    item_selecionado = itens[item_selecionado_id - 1];
+    item_selecionado = itens.find(item => item.id == item_selecionado_id);
   }
 
   function UsarItem(item: Item){
     if (!item) return;
     const limite = personagemCopia?.vida;
     let danoLevado: number = 0;
-    if (personagem && item.tipo == "Cura" && limite > personagem?.vida){
+    if (personagem && item.tipo == "Cura" && limite > personagem.vida && personagem.stamina >= item.stamina){
       let cura: number = item.fator_vida
       danoLevado = limite - personagem?.vida;
-      console.log("entrou no primeiro if")
       if (danoLevado == cura){
         personagem.vida = limite;
-        console.log("entrou no segundo if")
+        itens = itens.filter(item => item.id !== item_selecionado.id);
+        personagem.stamina -= item.stamina;
+        usouItem = true;
+        logCombate = `Você curou ${cura} pontos de vida e sua vida agora é ${personagem.vida}`;
+        OcultarInventario()
       }
       else if (danoLevado > cura){
-        console.log("entrou no terceiro if")
         personagem.vida += cura;
+        itens = itens.filter(item => item.id !== item_selecionado.id);
+        personagem.stamina -= item.stamina;
+        item_selecionado = null;
+        statusItem = false;
+        usouItem = true;
+        logCombate = `Você curou ${cura} pontos de vida e sua vida agora é ${personagem.vida}`;
+        OcultarInventario()
       }
       else if (danoLevado < cura){
-        console.log("entrou no quarto if")
         cura = limite - personagem.vida;
         personagem.vida += cura;
+        itens = itens.filter(item => item.id !== item_selecionado.id);
+        personagem.stamina -= item.stamina;
+        item_selecionado = null;
+        statusItem = false;
+        usouItem = true;
+        logCombate = `Você curou ${cura} pontos de vida e sua vida agora é ${personagem.vida}`;
+        OcultarInventario()
       }
+    }
+    else if (personagem && item.tipo == "Dano") {
+      bonusDanoTemp = item.fator_dano
+      
+      itens = itens.filter(item => item.id !== item_selecionado.id);
+      personagem.stamina -= item.stamina;
+      item_selecionado = null;
+      statusItem = false;
+      usouItem = true;
+
+      logCombate = `Você usou ${item.nome_item}! Seu dano aumentou em ${bonusDanoTemp} para este turno.`;
+      OcultarInventario();
+      return;
     }
     else{
       return "Sua vida está cheia"
@@ -287,6 +324,8 @@
   async function EncerrarTurno(){
     if (personagem){
       turnoJogador = false;
+
+      bonusDanoTemp = 0;
 
       if (verificaPrimeiroAtaque){
       staminaBackup = staminaPersonagem;
