@@ -144,8 +144,9 @@
               .join(' ')
             }>Perfil
           </NavLi>
-          {#if user.role === 'admin'} <!-- só exibe menu usuários para admin-->
-            <NavLi 
+
+        {#if user.role === 'admin'} <!-- exibe opção de visualizar os usuários somente para adm -->
+          <NavLi 
               href="/users" 
               nonActiveClass={
                 ['text-xl font-bold px-4 py-2 transition-colors rounded-lg', 
@@ -155,26 +156,30 @@
                 .join(' ')
               }>Usuários
             </NavLi>
-            <button 
-              class="ml-2 px-3 py-1 text-white rounded text-lg flex items-center gap-1 bg-secondary-50 hover:bg-secondary-51"
-              on:click={irParaGerenciamento}>
-              <AdjustmentsHorizontalSolid class="shrink-0 h-6 w-6" />
-              Gerenciar
-            </button>
           {/if}
+
           <NavLi>
-            <div class="flex items-center">
-              <span class={['text-lg px-4', !isAdmin ? 'text-primary-500' : 'text-secondary-500'].join(' ')}>Olá, {user.login}</span>
+            <div class="flex flex-row items-start sm:items-center gap-2 sm:gap-0 w-full">
+              <span class={['text-lg px-0 sm:px-4 text-left', !isAdmin ? 'text-primary-500' : 'text-secondary-500'].join(' ')}>Olá, {user.login}</span>
                 {#if user}
                   {#if user.role === 'jogador'}
                     <button 
-                      class="ml-2 px-3 py-1 text-white rounded text-lg flex items-center gap-1 bg-secondary-500 hover:bg-secondary-200"
+                      class="px-3 py-1 text-white rounded text-sm sm:text-lg flex items-center gap-1 bg-secondary-500 hover:bg-secondary-200"
                       on:click={irParaJogo}>
                       <PlaySolid class="shrink-0 h-6 w-6" />
                       Jogar
                     </button>
                   {/if}
                 {/if}
+
+          {#if user.role === 'admin'} <!-- só exibe menu de gerenciar para admin-->
+            <button 
+              class="px-3 py-1 text-white rounded text-sm sm:text-lg flex items-center gap-1 bg-primary-600 hover:bg-primary-200"
+              on:click={irParaGerenciamento}>
+              <AdjustmentsHorizontalSolid class="shrink-0 h-6 w-6" />
+              Gerenciar
+            </button>
+          {/if}
               <button 
                 class={
                   ['ml-2 px-3 py-1 text-white rounded text-sm flex items-center gap-1 bg-primary-900', 

@@ -487,7 +487,7 @@
         </div>
       </div>
 
-            <!-- Status do Inimigo EXCLUSIVO para telas pequenas (Canto Inferior Direito) -->
+      <!-- Status do Inimigo EXCLUSIVO para telas pequenas (Logo abaixo da ilustraçã) -->
       <div class="flex md:hidden w-full border-2 border-primary-300 bg-primary-900 p-3 flex-col shadow-md">
         <h2 class="text-2xl font-bold text-primary-500 pb-1 mb-1">Inimigo</h2>
         <div class="text-xs text-primary-50 flex-col grid gap-x-2 gap-y-0.5">
@@ -538,7 +538,7 @@
           <div class="border-2 border-primary-300 p-4 md:p-6 flex-1 relative">
             <h3 class="text-2xl md:text-5xl font-bold mb-2 md:mb-4">Inventário</h3>
             <button type="button" on:click|stopPropagation={() => {OcultarInventario()}} class="absolute top-4 right-4 text-primary-50 hover:text-primary-300 cursor-pointer">
-              <CloseOutline class="shrink-0 h-9 w-9" />
+              <CloseOutline class="shrink-0 h-7 w-7 md:h-9 md:w-9" />
           </button>
             {#each itens as item}
             <button type="button" on:click|stopPropagation={() => {MostrarStatus(item.id)}} class="px-4 md:px-12 py-2 md:py-4 text-sm md:text-lg border-2 border-primary-300 font-bold text-primary-50 hover:bg-primary-700 cursor-pointer transition bg-primary-900 shadow-md">

@@ -400,7 +400,7 @@
   <div class="mt-auto mb-auto" id="containerFormCena">
     <Card class="max-w-md mx-auto mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-secondary-600 rounded-lg">
       <form class="flex flex-col gap-6 p-6">
-        <Heading tag="h3" class="text-4xl mb-2 text-center text-secondary-100">
+        <Heading tag="h3" class="text-3xl md:text-4xl mb-2 text-center text-secondary-100">
           Crie uma cena
         </Heading>
 
@@ -486,8 +486,8 @@
 
 {#if exibeSelect && !selectedCena}
   <div>
-    <div id="divSelect">
-      <Heading tag="h3" class="text-4xl mb-2 text-center text-secondary-100">
+    <div id="divSelect" class="pt-0">
+      <Heading tag="h3" class="text-3xl md:text-5xl mb-3 text-center text-secondary-100">
         Selecione o episodio:
       </Heading>
       <div class="flex items-center justify-center gap-2">
