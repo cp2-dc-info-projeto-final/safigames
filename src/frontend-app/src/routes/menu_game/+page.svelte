@@ -178,10 +178,12 @@
     editingId = personagem_id;
     editingName = personagem_nome;
     inputOpen = true;
+    showBackButton = false;
   }
 
   function cancelEdit() {
     inputOpen = false;
+    showBackButton = true;
   }
 
   async function confirmEdit() {
@@ -197,6 +199,7 @@
     }
 
     inputOpen = false;
+    showBackButton = true;
     try {
       const res = await api.put(`/game/personagem/${editingId}`, { nome: novoName });
       const body = res.data as ApiResponse<Personagem>;
@@ -325,6 +328,49 @@
   </Card>
 </div>
 
+{#if inputOpen}
+  <div class="items-center justify-center p-4 flex min-h-screen" id="containerFormEdit">
+    <!-- Card do formulário -->
+    <Card class="w-full max-w-sm md:max-w-md mx-auto mt-4 md:mt-10 p-0 bg-primary-900 overflow-hidden shadow-lg border border-primary-600 rounded-lg max-h-[90vh] overflow-y-auto">
+      <!-- Formulário principal -->
+      <form class="flex flex-col gap-4 md:gap-6 p-4 md:p-6" onsubmit={(event) => { event.preventDefault(); void confirmEdit(); }}>
+        <!-- Título -->
+        <Heading tag="h3" class="text-2xl md:text-4xl mb-1 md:mb-2 text-center text-primary-100">
+          Edite seu personagem
+        </Heading>
+
+        <!-- Mensagem de erro -->
+        {#if error}
+          <div class="text-red-500 text-center text-xs md:text-sm">{error}</div>
+        {/if}
+
+        <!-- Campo Nome -->
+        <div>
+          <Label for="nome" class="text-sm md:text-lg text-primary-500">Nome</Label>
+          <Input id="nome" bind:value={editingName} placeholder="Digite o nome do personagem" required class="mt-1" />
+          {#if errorOf('nome')}
+            <div class="mt-1 text-xs md:text-sm text-red-500">{errorOf('nome')}</div>
+          {/if}
+        </div>
+        
+        <!-- Botões de ação -->
+        <div class="text-sm md:text-lg flex gap-2 md:gap-4 justify-end mt-2 md:mt-4">
+          <!-- Botão cancelar/voltar -->
+          <Button color="light" type="button" onclick={cancelEdit} disabled={loading}>
+            <ArrowLeftOutline class="inline w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2 align-text-bottom" />
+              Voltar
+          </Button>
+          <!-- Botão salvar -->
+          <Button type="submit" color="primary" disabled={loading}>
+            <FloppyDiskAltOutline class="inline w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2 align-text-bottom" />
+              Editar
+          </Button> 
+        </div>
+      </form>
+    </Card>
+  </div>
+{/if}
+
 <!-- Container de tabela personagem -->
 <div id="personagemContainer" class="mx-auto flex h-80 min-h-0 w-full max-w-4xl flex-col items-center gap-4 overflow-y-auto px-4">
   {#if selectedPersonagem}
@@ -354,7 +400,7 @@
       </div>
     </section>
   {:else}
-    {#if personagens.length > 0}
+    {#if !inputOpen && personagens.length > 0}
       <div class="mx-auto grid h-fit w-full max-w-3xl grid-cols-1 gap-3 overflow-y-auto p-1 sm:grid-cols-2 lg:grid-cols-2">
         {#each personagens as personagem (personagem.id)}
           <article class="relative min-h-[100px] rounded-lg border border-primary-500 bg-primary-900 text-primary-500 shadow-lg">
@@ -368,11 +414,14 @@
                 <br />
               </div>
               <div class="mt-auto flex flex-col gap-1">
-                <h2 class="text-lm font-bold">User ID: 
-                  <p class="text-white">{((personagem as any).id_user ?? '—')}</p>
-                </h2>
                 <h2 class="text-lm font-bold">ID: 
                   <p class="text-white">{personagem.id}</p>
+                </h2>                
+                <h2 class="text-lm font-bold">Classe: 
+                  <p class="text-white">{personagem.classe}</p>
+                </h2>                
+                <h2 class="text-lm font-bold">Vida: 
+                  <p class="text-white">{personagem.vida}</p>
                 </h2>
               </div>
             </button>
@@ -422,7 +471,7 @@
 
 <ConfirmModal
   open={confirmOpen}
-  message="Tem certeza que deseja remover este usuário?"
+  message="Tem certeza que deseja remover este personagem?"
   confirmText="Remover"
   cancelText="Cancelar"
   onConfirm={handleConfirm}
