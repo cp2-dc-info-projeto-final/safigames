@@ -2,12 +2,49 @@
   import { Heading, P, ImagePlaceholder } from "flowbite-svelte";
   import Menu from '../../components/Menu.svelte';
   import { onMount } from 'svelte';
-  import { getCurrentUser } from '$lib/auth';
+  import { getCurrentUser, getToken, type User } from '$lib/auth';
   let isAdmin = $state(false);
 
+  let user: User | null = null;
+  let hasToken = false;
+  let loadingUser = false;
+  let authRequestId = 0;
+
   onMount(async () => {
-    const user = await getCurrentUser();
-    isAdmin = user?.role === 'admin';
+	hasToken = getToken() !== null;
+
+    if (!hasToken) {
+      user = null;
+      loadingUser = false;
+      return;
+    }
+
+    if (user || loadingUser) {
+      return;
+    }
+
+    loadingUser = true;
+    const requestId = ++authRequestId;
+
+    try {
+      const userData = await getCurrentUser();
+      isAdmin = userData?.role === 'admin';
+      if (requestId !== authRequestId) {
+        return;
+      }
+      user = userData;
+      hasToken = userData !== null;
+    } catch {
+      if (requestId !== authRequestId) {
+        return;
+      }
+      user = null;
+      hasToken = false;
+    } finally {
+      if (requestId === authRequestId) {
+        loadingUser = false;
+      }
+    }
   });
 </script>
 

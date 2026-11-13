@@ -16,25 +16,25 @@
 <div class="grid grid-cols-2 md:grid-cols-4 gap-7 md:gap-20">
   <div class="flex flex-col items-center">
     <button class="px-3 py-1 rounded" on:click={() => goto('/gerenciamento/personagem')}>
-      <FolderOpenSolid class="h-25 w-25 text-secondary-50 hover:text-secondary-200'" />
+      <FolderOpenSolid class="h-25 w-25 text-primary-500 hover:text-primary-200" />
     </button>
     <p class="text-base md:text-lg font-medium text-center text-primary-50">Personagem</p>
   </div>
   <div class="flex flex-col items-center">
     <button class="px-3 py-1 rounded" on:click={() => goto('/gerenciamento/episodio')}>
-      <FolderOpenSolid class="h-25 w-25 text-secondary-50 hover:text-secondary-51" />
+      <FolderOpenSolid class="h-25 w-25 text-primary-500 hover:text-primary-200" />
     </button>
     <p class="text-base md:text-lg font-medium text-center text-primary-50">Episódio</p>
   </div>
   <div class="flex flex-col items-center">
     <button class="px-3 py-1 rounded" on:click={() => goto('/gerenciamento/comerciante')}>
-      <FolderOpenSolid class="h-25 w-25 text-secondary-50 hover:text-secondary-51" />
+      <FolderOpenSolid class="h-25 w-25 text-primary-500 hover:text-primary-200" />
     </button>
     <p class="text-base md:text-lg font-medium text-center text-primary-50">Comerciante</p>
   </div>
   <div class="flex flex-col items-center">
     <button class="px-3 py-1 rounded" on:click={() => goto('/gerenciamento/item')}>
-      <FolderOpenSolid class="h-25 w-25 text-secondary-50 hover:text-secondary-51" />
+      <FolderOpenSolid class="h-25 w-25 text-primary-500 hover:text-primary-200" />
     </button>
     <p class="text-base md:text-lg font-medium text-center text-primary-50">Item</p>
   </div>

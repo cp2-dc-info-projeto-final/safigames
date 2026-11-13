@@ -529,7 +529,7 @@
 
 {#if exibeCards}
   {#if selectedEpisodio}
-    <div id="cenaContainer" class="mx-auto flex h-80 min-h-0 w-full max-w-4xl flex-col items-center gap-4 overflow-y-auto px-4">
+    <div id="cenaContainer" class="mx-auto flex h-80 min-h-0 w-full max-w-4xl flex-col items-center overflow-y-auto px-4">
       {#if selectedCena}
         <section class="w-full max-w-2xl mt-4 p-6 rounded-lg border border-secondary-500 bg-primary-900 text-secondary-500 shadow-lg" aria-labelledby="personagem-title">
           <div class="mb-6">
@@ -560,7 +560,7 @@
         {#if cenas.length > 0}
           <div class="mt-4 grid h-fit w-full max-w-3xl grid-cols-1 gap-3 overflow-y-auto p-1 sm:grid-cols-2 lg:grid-cols-2">
             {#each cenas as cena (cena.id)}
-              <article class="relative min-h-[100px] rounded-lg border border-secondary-500 bg-primary-900 text-secondary-500 shadow-lg">
+              <article class="relative h-50px rounded-lg border border-secondary-500 bg-primary-900 text-secondary-500 shadow-lg">
                 <button
                   type="button"
                   class="flex h-full w-full flex-col justify-between rounded-lg p-3 pr-12 pb-2 text-left transition hover:bg-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary-500"
