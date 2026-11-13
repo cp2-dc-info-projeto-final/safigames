@@ -137,10 +137,12 @@ CREATE TABLE inventario(
     id bigint GENERATED ALWAYS AS IDENTITY,
     id_item INTEGER NOT NULL,
     FOREIGN KEY (id_item)
-        REFERENCES item (id),
+        REFERENCES item (id)
+        ON DELETE CASCADE,
     id_personagem INTEGER NOT NULL,
     FOREIGN KEY (id_personagem)
-        REFERENCES personagem (id),
+        REFERENCES personagem (id)
+        ON DELETE CASCADE,
 
     CONSTRAINT pk_inventario PRIMARY KEY (id)
 );
@@ -169,7 +171,7 @@ INSERT INTO inimigo(nome, vida, dano, descricao, fator_xp, fator_dinheiro)
 VALUES('Rato de Óculos e Barbicha', 30, 6, 'Esse rato fala, diferente de todos os outros. Além disso ele tem uma aparência um tanto quanto familiar...', 6, 12);
 
 INSERT INTO comerciante(nome, descricao)
-VALUES('Stefany da empadinha bem safadinha', 'Ela vende empadas que regeneram sua vida (e é bem safadinha)');
+VALUES('Stefany da empadinha', 'Ela vende empadas que regeneram sua vida.');
 
 INSERT INTO episodio(titulo)
 VALUES('Episódio 1: A RATIFICAÇÃO'),
@@ -210,8 +212,11 @@ VALUES('Jâo, o garoto de programa', 70, 3, 'Guerreiro', 1, 2, 1, 1),
 ('Safizigoto', 70, 3, 'Guerreiro', 2, 1, 1, 1);
 
 INSERT INTO item(nome, descricao, tipo, fator_vida, preco, stamina, fator_dano)
-VALUES('Empadinha safadinha de queijo', 'Deliciosa empadinha de queijo que te dá mais vontade de viver', 'Cura', 24, 5, 2, 0),
+VALUES('Empadinha de queijo', 'Deliciosa empadinha de queijo que te dá mais vontade de viver', 'Cura', 10, 5, 2, 0),
+('Empadinha de frango com requeijão', 'Deliciosa empadinha de frango com requeijão que te dá mais vontade de viver', 'Cura', 15, 5, 2, 0),
+('Empadinha de leite condensado', 'Deliciosa empadinha de leite condensado que te dá MUITA vontade de viver', 'Cura', 20, 5, 2, 0),
 ('Refresco de 1 real do panasco', 'Suco de sabor (???) com gosto de óleo velho. Ao tocar a arma, ela se torna fatal', 'Dano', 0, 1, 1, 5);
+
 
 INSERT INTO inventario(id_item, id_personagem)
 VALUES(1, 1),
@@ -219,4 +224,6 @@ VALUES(1, 1),
 (2, 2);
 
 INSERT INTO catalogo(id_item, id_comerciante)
-VALUES(1, 1);
+VALUES(1, 1),
+(2, 1),
+(3, 1);

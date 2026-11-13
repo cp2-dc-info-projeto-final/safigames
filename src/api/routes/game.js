@@ -69,10 +69,10 @@ router.post('/personagem', verifyToken, async function(req, res) {
     };
 
     if (classe == 'Guerreiro'){
-     personagem = { nome, vida : 80, defesa : 20, xp : 0, stamina : 3, classe, armadura : 'Armadura de Netherite', dinheiro : 1, id_arma : 1, id_cena : 1, id_user}
+     personagem = { nome, vida : 70, defesa : 0, xp : 0, stamina : 3, classe, armadura : 'Armadura de Netherite', dinheiro : 0, id_arma : 1, id_cena : 1, id_user}
     }
     else if (classe == 'Assassino'){
-      personagem = { nome, vida : 70, defesa : 0, xp : 0, stamina : 5, classe, armadura : 'Sem armadura', dinheiro : 42, id_arma : 2, id_cena : 1, id_user}
+      personagem = { nome, vida : 60, defesa : 0, xp : 0, stamina : 5, classe, armadura : 'Sem armadura', dinheiro : 0, id_arma : 2, id_cena : 1, id_user}
     }
     const result = await pool.query(
       'INSERT INTO personagem (nome, vida, defesa, xp, stamina, classe, armadura, dinheiro, id_arma, id_cena, id_usuario) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING nome, vida, defesa, xp, stamina, classe, armadura, dinheiro, id_arma, id_cena',
