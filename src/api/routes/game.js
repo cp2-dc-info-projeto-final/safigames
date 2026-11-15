@@ -68,11 +68,11 @@ router.post('/personagem', verifyToken, async function(req, res) {
       return sendError(res, 400, 'Nome e classe são obrigatórios', errors);
     };
 
-    if (classe == 'Guerreiro'){
-     personagem = { nome, vida : 70, defesa : 0, xp : 0, stamina : 3, classe, armadura : 'Armadura de Netherite', dinheiro : 0, id_arma : 1, id_cena : 1, id_user}
+    if (classe == 'Soldado da Ciência'){
+     personagem = { nome, vida : 50, defesa : 0, xp : 0, stamina : 3, classe, armadura : '', dinheiro : 0, id_arma : 1, id_cena : 1, id_user}
     }
-    else if (classe == 'Assassino'){
-      personagem = { nome, vida : 60, defesa : 0, xp : 0, stamina : 5, classe, armadura : 'Sem armadura', dinheiro : 0, id_arma : 2, id_cena : 1, id_user}
+    else if (classe == 'Repetente'){
+      personagem = { nome, vida : 40, defesa : 0, xp : 0, stamina : 4, classe, armadura : '', dinheiro : 0, id_arma : 2, id_cena : 1, id_user}
     }
     const result = await pool.query(
       'INSERT INTO personagem (nome, vida, defesa, xp, stamina, classe, armadura, dinheiro, id_arma, id_cena, id_usuario) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING nome, vida, defesa, xp, stamina, classe, armadura, dinheiro, id_arma, id_cena',
@@ -331,6 +331,18 @@ router.put('/comerciante/:id', verifyToken, async function(req, res) {
   }
 });
 
+// *GET busca o catalogo do comerciante da cena
+router.get('/catalogo/:id_comerciante', verifyToken, async function(req, res) {
+  try {
+    const { id_comerciante } = req.params;
+    const result = await pool.query('SELECT * FROM item i INNER JOIN catalogo c ON i.id = c.id_item WHERE c.id_comerciante = $1', [id_comerciante]);
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar catalogo:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
 // *GET busca todos os itens
 router.get('/item', verifyToken, async function(req, res) {
   try {
@@ -431,7 +443,7 @@ router.put('/item/:id', verifyToken, async function(req, res) {
 router.get('/inventario/:id_personagem', verifyToken, async function(req, res) {
   try {
     const { id_personagem } =  req.params;
-    const result = await pool.query('SELECT i.nome AS nome_item, i.id, i.descricao, i.tipo, i.fator_vida, i.fator_dano, i.fator_defesa, i.stamina FROM inventario inv INNER JOIN item i ON inv.id_item = i.id WHERE inv.id_personagem = $1', [id_personagem]);
+    const result = await pool.query('SELECT i.id, i.nome, i.descricao, i.tipo, i.fator_vida, i.fator_dano, i.fator_defesa, i.stamina FROM inventario inv INNER JOIN item i ON inv.id_item = i.id WHERE inv.id_personagem = $1', [id_personagem]);
     return sendSuccess(res, 200, null, result.rows);
   } catch (error) {
     console.error('Erro ao buscar itens:', error);

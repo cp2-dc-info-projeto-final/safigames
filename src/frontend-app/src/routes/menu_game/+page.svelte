@@ -218,8 +218,8 @@
   }
 
   const classeOptions = [
-    { value: 'Guerreiro', name: 'Guerreiro' },
-    { value: 'Assassino', name: 'Assassino' }
+    { value: 'Soldado da Ciência', name: 'Soldado da Ciência' },
+    { value: 'Repetente', name: 'Repetente' }
   ];
 
   onMount(async () => {
