@@ -14,15 +14,12 @@
       error = 'Por favor, preencha todos os campos';
       return;
     }
-
     loading = true;
     error = '';
-
     try {
       const result = await authLogin({ login, password });
-      
       if (result.success) {
-        await goto('/');
+        window.location.assign('/')
       } else {
         error = result.message || 'Credenciais inválidas';
       }
@@ -33,69 +30,61 @@
       loading = false;
     }
   }
-
-
 </script>
 
 <style>
-	  :global(body) {
+	:global(body) {
     font-family: 'fonte-topiy';
   }
 </style>
 
 <Menu />
+
 <svelte:head>
   <title>Login - Projeto Safigames</title>
 </svelte:head>
 
 <div class="h-screen flex flex-col items-center justify-center bg-primary-800 p-4">
   <div class="w-full max-w-sm">
-    <h2 class="text-4xl text-center text-3xl font-extrabold text-primary-100 mb-6">
+    <h2 class="text-4xl text-center font-extrabold text-primary-100 mb-6">
       Login
     </h2>
-    
     <Card class="text-lg p-6 w-full bg-primary-900 border-primary-500 text-primary-500">
       <form on:submit|preventDefault={handleLogin} class="space-y-6">
-          <div>
-            <Label for="login" class="text-lg mb-2 text-primary-500">Login</Label>
-            <Input
-              id="login"
-              type="text"
-              bind:value={login}
-              placeholder="Digite seu login"
-              required
-              class="border-primary-900"
-            />
-          </div>
-
-          <div>
-            <Label for="password" class="text-lg mb-2 text-primary-500">Senha</Label>
-            <Input 
-              id="password"
-              type="password"
-              bind:value={password}
-              placeholder="Digite sua senha"
-              required
-              class="border-primary-900"
-            />
-          </div>
-
-          {#if error}
-            <Alert color="red" class="mb-4">
-              {error}
-            </Alert>
-          {/if}
-
-          <Button 
-            type="submit"
-            class="w-full bg-primary-700 hover:bg-primary-200" 
-            disabled={loading}
-          >
+        <div>
+          <Label for="login" class="text-lg mb-2 text-primary-500">Login</Label>
+          <Input
+            id="login"
+            type="text"
+            bind:value={login}
+            placeholder="Digite seu login"
+            required
+            class="border-primary-900"
+          />
+        </div>
+        <div>
+          <Label for="password" class="text-lg mb-2 text-primary-500">Senha</Label>
+          <Input 
+            id="password"
+            type="password"
+            bind:value={password}
+            placeholder="Digite sua senha"
+            required
+            class="border-primary-900"
+          />
+        </div>
+        {#if error}
+          <Alert color="red" class="mb-4">
+            {error}
+          </Alert>
+        {/if}
+        <Button 
+          type="submit"
+          class="w-full bg-primary-700 hover:bg-primary-200" 
+          disabled={loading}>
             {loading ? 'Entrando...' : 'Entrar'}
-          </Button>
-            
-          <a href="/public_user" style="color: var(--color-primary-500); text-decoration: underline;">Cadastre-se</a>
-
+        </Button>
+        <a href="/public_user" style="color: var(--color-primary-500); text-decoration: underline;">Cadastre-se</a>
       </form>
     </Card>
   </div>

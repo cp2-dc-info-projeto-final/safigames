@@ -34,7 +34,7 @@ router.get('/personagem', verifyToken, async function(req, res) {
 router.get('/personagem/:id', verifyToken, isAdmin, async function(req, res) {
   try {
     const { id } = req.params;
-    const result = await pool.query('SELECT * FROM personagem WHERE id = $1 ORDER BY id', [id]);
+    const result = await pool.query('SELECT p.id AS id_personagem, p.nome AS nome_personagem, p.vida, p.defesa, p.xp, p.stamina AS stamina, p.classe, p.armadura, p.dinheiro, p.id_usuario, p.id_arma, p.id_cena, p.id_episodio, a.nome AS nome_arma, a.dano AS dano_arma, a.descricao, a.stamina AS stamina_arma FROM personagem p INNER JOIN arma a ON p.id_arma = a.id WHERE p.id = $1 ORDER BY p.id', [id]);
     return sendSuccess(res, 200, null, result.rows);
   } catch (error) {
     console.error('Erro ao buscar usuários:', error);
@@ -68,11 +68,11 @@ router.post('/personagem', verifyToken, async function(req, res) {
       return sendError(res, 400, 'Nome e classe são obrigatórios', errors);
     };
 
-    if (classe == 'Guerreiro'){
-      personagem = { nome, vida : 80, defesa : 20, xp : 0, stamina : 3, classe, armadura : 'Armadura de Netherite', dinheiro : 1, id_arma : 1, id_cena : 1, id_user}
+    if (classe == 'Soldado da Ciência'){
+     personagem = { nome, vida : 50, defesa : 0, xp : 0, stamina : 3, classe, armadura : '', dinheiro : 0, id_arma : 1, id_cena : 1, id_user}
     }
-    else if (classe == 'Assassino'){
-      personagem = { nome, vida : 70, defesa : 0, xp : 0, stamina : 5, classe, armadura : 'Sem armadura', dinheiro : 42, id_arma : 2, id_cena : 1, id_user}
+    else if (classe == 'Repetente'){
+      personagem = { nome, vida : 40, defesa : 0, xp : 0, stamina : 4, classe, armadura : '', dinheiro : 0, id_arma : 2, id_cena : 1, id_user}
     }
     const result = await pool.query(
       'INSERT INTO personagem (nome, vida, defesa, xp, stamina, classe, armadura, dinheiro, id_arma, id_cena, id_usuario) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING nome, vida, defesa, xp, stamina, classe, armadura, dinheiro, id_arma, id_cena',
@@ -331,6 +331,18 @@ router.put('/comerciante/:id', verifyToken, isAdmin, async function(req, res) {
   }
 });
 
+// *GET busca o catalogo do comerciante da cena
+router.get('/catalogo/:id_comerciante', verifyToken, async function(req, res) {
+  try {
+    const { id_comerciante } = req.params;
+    const result = await pool.query('SELECT * FROM item i INNER JOIN catalogo c ON i.id = c.id_item WHERE c.id_comerciante = $1', [id_comerciante]);
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar catalogo:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
 // *GET busca todos os itens
 router.get('/item', verifyToken, isAdmin, async function(req, res) {
   try {
@@ -427,7 +439,165 @@ router.put('/item/:id', verifyToken, isAdmin, async function(req, res) {
   }
 });
 
-// Unificar CRUD de episodio com cena e for para dar insert em cenas
-// Unificar CRUD de comerciante e catálogo na mesma tela com select
+// *GET busca inventário do personagem
+router.get('/inventario/:id_personagem', verifyToken, async function(req, res) {
+  try {
+    const { id_personagem } =  req.params;
+    const result = await pool.query('SELECT i.id, i.nome, i.descricao, i.tipo, i.fator_vida, i.fator_dano, i.fator_defesa, i.stamina FROM inventario inv INNER JOIN item i ON inv.id_item = i.id WHERE inv.id_personagem = $1', [id_personagem]);
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar itens:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+// GET inimigo com base na cena
+router.get('/inimigo/:idCena', verifyToken, async function(req, res) {
+  const { idCena } = req.params;
+  try {
+    const result = await pool.query('SELECT * FROM inimigo i INNER JOIN cena c ON i.id = c.id_inimigo WHERE c.id = $1', [idCena]);
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar inimigo:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+// GET inimigo 
+router.get('/inimigo', verifyToken, async function(req, res) {
+  try {
+    const result = await pool.query('SELECT * FROM inimigo', []);
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar inimigo:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+// *GET busca cenas com filtro por id do episodio
+router.get('/cena/:idEpisodio', verifyToken, async function(req, res) {
+  const { idEpisodio } = req.params;
+  try {
+    const result = await pool.query('SELECT * FROM cena WHERE id_episodio = $1', [idEpisodio]);
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar cenas:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+// *GET busca progresso do personagem
+router.get(`/progresso/:idEpisodio`, verifyToken, async function(req, res) {
+  try {
+    const { idEpisodio } = req.params;
+    const result = await pool.query('SELECT e.id AS episodio_id, e.titulo AS episodio_titulo, c.id AS cena_id, c.npc, c.dialogo, c.tipo, c.id_inimigo, c.id_comerciante FROM episodio e INNER JOIN cena c ON e.id = c.id_episodio  WHERE e.id = $1;', [idEpisodio]);
+    return sendSuccess(res, 200, null, result.rows);
+  } catch (error) {
+    console.error('Erro ao buscar progresso:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+// *POST criar cena
+router.post('/cena/:id', verifyToken, async function(req, res) {
+  try {
+    const idEpisodio = req.params.id;
+    const { npc, dialogo, tipo, id_inimigo, id_comerciante } = req.body;
+    const errors = [];
+
+    // Validação do tipo da cena
+    if (!tipo){
+      errors.push({ field: 'tipo', message: 'Tipo é obrigatório', code: 'REQUIRED' });
+      return sendError(res, 400, 'Tipo é obrigatório', errors);
+    }
+    else if (tipo == "combate" && !id_inimigo){
+      errors.push({ field: 'inimigo', message: 'Inimigo é obrigatório em cena de combate', code: 'REQUIRED' });
+      return sendError(res, 400, 'Inimigo é obrigatório', errors);
+    }
+    else if (tipo == "dialogo" && (!npc || !dialogo)){
+      if (!npc) {errors.push({ field: 'npc', message: 'NPC é obrigatório', code: 'REQUIRED' })};
+      if (!dialogo) {errors.push({ field: 'dialogo', message: 'Diálogo é obrigatório', code: 'REQUIRED' })};
+      return sendError(res, 400, 'NPC e diálogo são obrigatórios', errors);
+    }
+    else if (tipo == "comercio" && (!id_comerciante || !dialogo)){
+      if (!id_comerciante) {errors.push({ field: 'comerciante', message: 'Comerciante é obrigatório', code: 'REQUIRED' })};
+      if (!dialogo) {errors.push({ field: 'dialogo', message: 'Diálogo é obrigatório', code: 'REQUIRED' })};
+      return sendError(res, 400, 'Comerciante e diálogo são obrigatórios', errors);
+    }
+    
+    if (tipo == "dialogo"){
+      const result = await pool.query(
+        'INSERT INTO cena (tipo, npc, dialogo, id_episodio) VALUES ($1, $2, $3, $4) RETURNING tipo, npc, dialogo, id_episodio',
+        [tipo, npc, dialogo, idEpisodio]
+      );
+      return sendSuccess(res, 201, 'Item criado com sucesso', result.rows[0]);
+    }
+    else if (tipo == "combate"){
+      const result = await pool.query(
+        'INSERT INTO cena (tipo, id_inimigo, id_episodio) VALUES ($1, $2, $3) RETURNING tipo, id_inimigo, id_episodio',
+        [tipo, id_inimigo, idEpisodio]
+      );
+      return sendSuccess(res, 201, 'Item criado com sucesso', result.rows[0]);
+    }
+    else if (tipo == "comercio"){
+      const result = await pool.query(
+        'INSERT INTO cena (tipo, dialogo, id_comerciante, id_episodio) VALUES ($1, $2, $3, $4) RETURNING tipo, dialogo, id_comerciante, id_episodio',
+        [tipo, dialogo, id_comerciante, idEpisodio]
+      );
+      return sendSuccess(res, 201, 'Item criado com sucesso', result.rows[0]);
+    }
+  } catch (error) {
+    console.error('Erro ao criar item:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+/* DELETE - Remover cena */
+router.delete('/cena/:id', verifyToken, async function(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (id == 1){
+      return sendError(res, 400, 'Não é possível deletar a cena inicial');
+    }
+
+    // Verificar se o episódio existe
+    const cenaExists = await pool.query('SELECT id FROM cena WHERE id = $1', [id]);
+    if (cenaExists.rows.length === 0) {
+      return sendError(res, 404, 'Episódio não encontrado');
+    }
+    
+    await pool.query('DELETE FROM cena WHERE id = $1', [id]);
+    
+    return sendSuccess(res, 200, 'Episódio deletado com sucesso');
+  } catch (error) {
+    console.error('Erro ao deletar cena:', error);
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
+// *PUT salvar progresso
+router.put('/progresso/:id', verifyToken, async function(req, res) {
+  try {
+    const { id }  = req.params;
+    const { idCena, novaVida, novoDinheiro, novoXP }  = req.body;
+    console.log(idCena)
+    
+    let query, params;
+    query = 'UPDATE personagem SET id_cena = $1, vida = $2, dinheiro = $3, xp = $4 WHERE id = $5 RETURNING id, id_cena, vida, dinheiro, xp';
+    params = [idCena, novaVida, novoDinheiro, novoXP, id ];
+    
+    const result = await pool.query(query, params);
+    
+    return sendSuccess(res, 200, 'Progresso salvo com sucesso', result.rows[0]);
+  } catch (error) {
+    console.error('Erro ao salvar progresso:', error);
+    // Verificar se é erro de constraint
+    if (error.code === '23514') {
+      return sendError(res, 400, 'Dados inválidos. Verifique os campos e tente novamente.');
+    }
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
 
 module.exports = router;

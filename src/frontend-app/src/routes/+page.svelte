@@ -1,25 +1,80 @@
 <script lang="ts">
   import { Heading } from 'flowbite-svelte';
   import Menu from '../components/Menu.svelte';
-  import {  P } from "flowbite-svelte";
+  import { P } from "flowbite-svelte";
+  import { onMount } from 'svelte';
+  import { getCurrentUser, getToken, type User } from '$lib/auth';
+
+  let isAdmin = $state(false);
+
+  let user: User | null = null;
+  let hasToken = false;
+  let loadingUser = false;
+  let authRequestId = 0;
+
+  onMount(async () => {
+	hasToken = getToken() !== null;
+
+    if (!hasToken) {
+      user = null;
+      loadingUser = false;
+      return;
+    }
+
+    if (user || loadingUser) {
+      return;
+    }
+
+    loadingUser = true;
+    const requestId = ++authRequestId;
+
+    try {
+      const userData = await getCurrentUser();
+      isAdmin = userData?.role === 'admin';
+      if (requestId !== authRequestId) {
+        return;
+      }
+      user = userData;
+      hasToken = userData !== null;
+    } catch {
+      if (requestId !== authRequestId) {
+        return;
+      }
+      user = null;
+      hasToken = false;
+    } finally {
+      if (requestId === authRequestId) {
+        loadingUser = false;
+      }
+    }
+  });
 </script>
+
 <style>
-	  :global(body) {
-    font-family: 'fonte-topiy';
-  }
+	:global(body) {
+  font-family: 'fonte-topiy';
+	}
 </style>
+
 <Menu />
 
 <svelte:head>
   <title>Projeto Safigames</title>
 </svelte:head>
 
-<div class="text-center p-8 pt-32">
-	<Heading tag="h2" class="text-4xl font-extrabold tracking-tight text-primary-200 dark:text-white mb-6">Esgotamento: Um projeto Safigames</Heading>
-	<P class="text-xl leading-relaxed text-primary-50 dark:text-primary-100 mb-4 text-justify">
-		Somos do Colégio Pedro II - Campus Duque de Caxias do terceiro ano do curso desenvolvimento de sistemas. 
-		Como projeto final, estamos desenvolvendo um jogo estilo RPG de texto. O jogo será baseado em botões para interagir com o mundo.
-		O jogo será dividido em episódios, e haverá ilustração no formato ASCII.
-	</P>
-	<img src='../images/ilustracao-de-exemplo.png' alt="Ilustração de exemplo">
-</div>
+<main class={['flex flex-col items-center justify-center min-h-screen w-full', !isAdmin ? 'bg-primary-800' : 'bg-secondary-800'].join(' ')}>
+	<div class="text-center p-3 md:p-8 pt-4 md:pt-32">
+		<Heading
+			tag="h2"
+			class={['text-3xl md:text-4xl font-extrabold tracking-tight mb-6', !isAdmin ? 'text-primary-200' : 'text-secondary-200'].join(' ')}>
+			Esgotamento: Um projeto Safigames
+		</Heading>
+		<P class="text-base md:text-xl leading-relaxed text-primary-50 mb-4 text-justify">
+			Somos do Colégio Pedro II - Campus Duque de Caxias do terceiro ano do curso desenvolvimento de sistemas. 
+			Como projeto final, estamos desenvolvendo um jogo estilo RPG de texto. O jogo será baseado em botões para interagir com o mundo.
+			O jogo será dividido em episódios, e haverá ilustração no formato ASCII.
+		</P>
+		<img src='../images/print_ESGOTAMENTO.png' alt="Ilustração de exemplo do nosso jogo" class="hidden md:flex">
+    <img src='../images/print_ESGOTAMENTO_celular.png' alt="Ilustração de exemplo do nosso jogo" class="md:hidden flex h-110">
+	</div>
+</main>
