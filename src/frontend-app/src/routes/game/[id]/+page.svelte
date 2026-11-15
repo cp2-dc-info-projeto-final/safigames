@@ -86,8 +86,8 @@
     try{
       const res = await api.get(`/game/personagem/${idPersonagem}`);
       const body = res.data as ApiResponse<Personagem[]>;
-
       if (body.success) {
+        console.log(idPersonagem)
         const personagens = body.data;
 
         if (Array.isArray(personagens) && personagens.length > 0) {

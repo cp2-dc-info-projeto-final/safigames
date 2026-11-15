@@ -31,10 +31,10 @@ router.get('/personagem', verifyToken, async function(req, res) {
 });
 
 // Busca personagens por id
-router.get('/personagem/:id', verifyToken, isAdmin, async function(req, res) {
+router.get('/personagem/:idPersonagem', verifyToken, async function(req, res) {
   try {
-    const { id } = req.params;
-    const result = await pool.query('SELECT p.id AS id_personagem, p.nome AS nome_personagem, p.vida, p.defesa, p.xp, p.stamina AS stamina, p.classe, p.armadura, p.dinheiro, p.id_usuario, p.id_arma, p.id_cena, p.id_episodio, a.nome AS nome_arma, a.dano AS dano_arma, a.descricao, a.stamina AS stamina_arma FROM personagem p INNER JOIN arma a ON p.id_arma = a.id WHERE p.id = $1 ORDER BY p.id', [id]);
+    const { idPersonagem } = req.params;
+    const result = await pool.query('SELECT p.id AS id_personagem, p.nome AS nome_personagem, p.vida, p.defesa, p.xp, p.stamina AS stamina, p.classe, p.armadura, p.dinheiro, p.id_usuario, p.id_arma, p.id_cena, p.id_episodio, a.nome AS nome_arma, a.dano AS dano_arma, a.descricao, a.stamina AS stamina_arma FROM personagem p INNER JOIN arma a ON p.id_arma = a.id WHERE p.id = $1 ORDER BY p.id', [idPersonagem]);
     return sendSuccess(res, 200, null, result.rows);
   } catch (error) {
     console.error('Erro ao buscar usuários:', error);
@@ -490,6 +490,7 @@ router.get('/cena/:idEpisodio', verifyToken, async function(req, res) {
 router.get(`/progresso/:idEpisodio`, verifyToken, async function(req, res) {
   try {
     const { idEpisodio } = req.params;
+    console
     const result = await pool.query('SELECT e.id AS episodio_id, e.titulo AS episodio_titulo, c.id AS cena_id, c.npc, c.dialogo, c.tipo, c.id_inimigo, c.id_comerciante FROM episodio e INNER JOIN cena c ON e.id = c.id_episodio  WHERE e.id = $1;', [idEpisodio]);
     return sendSuccess(res, 200, null, result.rows);
   } catch (error) {
