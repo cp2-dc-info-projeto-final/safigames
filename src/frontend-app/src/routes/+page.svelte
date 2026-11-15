@@ -74,6 +74,7 @@
 			Como projeto final, estamos desenvolvendo um jogo estilo RPG de texto. O jogo será baseado em botões para interagir com o mundo.
 			O jogo será dividido em episódios, e haverá ilustração no formato ASCII.
 		</P>
-		<img src='../images/ilustracao-de-exemplo.png' alt="Ilustração de exemplo">
+		<img src='../images/print_ESGOTAMENTO.png' alt="Ilustração de exemplo do nosso jogo" class="hidden md:flex">
+    <img src='../images/print_ESGOTAMENTO_celular.png' alt="Ilustração de exemplo do nosso jogo" class="md:hidden flex h-110">
 	</div>
 </main>
