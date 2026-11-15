@@ -576,5 +576,29 @@ router.delete('/cena/:id', verifyToken, async function(req, res) {
   }
 });
 
+// *PUT salvar progresso
+router.put('/progresso/:id', verifyToken, async function(req, res) {
+  try {
+    const { id }  = req.params;
+    const { idCena }  = req.body;
+    console.log(idCena)
+    
+    let query, params;
+    query = 'UPDATE personagem SET id_cena = $1 WHERE id = $2 RETURNING id, id_cena';
+    params = [idCena, id];
+    
+    const result = await pool.query(query, params);
+    
+    return sendSuccess(res, 200, 'Progresso salvo com sucesso', result.rows[0]);
+  } catch (error) {
+    console.error('Erro ao salvar progresso:', error);
+    // Verificar se é erro de constraint
+    if (error.code === '23514') {
+      return sendError(res, 400, 'Dados inválidos. Verifique os campos e tente novamente.');
+    }
+    return sendError(res, 500, 'Erro interno do servidor');
+  }
+});
+
 
 module.exports = router;
