@@ -31,7 +31,7 @@ router.get('/personagem', verifyToken, async function(req, res) {
 });
 
 // Busca personagens por id
-router.get('/personagem/:id', verifyToken, async function(req, res) {
+router.get('/personagem/:id', verifyToken, isAdmin, async function(req, res) {
   try {
     const { id } = req.params;
     const result = await pool.query('SELECT p.id AS id_personagem, p.nome AS nome_personagem, p.vida, p.defesa, p.xp, p.stamina AS stamina, p.classe, p.armadura, p.dinheiro, p.id_usuario, p.id_arma, p.id_cena, p.id_episodio, a.nome AS nome_arma, a.dano AS dano_arma, a.descricao, a.stamina AS stamina_arma FROM personagem p INNER JOIN arma a ON p.id_arma = a.id WHERE p.id = $1 ORDER BY p.id', [id]);
@@ -43,7 +43,7 @@ router.get('/personagem/:id', verifyToken, async function(req, res) {
 });
 
 // Busca todos os personagens
-router.get('/personagemsemid', verifyToken, async function(req, res) {
+router.get('/personagemsemid', verifyToken, isAdmin, async function(req, res) {
   try {
     const result = await pool.query('SELECT * FROM personagem');
     return sendSuccess(res, 200, null, result.rows);
@@ -142,7 +142,7 @@ router.put('/personagem/:id', verifyToken, async function(req, res) {
   }
 });
 
-router.post('/episodio', verifyToken, async function(req, res) {
+router.post('/episodio', verifyToken, isAdmin, async function(req, res) {
   try {
     const { titulo } = req.body;
 
@@ -166,7 +166,7 @@ router.post('/episodio', verifyToken, async function(req, res) {
 });
 
 /* Busca todos os episodios */
-router.get('/episodio', verifyToken, async function(req, res) {
+router.get('/episodio', verifyToken, isAdmin, async function(req, res) {
   try {
     const result = await pool.query('SELECT * FROM episodio');
     return sendSuccess(res, 200, null, result.rows);
@@ -177,7 +177,7 @@ router.get('/episodio', verifyToken, async function(req, res) {
 });
 
 /* DELETE - Remover episodio */
-router.delete('/episodio/:id', verifyToken, async function(req, res) {
+router.delete('/episodio/:id', verifyToken, isAdmin, async function(req, res) {
   try {
     const { id } = req.params;
 
@@ -202,7 +202,7 @@ router.delete('/episodio/:id', verifyToken, async function(req, res) {
 });
 
 /* PUT - Editar título do episódio*/
-router.put('/episodio/:id', verifyToken, async function(req, res) {
+router.put('/episodio/:id', verifyToken, isAdmin, async function(req, res) {
   try {
     const { id }  = req.params;
     const { titulo }  = req.body;
@@ -239,7 +239,7 @@ router.put('/episodio/:id', verifyToken, async function(req, res) {
 });
 
 // *GET busca todos os comerciantes
-router.get('/comerciante', verifyToken, async function(req, res) {
+router.get('/comerciante', verifyToken, isAdmin, async function(req, res) {
   try {
     const result = await pool.query('SELECT * FROM comerciante');
     return sendSuccess(res, 200, null, result.rows);
@@ -250,7 +250,7 @@ router.get('/comerciante', verifyToken, async function(req, res) {
 });
 
 // *POST criar comerciante
-router.post('/comerciante', verifyToken, async function(req, res) {
+router.post('/comerciante', verifyToken, isAdmin, async function(req, res) {
   try {
     const { nome, descricao } = req.body;
 
@@ -275,7 +275,7 @@ router.post('/comerciante', verifyToken, async function(req, res) {
 });
 
 // *DELETE excluir comerciante
-router.delete('/comerciante/:id', verifyToken, async function(req, res) {
+router.delete('/comerciante/:id', verifyToken, isAdmin, async function(req, res) {
   try {
     const { id } = req.params;
 
@@ -295,7 +295,7 @@ router.delete('/comerciante/:id', verifyToken, async function(req, res) {
 });
 
 // *PUT editar comerciante
-router.put('/comerciante/:id', verifyToken, async function(req, res) {
+router.put('/comerciante/:id', verifyToken, isAdmin, async function(req, res) {
   try {
     const { id }  = req.params;
     const { nome, descricao }  = req.body;
@@ -344,7 +344,7 @@ router.get('/catalogo/:id_comerciante', verifyToken, async function(req, res) {
 });
 
 // *GET busca todos os itens
-router.get('/item', verifyToken, async function(req, res) {
+router.get('/item', verifyToken, isAdmin, async function(req, res) {
   try {
     const result = await pool.query('SELECT * FROM item');
     return sendSuccess(res, 200, null, result.rows);
@@ -355,7 +355,7 @@ router.get('/item', verifyToken, async function(req, res) {
 });
 
 // *POST criar item
-router.post('/item', verifyToken, async function(req, res) {
+router.post('/item', verifyToken, isAdmin, async function(req, res) {
   try {
     const { nome, descricao, tipo, fator_vida, fator_dano, fator_defesa, preco } = req.body;
 
@@ -384,7 +384,7 @@ router.post('/item', verifyToken, async function(req, res) {
 });
 
 // *DELETE excluir item
-router.delete('/item/:id', verifyToken, async function(req, res) {
+router.delete('/item/:id', verifyToken, isAdmin, async function(req, res) {
   try {
     const { id } = req.params;
 
@@ -404,7 +404,7 @@ router.delete('/item/:id', verifyToken, async function(req, res) {
 });
 
 // *PUT editar item
-router.put('/item/:id', verifyToken, async function(req, res) {
+router.put('/item/:id', verifyToken, isAdmin, async function(req, res) {
   try {
     const { id }  = req.params;
     const { nome, descricao, tipo, fator_vida, fator_dano, fator_defesa, preco } = req.body;
@@ -599,6 +599,5 @@ router.put('/progresso/:id', verifyToken, async function(req, res) {
     return sendError(res, 500, 'Erro interno do servidor');
   }
 });
-
 
 module.exports = router;
