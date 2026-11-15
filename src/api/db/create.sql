@@ -168,14 +168,15 @@ INSERT INTO usuario (login, email, senha, role) VALUES
 ('jao', 'jao@gmail.com', '$2a$12$AuHwdJEcFAggJX4Hi5DGquFShw2w7Z5a6TUqki12GprmU/9G/5ZWq', 'jogador');
 
 INSERT INTO inimigo(nome, vida, dano, descricao, fator_xp, fator_dinheiro)
-VALUES('Rato de Óculos e Barbicha', 30, 6, 'Esse rato fala, diferente de todos os outros. Além disso ele tem uma aparência um tanto quanto familiar...', 6, 12);
+VALUES('Rato de Óculos e Barbicha', 30, 6, 'Esse rato fala, diferente de todos os outros. Além disso ele tem uma aparência um tanto quanto familiar...', 6, 12),
+('Barata de Iphone', 40, 8, 'Não se deixe enganar pelo tamanho, essa barata consegue causar sérios danos (psicológicos). O fato dela ter um Iphone te deixa intrigado...', 2, 30);
 
 INSERT INTO comerciante(nome, descricao)
 VALUES('Stefany da empadinha', 'Ela vende empadas que regeneram sua vida.');
 
 INSERT INTO episodio(titulo)
 VALUES('Episódio 1: A RATIFICAÇÃO'),
-('Episódio 2: O DESPERTAR DO GORDINHO');
+('Episódio 2: A INVESTIGAÇÃO');
 
 INSERT INTO cena(npc, dialogo, tipo, id_episodio, id_inimigo, id_comerciante)
 VALUES('Narrador', 'Narrador: Você é a amizade mais confiável de Daniel, ele está desaparecido e sua missão é encontrá-lo. Há boatos que ele foi visto pela última vez entrando em um bueiro na frente do Colégio Pedro II - Campus Duque de Caxias. Você inicia sua jornada numa rede de esgotos, desconfiando se ele está lá mesmo. 
@@ -199,17 +200,76 @@ Rato de óculos e barbicha: Mano, a pessoa invade o meu espaço pessoal e ainda 
 
 Você: Foi você que avançou em mim doidão! Mas ai, na moral agora, você por acaso viu um menino branco, loiro, com cara de nerd por aí?
 
-Rato de óculos e barbicha: Menino? Nem tem gente aqui. Eu vou é meter minha pata, tu é um doido falando com um rato.
+Rato de óculos e barbicha: Menino? Nunca vi gente aqui. Eu vou é meter minha pata, tu é um doido falando com um rato.
 
-Narrador: O rato entra em um dos buracos na parede, perto do chão e você segue em frente pelos dutos escuros, fedidos e ecoantes.', 'Diálogo', 1, NULL, NULL);
+Narrador: O rato entra em um dos buracos na parede, perto do chão e você segue em frente pelos dutos escuros, fedidos e ecoantes.', 'Diálogo', 1, NULL, NULL),
+
+('', 'Você: Pera aí... Eu te conheço!
+
+Stefany: Depois de sair do Pedro II, precisei expandir meus horizontes! Pior que aqui nem tem muita clientela...
+
+Você: Ainda tem empadinha? Lembro de ouvir dizer que eram bem safa-
+
+Stefany: TENHO EMPADA DE TODOS OS SABORES!!!! Na verdade, são só três mesmo, e só tenho uma de cada', 'comercio', 1, NULL, 1),
+
+('Stefany, Barata de Iphone, Narrador', 'Stefany: Foi bom te ver! Agora vou sair desse esgoto esquisito e procurar outro lugar para minhas vendas.
+
+Você: Antes de ir, deixa eu te perguntar uma coisa, você viu o Daniel por aí?
+
+Stefany: O namorado da Fernanda? Não vi não... Por que ele estaria aqui???
+
+Você: Por que qualquer um estaria aqui nesse lugar fedido??? De qualquer forma, obrigado pela ajuda, e boas vendas!
+
+Narrador: Você segue seu caminho e ouve alguém falar, mas não vê ninguém.
+
+???: EI! AQUI EMBAIXO!
+
+Narrador: Você olha para baixo muito confuso e vê uma barata segurando um Iphone, o que te deixa mais confuso ainda.
+
+Barata de Iphone: QUEM É VOCÊ?? 
+
+Você: UMA BARATA QUE FALA????? SEGURANDO UM IPHONE?? 
+
+Narrador: Você odeia baratas. E essa em particular te irrita mais ainda. Sua voz te causa danos. Você se prepara para atacar.', 'Diálogo', 1, NULL, NULL),
+
+('', '', 'Combate', 1, 2, NULL),
+
+('Barata de Iphone, Narrador', 'Barata de Iphone: NÃOOOO, VOCÊ DERRUBOU MEU IPHONE!!! VOCÊ TEM NOÇÃO DE QUANTO É PRA TROCAR ESSA TELA?? MEU IPHONE COMPRA SUA CASA, POBRE!
+
+Você: SEI! Eu sou DS!
+
+Barata de Iphone: AH, ENTÃO POR ISSO VOCÊ TÁ NO ESGOTO NÉ? TA FAMILIARIZADO COM ESSE FUTUM, SEU NOJENTO!
+
+Você: Eu acabei de ser chamado de nojento por uma BARATA! Inclusive, todos os animais aqui dentro falam?? Pelo amor de Deus...
+
+Barata de Iphone: ÓBVIO NÉ! TODOS OS ANIMAIS DAQUI VIERAM PRA CÁ PORQUE- PERA, EU NÃO DEVIA TA TE FALANDO ISSO, VOCÊ É DS.
+
+Você: (Cara, que irritante...)
+
+Narrador: Você vai embora e deixa ela falando sozinha.
+
+Barata de Iphone: EI, VOLTA AQUI!! MAL-EDUCADO!
+
+Você: (Calma, como assim "óbvio"?)
+
+FIM DO EPISÓDIO', 'Diálogo', 1, NULL, NULL),
+
+('Narrador', 'Narrador: Você chega ao final do túnel e só há um caminho: a esquerda. Você vira e se depara com uma cena um tanto quanto peculiar...
+
+Você: (Meu Deus, o que é isso??? Onde eu fui me meter?? O que eu faço com essa visão???)
+
+Narrador: O que você vê é surreal, há um rato gordo, uma barata alta e uma outra barata que se parece com um rato, reunidos ao redor de uma pedra, o que parece ser um jantar em família (?)
+
+Você: (Bizarro... Mas acho que dessa vez vou tentar pergutar antes de bater. Eles parecem pacíficos.)', 'Diálogo', 2, NULL, NULL);
+
 
 INSERT INTO arma(nome, dano, descricao, stamina)
-VALUES('Espada de esmeralda', 10, 'Os aldeões adoram', 2),
-('Adaga de obsidiana', 5, 'Corta até átomos', 1);
+VALUES('Inteligência', 15, 'Bom, no hino do CP2 diz "O livro é nosso escudo e a arma a inteligência".', 2),
+('PFV', 5, 'Única saída de quem ficou com a média baixa', 1);
 
 INSERT INTO personagem(nome, vida, stamina, classe, id_usuario, id_cena, id_episodio, id_arma)
-VALUES('Jâo, o garoto de programa', 70, 3, 'Guerreiro', 1, 2, 1, 1),
-('Safizigoto', 70, 3, 'Guerreiro', 2, 1, 1, 1);
+VALUES('Jâo, o garoto de programa', 50, 3, 'Soldado da Ciência', 1, 2, 1, 1),
+('Safizigoto', 50, 3, 'Soldado da Ciência', 2, 1, 1, 1);
 
 INSERT INTO item(nome, descricao, tipo, fator_vida, preco, stamina, fator_dano)
 VALUES('Empadinha de queijo', 'Deliciosa empadinha de queijo que te dá mais vontade de viver', 'Cura', 10, 5, 2, 0),
@@ -220,8 +280,7 @@ VALUES('Empadinha de queijo', 'Deliciosa empadinha de queijo que te dá mais von
 
 INSERT INTO inventario(id_item, id_personagem)
 VALUES(1, 1),
-(1, 2),
-(2, 2);
+(4, 2);
 
 INSERT INTO catalogo(id_item, id_comerciante)
 VALUES(1, 1),
