@@ -580,12 +580,12 @@ router.delete('/cena/:id', verifyToken, async function(req, res) {
 router.put('/progresso/:id', verifyToken, async function(req, res) {
   try {
     const { id }  = req.params;
-    const { idCena }  = req.body;
+    const { idCena, novaVida, novoDinheiro, novoXP }  = req.body;
     console.log(idCena)
     
     let query, params;
-    query = 'UPDATE personagem SET id_cena = $1 WHERE id = $2 RETURNING id, id_cena';
-    params = [idCena, id];
+    query = 'UPDATE personagem SET id_cena = $1, vida = $2, dinheiro = $3, xp = $4 WHERE id = $5 RETURNING id, id_cena, vida, dinheiro, xp';
+    params = [idCena, novaVida, novoDinheiro, novoXP, id ];
     
     const result = await pool.query(query, params);
     

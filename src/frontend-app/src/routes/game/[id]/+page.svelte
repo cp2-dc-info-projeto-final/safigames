@@ -137,7 +137,10 @@
   async function salvarProgresso(idCena: number){
     try {
       const id: number = personagem.id_personagem;
-      const res = await api.put(`/game/progresso/${id}`, { idCena });
+      const novaVida = personagem.vida;
+      const novoDinheiro = personagem.dinheiro;
+      const novoXP = personagem.xp;
+      const res = await api.put(`/game/progresso/${id}`, { idCena, novaVida, novoDinheiro, novoXP });
       const body = res.data as ApiResponse<Personagem>;
       if (!body.success) {
         error = body.message ?? 'Erro ao salvar progresso.';
@@ -224,7 +227,7 @@
   function proximaCena() {
     if (cenaAtual && cenaAtual.tipo == "Combate" && !inimigoMorto) return;
     if (indiceCena == progresso.length - 1) return;
-    if (indiceCena < progresso.length - 1 && cenaAtual.tipo == "Diálogo" || (inimigoAtual && inimigoAtual.vida == 0)) {
+    if (indiceCena < progresso.length - 1 && cenaAtual.tipo == "Diálogo" || (inimigoAtual && inimigoAtual.vida == 0) || cenaAtual.tipo == "comercio") {
         indiceCena++;
         statusItem = false;
         logCombate = '';
